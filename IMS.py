@@ -7,10 +7,11 @@ The Solid Principles - Ricardo Olazabal, Victor Boyd, Michael Warner
 import sqlite3
 from typing import Optional
 import uuid
+import decimal
 
 # ------------------------- FUNCTIONS ---------------------------
 
-# Generate UUID given an optional input.
+# Generate UUID given an optional input. Note that UUID retrurns strings
 def gen_uuid(s: Optional[str] = None) -> str:
     if s:
         try:
@@ -19,3 +20,70 @@ def gen_uuid(s: Optional[str] = None) -> str:
             raise ValueError(f"Invalid UUID provided: {s}")
     #Auto generate UUID if not provided input
     return str(uuid.uuid4())
+
+
+
+# -------------------------- DATABASE --------------------------
+# Database using sqlite library
+def init_database(connection: sqlite3.Connection):
+    c = connection.cursor()
+    c.execute("PRAGMA foreign_keys = ON;") # This line turns on foreign key constraints
+    
+    # TABLES: Products, Suppliers, Categories, Images - in order
+    c.executescript(""" 
+    CREATE TABLE IF NOT EXISTS products (
+        product_id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        quantity INTEGER NOT NULL CHECK(quantity >= 0),
+        price TEXT NOT NULL  -- NOTE: doesn't allow decimal, need function to check value there I think
+    );
+
+    CREATE TABLE IF NOT EXISTS suppliers (
+        supplier_id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        contact_email TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS categories (
+        category_id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS images (
+        image_id TEXT PRIMARY KEY,
+        product_id TEXT NOT NULL,
+        url TEXT NOT NULL,
+        FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE
+    );
+
+    ----------- JOIN TABLES (not added yet but we need one for product suppliers and product categories I think??) ------------
+                    
+                    
+    CREATE TABLE IF NOT EXISTS product_suppliers (
+
+    );
+
+    CREATE TABLE IF NOT EXISTS product_categories (
+                    
+    );
+    """)
+    connection.commit()
+
+
+# -------------------- CRUD Operations --------------------
+
+# All record types should allow CRUD operations:
+#   Create record, which generates a UUID if not provided and returns this ID; 
+#   Read record, requiring the record ID; 
+#   Update, also requiring the ID to modify attributes;
+#   Delete, which requires the ID to remove the entity.
+
+# PRODUCT CREATE: UUID, Name, Description, Quantity, Price, 
+def product_create(conn: sqlite3.Connection, name: str, description: Optional[str], quantity: int, price: str, product_id: Optional[str]=None) -> str:
+    pid = gen_uuid(product_id)
+
+    conn.execute("") #sql code to be added here once other functions done
+    conn.commit()
+    return pid
