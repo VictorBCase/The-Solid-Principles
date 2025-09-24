@@ -61,13 +61,9 @@ def init_database(connection: sqlite3.Connection):
     ----------- JOIN TABLES (not added yet but we need one for product suppliers and product categories I think??) ------------
                     
                     
-    CREATE TABLE IF NOT EXISTS product_suppliers (
 
-    );
 
-    CREATE TABLE IF NOT EXISTS product_categories (
-                    
-    );
+
     """)
     connection.commit()
 
@@ -80,10 +76,28 @@ def init_database(connection: sqlite3.Connection):
 #   Update, also requiring the ID to modify attributes;
 #   Delete, which requires the ID to remove the entity.
 
-# PRODUCT CREATE: UUID, Name, Description, Quantity, Price, 
+
+# PRODUCT CREATE: UUID, Name, Description, Quantity, Price 
 def product_create(conn: sqlite3.Connection, name: str, description: Optional[str], quantity: int, price: str, product_id: Optional[str]=None) -> str:
     pid = gen_uuid(product_id)
 
     conn.execute("") #sql code to be added here once other functions done
     conn.commit()
     return pid
+
+# SUPPLIER CREATE: UUID, Name, Contact
+def supplier_create(conn: sqlite3.Connection, name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
+    sid = gen_uuid(supplier_id)
+   
+    conn.execute("") #sql code to be added here once other functions done
+    conn.commit()
+    return sid
+
+
+# CATEGORY CREATE: UUID, Name, Description
+def category_create(conn: sqlite3.Connection, name: str, description: Optional[str], category_id: Optional[str]=None) -> str:
+    cid = gen_uuid(category_id)
+   
+    conn.execute("") #sql code to be added here once other functions done
+    conn.commit()
+    return cid
