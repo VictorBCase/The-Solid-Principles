@@ -8,17 +8,15 @@ import sqlite3
 from typing import Optional
 import uuid
 
-# QUERIES
-
-create_prod_table = "CREATE TABLE products(pID, name, description, quantity, price)";
-create_cat_table = "CREATE TABLE categories(cID, name, description)";
-create_sup_table = "CREATE TABLE suppliers(sID, name, contact)";
-create_img_table = "CREATE TABLE images(iID, pID, url)";
-create_catProd_table = "CREATE TABLE categoryProducts(cID, pID)";
-create_supProd_table = "CREATE TABLE supplierProducts(sID, pID)";
-
 # queries -> i think its best to define them up here
-
+add_product = """INSERT INTO products(product_id, name, description, quantity, price)
+                 VALUES(?, ?, ?, ?, ?)"""
+add_supplier = """INSERT INTO suppliers(supplier_id, name, contact_email)
+                 VALUES(?, ?, ?)"""
+add_category = """INSERT INTO categories(category_id, name, description)
+                 VALUES(?, ?, ?)"""
+add_image = """INSERT INTO images(image_id, product_id, url)
+                 VALUES(?, ?, ?)"""
 
 # ------------------------- FUNCTIONS ---------------------------
 
@@ -31,16 +29,6 @@ def gen_uuid(s: Optional[str] = None) -> str:
             raise ValueError(f"Invalid UUID provided: {s}")
     #Auto generate UUID if not provided input
     return str(uuid.uuid4())
-
-try:
-    with sqlite3.connect("IMS.db") as connection:
-        cursor = connection.cursor()
-
-<<<<<<< Updated upstream
-        pass
-except sqlite3.OperationalError as error:
-    print("Failed to open database:", e)
-=======
 
 # -------------------------- DATABASE --------------------------
 # Database using sqlite library
@@ -111,7 +99,7 @@ def init_database(connection: sqlite3.Connection):
 def product_create(conn: sqlite3.Connection, name: str, description: Optional[str], quantity: int, price: str, product_id: Optional[str]=None) -> str:
     pid = gen_uuid(product_id)
 
-    conn.execute("") #sql code to be added here once other functions done
+    conn.execute(add_product, pid, name, description, quantity, price) #sql code to be added here once other functions done
     conn.commit()
     return pid
 
@@ -119,7 +107,7 @@ def product_create(conn: sqlite3.Connection, name: str, description: Optional[st
 def supplier_create(conn: sqlite3.Connection, name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
     sid = gen_uuid(supplier_id)
    
-    conn.execute("") #sql code to be added here once other functions done
+    conn.execute(add_supplier, sid, name, contact) #sql code to be added here once other functions done
     conn.commit()
     return sid
 
@@ -128,7 +116,6 @@ def supplier_create(conn: sqlite3.Connection, name: str, contact_email: str, sup
 def category_create(conn: sqlite3.Connection, name: str, description: Optional[str], category_id: Optional[str]=None) -> str:
     cid = gen_uuid(category_id)
    
-    conn.execute("") #sql code to be added here once other functions done
+    conn.execute(add_category, cid, name, description) #sql code to be added here once other functions done
     conn.commit()
     return cid
->>>>>>> Stashed changes
