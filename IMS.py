@@ -8,7 +8,7 @@ import sqlite3 #Python SQL Library
 from typing import Optional
 import uuid
 
-# queries -> i think its best to define them up here
+# QUERIES
 
 add_product = "INSERT INTO products(product_id, name, description, quantity, price) VALUES(?, ?, ?, ?, ?)"
 add_supplier = "INSERT INTO suppliers(supplier_id, name, contact_email) VALUES(?, ?, ?)"
@@ -17,9 +17,11 @@ add_image = "INSERT INTO images(image_id, product_id, url) VALUES(?, ?, ?)"
 get_product = "SELECT * FROM products WHERE product_id = ?" 
 get_supplier = "SELECT * FROM suppliers WHERE supplier_id = ?"
 get_category = "SELECT * FROM categories WHERE category_id = ?"
+get_image = "SELECT * FROM images WHERE image_id = ?"
 update_product = "UPDATE products SET name = ?, description = ?, quantity = ?, price = ? WHERE product_id = ?"
 update_supplier = "UPDATE suppliers SET name = ?, contact_email = ? WHERE supplier_id = ?"
 update_category = "UPDATE categories SET name = ?, description = ? WHERE category_id = ?"
+update_image = "UPDATE images SET product_id = ?, url = ? WHERE image_id = ?"
 
 # ------------------------- FUNCTIONS ---------------------------
 
@@ -35,8 +37,8 @@ def gen_uuid(s: Optional[str] = None) -> str:
 
 # -------------------------- DATABASE --------------------------
 # Database using sqlite library
-def init_database(connection: sqlite3.Connection):
-    c = connection.cursor()
+def init_database(conn: sqlite3.Connection):
+    c = conn.cursor()
     c.execute("PRAGMA foreign_keys = ON;") # This line turns on foreign key constraints
     
     # TABLES: Products, Suppliers, Categories, Images - in order
@@ -82,14 +84,9 @@ def init_database(connection: sqlite3.Connection):
         PRIMARY KEY (supplier_id, product_id),
     	FOREIGN KEY(supplier_id) REFERENCES suppliers(supplier_id) ON DELETE CASCADE,
     	FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE
-    );                    
-                    
-
-
-
+    );
     """)
-    connection.commit()
-
+    conn.commit()
 
 # -------------------- CRUD Operations --------------------
 
@@ -101,7 +98,7 @@ def init_database(connection: sqlite3.Connection):
 
 
 # PRODUCT CREATE: UUID, Name, Description, Quantity, Price 
-def product_create(conn: sqlite3.Connection, name: str, description: Optional[str], quantity: int, price: str, product_id: Optional[str]=None) -> str:
+def product_create(conn: sqlite3.Connection, name: str, description: Optional[str], quantity: int, price: str, product_id: Optional[str] = None) -> str:
     pid = gen_uuid(product_id)
     c = conn.cursor()
     data = [pid, name, description, quantity, price]
@@ -120,9 +117,8 @@ def supplier_create(conn: sqlite3.Connection, name: str, contact_email: str, sup
     conn.commit()
     return sid
 
-
 # CATEGORY CREATE: UUID, Name, Description
-def category_create(conn: sqlite3.Connection, name: str, description: Optional[str], category_id: Optional[str]=None) -> str:
+def category_create(conn: sqlite3.Connection, name: str, description: Optional[str], category_id: Optional[str] = None) -> str:
     cid = gen_uuid(category_id)
     c = conn.cursor()
     data = [cid, name, description]
@@ -131,6 +127,17 @@ def category_create(conn: sqlite3.Connection, name: str, description: Optional[s
     conn.commit()
     return cid
 
+# IMAGE CREATE: UUID, ProductID, Url
+def image_create(conn: sqlite3.Connection, product_id: str, url: str, image_id: Optional[str] = None) -> str:
+    iid = gen_uuid(image_id)
+    c = conn.cursor()
+    data = [iid, product_id, url]
+    c.executemany(add_image, (data,))
+    c.close()
+    conn.commit()
+    return iid
+
+#
 def product_read(conn: sqlite3.Connection, product_id: str) -> str:
     c = conn.cursor() 
     c.execute(get_product, (product_id,))
@@ -138,6 +145,7 @@ def product_read(conn: sqlite3.Connection, product_id: str) -> str:
     c.close()
     return str(row)
 
+#
 def supplier_read(conn: sqlite3.Connection, supplier_id: str) -> str:
     c = conn.cursor()
     c.execute(get_supplier, (supplier_id,))
@@ -145,6 +153,7 @@ def supplier_read(conn: sqlite3.Connection, supplier_id: str) -> str:
     c.close()
     return str(row)
 
+#
 def category_read(conn: sqlite3.Connection, category_id: str) -> str:
     c = conn.cursor()
     c.execute(get_category, (category_id,))
@@ -152,6 +161,15 @@ def category_read(conn: sqlite3.Connection, category_id: str) -> str:
     c.close()
     return str(row)
 
+#
+def image_read(conn: sqlite3.Connection, image_id: str) -> str:
+    c = conn.cursor()
+    c.execute(get_image, (image_id,))
+    row = c.fetchone()
+    c.close()
+    return str(row)
+
+#
 def product_update(conn: sqlite3.Connection, product_id: str, name: str, description: str, quantity: int, price: str) -> str:
     c = conn.cursor()
     data = [name, description, quantity, price, product_id]
@@ -160,6 +178,7 @@ def product_update(conn: sqlite3.Connection, product_id: str, name: str, descrip
     conn.commit()
     return product_read(conn, str(product_id))
 
+#
 def supplier_update(conn: sqlite3.Connection, supplier_id: str, name: str, contact_email: str) -> str:
     c = conn.cursor()
     data = [name, contact_email, supplier_id]
@@ -168,6 +187,7 @@ def supplier_update(conn: sqlite3.Connection, supplier_id: str, name: str, conta
     conn.commit()
     return supplier_read(conn, str(supplier_id))
 
+# 
 def category_update(conn: sqlite3.Connection, category_id: str, name: str, description: str) -> str:
     c = conn.cursor()
     data = [name, description, category_id]
@@ -176,20 +196,6 @@ def category_update(conn: sqlite3.Connection, category_id: str, name: str, descr
     conn.commit()
     return category_read(conn, str(category_id))
 
-#
-
-try:
-    with sqlite3.connect("IMS.db") as conn:
-        init_database(conn)
-        out = product_create(conn, "laptop", "portable computer", 1, "100")
-        print(product_update(conn, str(out), "laptop2", "port", 2, "300"))
-        out = supplier_create(conn, "hp", "email")
-        print(supplier_update(conn, str(out), "apple", "icloud"))
-        out = category_create(conn, "portables", "portable electronics")
-        print(category_update(conn, str(out), "mobile device", "yes"))
-        pass
-except sqlite3.OperationalError as error:
-    print("Failed to open/modify database:", error)
 #---------------- CLI ARGUMENT PARSER -------------------
  
 # Arguments to be Parsed in CLI:
@@ -198,79 +204,100 @@ except sqlite3.OperationalError as error:
 #   Update
 #   Delete
 
-
-
-
 # ---------------- MAIN ----------------------
+
 def main():
-    connection = sqlite3.connect("") #Add db file name to quotes when db created.
-    init_database(connection)
+    conn = sqlite3.connect("") #Add db file name to quotes when db created.
+    init_database(conn)
 
     print("Welcome to The Solid Principles' Monolithic Inventory Management System")
     print("Type help or ? to list commands.")
 
     while True:
         try:
-            command = input(">>> ").strip()
+            with sqlite3.connect("IMS.db") as conn:
+                init_database(conn)
 
-            if command in ("exit", "quit"):
-                print("Terminating session.")
-                break
-            elif command == "help":
-                print("Available commands: help, create, read, update, delete, exit, quit")
-            elif command == "create":
-                print("What type of record do you want to create: product, supplier, category, image")
-                create_type = input(">>> ").strip()
-                match create_type:
-                    case "product":
-                        print("Enter product name: ")
-                        name = input(">>> ").strip()
-                        print("\nEnter product description: ")
-                        desc = input(">>> ").strip()
-                        quant = -1
-                        while quant == -1:
-                            print("\nEnter product quantity: ")
-                            quant_string = input(">>> ").strip()
-                            try:
-                                quant = int(quant_string)
-                            except ValueError:
-                                print("\nERR: You must enter an integer for quantity.")
-                        print("\nEnter product price: ")
-                        price = input(">>> ").strip()
-                        pid = product_create(connection, name, desc, quant, price)
-                        print("New product id: " + pid)
-                    case "supplier":
-                        print("Enter supplier name: ")
-                        name = input(">>> ").strip()
-                        print("\nEnter supplier's email:")
-                        email = input(">>> ").strip()
-                        pid = supplier_create(connection, name, email)
-                        print("New supplier id: " + pid)
-                    case "category":
-                        print("Enter category name: ")
-                        name = input(">>> ").strip()
-                        print("\nEnter cateogry description: ")
-                        desc = input(">>> ").strip()
-                        pid = category_create(connection, name, desc)
-                        print("New category id: " + pid)
-                    case "image":
-                        print("Enter product id: ")
-                        prod_id = input(">>> ").strip()
-                        print("\nEnter image URL: ")
-                        url = input(">>> ").strip()
-                        #Uncomment once image creation function is complete.
-                        #pid = image_create(connection, prod_id, url)
-                        #print("New image id: " + pid)
-            elif command == "read":
-                print("Not yet implemented")
-            elif command == "update":
-                print("Not yet implemented")
-            elif command == "delete":
-                print("Not yet implemented")
-            else:
-                print("ERR: Invalid command.")
+                command = input(">>> ").strip()
+    
+                if command in ("exit", "quit"):
+                    print("Terminating session.")
+                    break
+                elif command == "help" or command == "?":
+                    print("Available commands: help, create, read, update, delete, exit, quit")
+                elif command == "create":
+                    print("What type of record do you want to create: product, supplier, category, image")
+                    create_type = input(">>> ").strip()
+                    match create_type:
+                        case "product":
+                            print("Enter product name: ")
+                            name = input(">>> ").strip()
+                            print("\nEnter product description: ")
+                            desc = input(">>> ").strip()
+                            quant = -1
+                            while quant == -1:
+                                print("\nEnter product quantity: ")
+                                quant_string = input(">>> ").strip()
+                                try:
+                                    quant = int(quant_string)
+                                except ValueError:
+                                    print("\nERR: You must enter an integer for quantity.")
+                            print("\nEnter product price: ")
+                            price = input(">>> ").strip()
+                            pid = product_create(conn, name, desc, quant, price)
+                            print("New product id: " + pid)
+                        case "supplier":
+                            print("Enter supplier name: ")
+                            name = input(">>> ").strip()
+                            print("\nEnter supplier's email:")
+                            email = input(">>> ").strip()
+                            sid = supplier_create(conn, name, email)
+                            print("New supplier id: " + sid)
+                        case "category":
+                            print("Enter category name: ")
+                            name = input(">>> ").strip()
+                            print("\nEnter cateogry description: ")
+                            desc = input(">>> ").strip()
+                            cid = category_create(conn, name, desc)
+                            print("New category id: " + cid)
+                        case "image":
+                            print("Enter product id: ")
+                            prod_id = input(">>> ").strip()
+                            print("\nEnter image URL: ")
+                            url = input(">>> ").strip()
+                            iid = image_create(conn, prod_id, url)
+                            print("New image id: " + iid)
+                elif command == "read":
+                    print("What type of record do you want to read: product, supplier, category, image")
+                    read_type = input(">>> ").strip()
+                    match read_type:
+                        case "product":
+                            print("Enter product id: ")
+                            prod_id = input(">>> ").strip()
+                            print(product_read(conn, prod_id))
+                        case "supplier":
+                            print("Enter supplier id: ")
+                            sup_id = input(">> ").strip()
+                            print(supplier_read(conn, sup_id))
+                        case "category":
+                            print("Enter category id: ")
+                            cat_id = input(">>> ").strip()
+                            print(category_read(conn, cat_id))
+                        case "image":
+                            print("Enter image id: ")
+                            img_id = input(">>> ").strip()
+                            print(image_read(conn, img_id))
+                elif command == "update":
+                    print("Not yet implemented")
+                elif command == "delete":
+                    print("Not yet implemented")
+                else:
+                    print("ERR: Invalid command.")
         except KeyboardInterrupt:
             print("\nGoodbye!")
+            break
+        except sqlite3.OperationalError as error:
+            print("\nCould not open database!")
             break
 
 if __name__ == "__main__":
