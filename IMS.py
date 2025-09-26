@@ -4,7 +4,8 @@ IMS.py - Inventory Management System (Monolithic)
 The Solid Principles - Ricardo Olazabal, Victor Boyd, Michael Warner
 
 """
-import sqlite3
+import sqlite3 #Python SQL Library
+import argparse #Python Parser Library
 from typing import Optional
 import uuid
 import decimal
@@ -101,3 +102,48 @@ def category_create(conn: sqlite3.Connection, name: str, description: Optional[s
     conn.execute("") #sql code to be added here once other functions done
     conn.commit()
     return cid
+
+
+
+
+
+#---------------- CLI ARGUMENT PARSER -------------------
+ 
+# Arguments to be Parsed in CLI:
+#   Create
+#   Read
+#   Update
+#   Delete
+
+# CLI in hierarchy (Ex: Product --> Create,Read,etc.) using subparsers
+
+def parse_arguments(): 
+    
+    parser = argparse.ArgumentParser(description="IMS Monolithic CLI")
+    # parser.add_argument('--dataBaseFile', default=, help="")  <-- when database is finished put the name in default
+    subparsers = parser.add_subparsers(dest='operation', required=True) # not very familiar with python subparsers - feel free to change this
+
+    # PRODUCT
+    product = subparsers.add_parser('product', help='Product operations')
+    productSP = product.add_subparsers(dest='op', required=True)
+
+    product_create = productSP.add_parser('create', help='Create a product') 
+    product_create.add_argument('--id', help='Will generate random UUID if left blank')
+    product_create.add_argument('--name', required=True)
+    product_create.add_argument('--description')
+    product_create.add_argument('--quantity', required=True, type=int)
+    product_create.add_argument('--price', required=True)
+    
+
+    # SUPPLIER
+
+    # CATEGORY
+
+    # IMAGE
+
+
+# ---------------- MAIN ----------------------
+def main():
+    args = parse_arguments()
+    connection = sqlite3.connect(args.dataBaseFile)
+    init_database(connection)
