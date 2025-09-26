@@ -10,16 +10,19 @@ import uuid
 
 # queries -> i think its best to define them up here
 
-add_product = """INSERT INTO products(product_id, name, description, quantity, price)
-                 VALUES(?, ?, ?, ?, ?)"""
-add_supplier = """INSERT INTO suppliers(supplier_id, name, contact_email)
-                 VALUES(?, ?, ?)"""
-add_category = """INSERT INTO categories(category_id, name, description)
-                 VALUES(?, ?, ?)"""
-add_image = """INSERT INTO images(image_id, product_id, url)
-                 VALUES(?, ?, ?)"""
-get_product = """SELECT * FROM products 
-                 WHERE product_id = ?"""
+add_product = "INSERT INTO products(product_id, name, description, quantity, price)
+                VALUES(?, ?, ?, ?, ?)"
+add_supplier = "INSERT INTO suppliers(supplier_id, name, contact_email)
+                VALUES(?, ?, ?)"
+add_category = "INSERT INTO categories(category_id, name, description)
+                VALUES(?, ?, ?)"
+add_image = "INSERT INTO images(image_id, product_id, url)
+                 VALUES(?, ?, ?)"
+get_product = "SELECT * FROM products WHERE product_id = ?" 
+
+get_supplier = "SELECT * FROM suppliers WHERE supplier_id = ?"
+
+get_category = "SELECT * FROM categories WHERE category_id = ?"
 
 # ------------------------- FUNCTIONS ---------------------------
 
@@ -106,6 +109,7 @@ def product_create(conn: sqlite3.Connection, name: str, description: Optional[st
     c = conn.cursor()
     data = [pid, name, description, quantity, price]
     c.executemany(add_product, (data,)) #sql code to be added here once other functions done
+    c.close()
     conn.commit()
     return pid
 
@@ -115,6 +119,7 @@ def supplier_create(conn: sqlite3.Connection, name: str, contact_email: str, sup
     c = conn.cursor()
     data = [sid, name, contact_email]
     c.executemany(add_supplier, (data,)) #sql code to be added here once other functions done
+    c.close()
     conn.commit()
     return sid
 
@@ -125,24 +130,38 @@ def category_create(conn: sqlite3.Connection, name: str, description: Optional[s
     c = conn.cursor()
     data = [cid, name, description]
     c.executemany(add_category, (data,)) #sql code to be added here once other functions done
+    c.close()
     conn.commit()
     return cid
 
-#
 def product_read(conn: sqlite3.Connection, product_id: str) -> str:
     c = conn.cursor() 
-    c.execute(get_product, [str(product_id)])
+    c.execute(get_product, (product_id,))
     row = c.fetchone()
-    return str(row)
+    c.close()
+    return row
+
+def supplier_read(conn: sqlite3.Connection, supplier_id: str) -> str:
+    c = conn.cursor()
+    c.execute(get_supplier, (supplier_id,))
+    row = c.fetchone()
+    c.close()
+    return row
+
+def category_read(conn: sqlite3.Connection, category_id: str) -> str:
+    c = conn.cursor()
+    c.execute(get_category, (supplier_id,))
+    row = c.fetchone()
+    c.close()
+    return row
 
 #
 
 try:
     with sqlite3.connect("IMS.db") as conn:
         init_database(conn)
-        out = product_create(conn, "laptop", "portable computer", 1, 100)
-        print(out)
-        print(product_read(conn, [out]))
+        out = product_create(conn, "laptop", "portable computer", 1, "100")
+        print(product_read(conn, str(out)))
         pass
 except sqlite3.OperationalError as error:
     print("Failed to open/modify database:", error)
