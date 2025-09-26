@@ -332,7 +332,7 @@ def main():
 
     while True:
         try:
-            with sqlite3.connect("IMS.db") as conn:
+            with sqlite3.connect("") as conn:
                 init_database(conn)
 
                 print("Type help or ? to list commands.")
