@@ -329,6 +329,15 @@ def categoryProduct_delete(conn: sqlite3.Connection, category_id: str, product_i
 
 def main():
     print("Welcome to The Solid Principles' Monolithic Inventory Management System")
+<<<<<<< Updated upstream
+=======
+    try:
+        conn = sqlite3.connect("")
+        init_database(conn)
+    except sqlite3.OperationalError as error:
+        print("\nDatabase error: ", error)
+        exit()
+>>>>>>> Stashed changes
 
     while True:
         try:
