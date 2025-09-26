@@ -332,7 +332,7 @@ def main():
 
     while True:
         try:
-            with sqlite3.connect("") as conn:
+            with sqlite3.connect("file::memory:?cache=shared") as conn:
                 init_database(conn)
 
                 print("Type help or ? to list commands.")
