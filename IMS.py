@@ -265,41 +265,31 @@ def main():
                     create_type = input(">>> ").strip()
                     match create_type:
                         case "product":
-                            print("Enter product name: ")
-                            name = input(">>> ").strip()
-                            print("\nEnter product description: ")
-                            desc = input(">>> ").strip()
+                            name = input("Enter product name: ").strip()
+                            desc = input("Enter product description: ").strip()
                             quant = -1
                             while quant == -1:
-                                print("\nEnter product quantity: ")
-                                quant_string = input(">>> ").strip()
+                                quant_string = input("Enter product quantity: ").strip()
                                 try:
                                     quant = int(quant_string)
                                 except ValueError:
-                                    print("\nERR: You must enter an integer for quantity.")
-                            print("\nEnter product price: ")
-                            price = input(">>> ").strip()
+                                    print("ERR: You must enter an integer for quantity.")
+                            price = input("Enter product price: ").strip()
                             pid = product_create(conn, name, desc, quant, price)
                             print("New product id: " + pid)
                         case "supplier":
-                            print("Enter supplier name: ")
-                            name = input(">>> ").strip()
-                            print("\nEnter supplier's email:")
-                            email = input(">>> ").strip()
+                            name = input("Enter supplier name: ").strip()
+                            email = input("Enter supplier email").strip()
                             sid = supplier_create(conn, name, email)
                             print("New supplier id: " + sid)
                         case "category":
-                            print("Enter category name: ")
-                            name = input(">>> ").strip()
-                            print("\nEnter cateogry description: ")
-                            desc = input(">>> ").strip()
+                            name = input("Enter category name: ").strip()
+                            desc = input("Enter category description: ").strip()
                             cid = category_create(conn, name, desc)
                             print("New category id: " + cid)
                         case "image":
-                            print("Enter product id: ")
-                            prod_id = input(">>> ").strip()
-                            print("\nEnter image URL: ")
-                            url = input(">>> ").strip()
+                            prod_id = input("Enter product id: ").strip()
+                            url = input("Enter image URL: ").strip()
                             iid = image_create(conn, prod_id, url)
                             print("New image id: " + iid)
                 elif command == "read":
@@ -307,23 +297,43 @@ def main():
                     read_type = input(">>> ").strip()
                     match read_type:
                         case "product":
-                            print("Enter product id: ")
-                            prod_id = input(">>> ").strip()
+                            prod_id = input("Enter product id: ").strip()
                             print(product_read(conn, prod_id))
                         case "supplier":
-                            print("Enter supplier id: ")
-                            sup_id = input(">> ").strip()
+                            sup_id = input("Enter supplier id: ").strip()
                             print(supplier_read(conn, sup_id))
                         case "category":
-                            print("Enter category id: ")
-                            cat_id = input(">>> ").strip()
+                            cat_id = input("Enter category id: ").strip()
                             print(category_read(conn, cat_id))
                         case "image":
-                            print("Enter image id: ")
-                            img_id = input(">>> ").strip()
+                            img_id = input("Enter image id: ").strip()
                             print(image_read(conn, img_id))
                 elif command == "update":
-                    print("Not yet implemented")
+                    print("What type of record do you want to update: product, supplier, category, image")
+                    update_type = input(">>> ").strip()
+                    match update_type:
+                        case "product":
+                            prod_id = input("Enter product id: ").strip()
+                            name = input("Enter new product name: ").strip()
+                            desc = input("Enter new product description: ").strip()
+                            quantity = input("Enter new product quantity: ").strip()
+                            price = input("Enter new product price: ").strip()
+                            print("New record: " + product_update(conn, prod_id, name, desc, quantity, price))
+                        case "supplier":
+                            sup_id = input("Enter supplier id: ").strip()
+                            name = input("Enter new supplier name: ").strip()
+                            email = input("Enter new supplier email: ").strip()
+                            print(supplier_update(conn, sup_id, name, email))
+                        case "category":
+                            cat_id = input("Enter category id: ").strip()
+                            name = input("Enter new category name: ").strip()
+                            desc = input("Enter new category description: ").strip()
+                            print(category_update(conn, cat_id, name, desc))
+                        case "image":
+                            img_id = input("Enter image id: ").strip()
+                            prod_id = input("Enter new product id: ").strip()
+                            url = input("Enter new image URL: ").strip()
+                            # print(image_update(conn, img_id, prod_id, url)) --- UNCOMMENT AND CHECK ARGS WHEN IMAGE UPDATE FUNCTION IS IMPLEMENTED
                 elif command == "delete":
                     print("Not yet implemented")
                 else:
