@@ -329,12 +329,15 @@ def categoryProduct_delete(conn: sqlite3.Connection, category_id: str, product_i
 
 def main():
     print("Welcome to The Solid Principles' Monolithic Inventory Management System")
+    try:
+        conn = sqlite3.connect("")
+        init_database(conn)
+    except sqlite3.OperationalError as error:
+        print("\nGoodbye!")
+        exit()
 
     while True:
         try:
-            with sqlite3.connect("file::memory:?cache=shared") as conn:
-                init_database(conn)
-
                 print("Type help or ? to list commands.")
                 command = input(">>> ").strip()
     
