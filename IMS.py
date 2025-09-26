@@ -14,11 +14,15 @@ add_product = "INSERT INTO products(product_id, name, description, quantity, pri
 add_supplier = "INSERT INTO suppliers(supplier_id, name, contact_email) VALUES(?, ?, ?)"
 add_category = "INSERT INTO categories(category_id, name, description) VALUES(?, ?, ?)"
 add_image = "INSERT INTO images(image_id, product_id, url) VALUES(?, ?, ?)"
+add_supplierProduct = "INSERT INTO supplierProducts(supplier_id, product_id) VALUES (?, ?)"
+add_categoryProduct = "INSERT INTO categoryProducts(category_id, product_id) VALUES (?, ?)"
 
 get_product = "SELECT * FROM products WHERE product_id = ?" 
 get_supplier = "SELECT * FROM suppliers WHERE supplier_id = ?"
 get_category = "SELECT * FROM categories WHERE category_id = ?"
 get_image = "SELECT * FROM images WHERE image_id = ?"
+get_supplierProducts = "SELECT p.product_id, p.name, p.description FROM products p INNER JOIN supplierProducts sp ON p.product_id = sp.product_id WHERE sp.supplier_id = ?"
+get_categoryProducts = "SELECT p.product_id, p.name, p.description FROM products p INNER JOIN categoryProducts cp ON p.product_id = cp.product_id WHERE cp.category_id = ?"
 
 update_product = "UPDATE products SET name = ?, description = ?, quantity = ?, price = ? WHERE product_id = ?"
 update_supplier = "UPDATE suppliers SET name = ?, contact_email = ? WHERE supplier_id = ?"
@@ -29,7 +33,8 @@ delete_product = "DELETE FROM products WHERE product_id = ?"
 delete_supplier = "DELETE FROM suppliers WHERE supplier_id = ?"
 delete_category = "DELETE FROM categories WHERE category_id = ?"
 delete_image = "DELETE FROM images WHERE image_id = ?"
-
+delete_supplierProduct = "DELETE FROM supplierProducts WHERE supplier_id = ? AND product_id = ?"
+delere_categoryProduct = "DELETE FROM categoryProducts WHERE category_id = ? AND product_id = ?"
 
 # ------------------------- FUNCTIONS ---------------------------
 
@@ -145,6 +150,22 @@ def image_create(conn: sqlite3.Connection, product_id: str, url: str, image_id: 
     conn.commit()
     return iid
 
+# SUPPLIER PRODUCT CREATE
+def supplierProduct_create(conn: sqlite3.Connection, supplier_id: str, product_id: str) -> None:
+    c = conn.cursor()
+    data = [supplier_id, product_id]
+    c.executemany(add_supplierProduct, (data,))
+    c.close()
+    conn.commit()
+
+# CATEGORY PRODUCT CREATE
+def categoryProduct_create(conn: sqlite3.Connection, category_id: str, product_id: str) -> None:
+    c = conn.cursor()
+    data = [category_id, product_id]
+    c.executemany(add_categoryProduct, (data,))
+    c.close()
+    conn.commit()
+
 # PRODUCT READ
 def product_read(conn: sqlite3.Connection, product_id: str) -> str:
     c = conn.cursor() 
@@ -177,6 +198,24 @@ def image_read(conn: sqlite3.Connection, image_id: str) -> str:
     c.close()
     return str(row)
 
+# SUPPLIER PRODUCTS READ
+def supplierProducts_read(conn: sqlite3.Connection, supplier_id: str) -> None:
+    c = conn.cursor()
+    c.execute(get_supplierProducts, (supplier_id,))
+    rows = c.fetchall()
+    c.close()
+    for row in rows:
+        print(str(row))
+
+# CATEGORY PRODUCRS READ
+def categoryProducts_read(conn: sqlite3.Connection, category_id: str) -> None:
+    c = conn.cursor()
+    c.execute(get_categoryProducts, (category_id,))
+    rows = c.fetchall()
+    c.close()
+    for row in rows:
+        print(str(row))
+
 # PRODUCT UPDATE
 def product_update(conn: sqlite3.Connection, product_id: str, name: str, description: str, quantity: int, price: str) -> str:
     c = conn.cursor()
@@ -203,6 +242,15 @@ def category_update(conn: sqlite3.Connection, category_id: str, name: str, descr
     c.close()
     conn.commit()
     return category_read(conn, str(category_id))
+
+# IMAGE UPDATE
+def image_update(conn: sqlite3.Connection, image_id: str, product_id: str, url: str) -> str:
+    c = conn.cursor()
+    data = [product_id, url]
+    c.executemany(update_image, (data,))
+    c.close()
+    conn.commit()
+    return image_read(conn, str(image_id))
 
 # PRODUCT DELETE
 def product_delete(conn: sqlite3.Connection, product_id: str) -> None:
@@ -232,8 +280,6 @@ def image_delete(conn: sqlite3.Connection, image_id: str) -> None:
     conn.commit()
     c.close()
 
-
-
 #---------------- CLI ARGUMENT PARSER -------------------
  
 # Arguments to be Parsed in CLI:
@@ -258,10 +304,10 @@ def main():
                 if command in ("exit", "quit"):
                     print("Terminating session.")
                     break
-                elif command == "help" or command == "?":
+                elif command in ("help", "?"):
                     print("Available commands: help, create, read, update, delete, exit, quit")
                 elif command == "create":
-                    print("What type of record do you want to create: product, supplier, category, image")
+                    print("What type of record do you want to create: product, supplier, category, image, supplierProduct, categoryProduct")
                     create_type = input(">>> ").strip()
                     match create_type:
                         case "product":
@@ -302,8 +348,20 @@ def main():
                             url = input(">>> ").strip()
                             iid = image_create(conn, prod_id, url)
                             print("New image id: " + iid)
+                        case "supplierProduct":
+                            print("Enter supplier id: ")
+                            sup_id = input(">>> ").strip()
+                            print("\nEnter product id: ")
+                            prod_id = input(">>> ").strip()
+                            supplierProduct_create(conn, sup_id, prod_id)
+                        case "categoryProduct":
+                            print("Enter category id: ")
+                            cat_id = input(">>> ").strip()
+                            print("\nEnter product id: ")
+                            prod_id = input(">>> ").strip()
+                            categoryProduct_create(conn, cat_id, prod_id)
                 elif command == "read":
-                    print("What type of record do you want to read: product, supplier, category, image")
+                    print("What type of record do you want to read: product, supplier, category, image", "supplierProducts, categoryProducts")
                     read_type = input(">>> ").strip()
                     match read_type:
                         case "product":
@@ -322,6 +380,14 @@ def main():
                             print("Enter image id: ")
                             img_id = input(">>> ").strip()
                             print(image_read(conn, img_id))
+                        case "supplierProducts":
+                            print("Enter supplier id: ")
+                            sup_id = input(">>> ").strip()
+                            supplierProducts_read(conn, sup_id)
+                        case "categoryProducts":
+                            print("Enter category id: ")
+                            cat_id = input(">>> ").strip()
+                            categoryProducts_read(conn, cat_id)
                 elif command == "update":
                     print("Not yet implemented")
                 elif command == "delete":
@@ -332,7 +398,7 @@ def main():
             print("\nGoodbye!")
             break
         except sqlite3.OperationalError as error:
-            print("\nCould not open database!")
+            print("\nDatabase error: ", error)
             break
 
 if __name__ == "__main__":
