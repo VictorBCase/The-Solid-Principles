@@ -25,8 +25,8 @@ get_supplierProducts = "SELECT p.product_id, p.name, p.description FROM products
 get_categoryProducts = "SELECT p.product_id, p.name, p.description FROM products p INNER JOIN categoryProducts cp ON p.product_id = cp.product_id WHERE cp.category_id = ?"
 # these could be used to access these records using the product id rather than the 
 #supplier/category id
-get productSuppliers = "SELECT s.supplier_id, s.name, s.contact_email FROM suppliers s INNER JOIN supplierProducts sp ON s.supplier_id = sp.supplier_id WHERE sp.product_id = ?"
-get productSuppliers = "SELECT c.category_id, c.name, c.description FROM categories c INNER JOIN categoryProducts cp ON c.category_id = cp.category_id WHERE cp.product_id = ?"
+get_productSuppliers = "SELECT s.supplier_id, s.name, s.contact_email FROM suppliers s INNER JOIN supplierProducts sp ON s.supplier_id = sp.supplier_id WHERE sp.product_id = ?"
+get_productSuppliers = "SELECT c.category_id, c.name, c.description FROM categories c INNER JOIN categoryProducts cp ON c.category_id = cp.category_id WHERE cp.product_id = ?"
 
 update_product = "UPDATE products SET name = ?, description = ?, quantity = ?, price = ? WHERE product_id = ?"
 update_supplier = "UPDATE suppliers SET name = ?, contact_email = ? WHERE supplier_id = ?"
