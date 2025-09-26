@@ -10,19 +10,16 @@ import uuid
 
 # queries -> i think its best to define them up here
 
-add_product = "INSERT INTO products(product_id, name, description, quantity, price)
-                VALUES(?, ?, ?, ?, ?)"
-add_supplier = "INSERT INTO suppliers(supplier_id, name, contact_email)
-                VALUES(?, ?, ?)"
-add_category = "INSERT INTO categories(category_id, name, description)
-                VALUES(?, ?, ?)"
-add_image = "INSERT INTO images(image_id, product_id, url)
-                 VALUES(?, ?, ?)"
+add_product = "INSERT INTO products(product_id, name, description, quantity, price) VALUES(?, ?, ?, ?, ?)"
+add_supplier = "INSERT INTO suppliers(supplier_id, name, contact_email) VALUES(?, ?, ?)"
+add_category = "INSERT INTO categories(category_id, name, description) VALUES(?, ?, ?)"
+add_image = "INSERT INTO images(image_id, product_id, url) VALUES(?, ?, ?)"
 get_product = "SELECT * FROM products WHERE product_id = ?" 
-
 get_supplier = "SELECT * FROM suppliers WHERE supplier_id = ?"
-
 get_category = "SELECT * FROM categories WHERE category_id = ?"
+update_product = "UPDATE products SET name = ?, description = ?, quantity = ?, price = ? WHERE product_id = ?"
+update_supplier = "UPDATE suppliers SET name = ?, contact_email = ? WHERE supplier_id = ?"
+update_category = "UPDATE categories SET name = ?, description = ? WHERE category_id = ?"
 
 # ------------------------- FUNCTIONS ---------------------------
 
@@ -139,21 +136,45 @@ def product_read(conn: sqlite3.Connection, product_id: str) -> str:
     c.execute(get_product, (product_id,))
     row = c.fetchone()
     c.close()
-    return row
+    return str(row)
 
 def supplier_read(conn: sqlite3.Connection, supplier_id: str) -> str:
     c = conn.cursor()
     c.execute(get_supplier, (supplier_id,))
     row = c.fetchone()
     c.close()
-    return row
+    return str(row)
 
 def category_read(conn: sqlite3.Connection, category_id: str) -> str:
     c = conn.cursor()
-    c.execute(get_category, (supplier_id,))
+    c.execute(get_category, (category_id,))
     row = c.fetchone()
     c.close()
-    return row
+    return str(row)
+
+def product_update(conn: sqlite3.Connection, product_id: str, name: str, description: str, quantity: int, price: str) -> str:
+    c = conn.cursor()
+    data = [name, description, quantity, price, product_id]
+    c.executemany(update_product, (data,))
+    c.close()
+    conn.commit()
+    return product_read(conn, str(product_id))
+
+def supplier_update(conn: sqlite3.Connection, supplier_id: str, name: str, contact_email: str) -> str:
+    c = conn.cursor()
+    data = [name, contact_email, supplier_id]
+    c.executemany(update_supplier, (data,))
+    c.close()
+    conn.commit()
+    return supplier_read(conn, str(supplier_id))
+
+def category_update(conn: sqlite3.Connection, category_id: str, name: str, description: str) -> str:
+    c = conn.cursor()
+    data = [name, description, category_id]
+    c.executemany(update_category, (data,))
+    c.close()
+    conn.commit()
+    return category_read(conn, str(category_id))
 
 #
 
@@ -161,7 +182,11 @@ try:
     with sqlite3.connect("IMS.db") as conn:
         init_database(conn)
         out = product_create(conn, "laptop", "portable computer", 1, "100")
-        print(product_read(conn, str(out)))
+        print(product_update(conn, str(out), "laptop2", "port", 2, "300"))
+        out = supplier_create(conn, "hp", "email")
+        print(supplier_update(conn, str(out), "apple", "icloud"))
+        out = category_create(conn, "portables", "portable electronics")
+        print(category_update(conn, str(out), "mobile device", "yes"))
         pass
 except sqlite3.OperationalError as error:
     print("Failed to open/modify database:", error)
