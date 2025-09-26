@@ -207,9 +207,6 @@ def category_update(conn: sqlite3.Connection, category_id: str, name: str, descr
 # ---------------- MAIN ----------------------
 
 def main():
-    conn = sqlite3.connect("") #Add db file name to quotes when db created.
-    init_database(conn)
-
     print("Welcome to The Solid Principles' Monolithic Inventory Management System")
     print("Type help or ? to list commands.")
 
