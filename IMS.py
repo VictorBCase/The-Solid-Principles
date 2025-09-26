@@ -4,7 +4,7 @@ IMS.py - Inventory Management System (Monolithic)
 The Solid Principles - Ricardo Olazabal, Victor Boyd, Michael Warner
 
 """
-import sqlite3
+import sqlite3 #Python SQL Library
 from typing import Optional
 import uuid
 
@@ -190,3 +190,89 @@ try:
         pass
 except sqlite3.OperationalError as error:
     print("Failed to open/modify database:", error)
+#---------------- CLI ARGUMENT PARSER -------------------
+ 
+# Arguments to be Parsed in CLI:
+#   Create
+#   Read
+#   Update
+#   Delete
+
+
+
+
+# ---------------- MAIN ----------------------
+def main():
+    connection = sqlite3.connect("") #Add db file name to quotes when db created.
+    init_database(connection)
+
+    print("Welcome to The Solid Principles' Monolithic Inventory Management System")
+    print("Type help or ? to list commands.")
+
+    while True:
+        try:
+            command = input(">>> ").strip()
+
+            if command in ("exit", "quit"):
+                print("Terminating session.")
+                break
+            elif command == "help":
+                print("Available commands: help, create, read, update, delete, exit, quit")
+            elif command == "create":
+                print("What type of record do you want to create: product, supplier, category, image")
+                create_type = input(">>> ").strip()
+                match create_type:
+                    case "product":
+                        print("Enter product name: ")
+                        name = input(">>> ").strip()
+                        print("\nEnter product description: ")
+                        desc = input(">>> ").strip()
+                        quant = -1
+                        while quant == -1:
+                            print("\nEnter product quantity: ")
+                            quant_string = input(">>> ").strip()
+                            try:
+                                quant = int(quant_string)
+                            except ValueError:
+                                print("\nERR: You must enter an integer for quantity.")
+                        print("\nEnter product price: ")
+                        price = input(">>> ").strip()
+                        pid = product_create(connection, name, desc, quant, price)
+                        print("New product id: " + pid)
+                    case "supplier":
+                        print("Enter supplier name: ")
+                        name = input(">>> ").strip()
+                        print("\nEnter supplier's email:")
+                        email = input(">>> ").strip()
+                        pid = supplier_create(connection, name, email)
+                        print("New supplier id: " + pid)
+                    case "category":
+                        print("Enter category name: ")
+                        name = input(">>> ").strip()
+                        print("\nEnter cateogry description: ")
+                        desc = input(">>> ").strip()
+                        pid = category_create(connection, name, desc)
+                        print("New category id: " + pid)
+                    case "image":
+                        print("Enter product id: ")
+                        prod_id = input(">>> ").strip()
+                        print("\nEnter image URL: ")
+                        url = input(">>> ").strip()
+                        #Uncomment once image creation function is complete.
+                        #pid = image_create(connection, prod_id, url)
+                        #print("New image id: " + pid)
+            elif command == "read":
+                print("Not yet implemented")
+            elif command == "update":
+                print("Not yet implemented")
+            elif command == "delete":
+                print("Not yet implemented")
+            else:
+                print("ERR: Invalid command.")
+        except KeyboardInterrupt:
+            print("\nGoodbye!")
+            break
+
+if __name__ == "__main__":
+    main()
+
