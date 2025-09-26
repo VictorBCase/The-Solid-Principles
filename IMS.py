@@ -250,7 +250,7 @@ def category_update(conn: sqlite3.Connection, category_id: str, name: str, descr
 # IMAGE UPDATE
 def image_update(conn: sqlite3.Connection, image_id: str, product_id: str, url: str) -> str:
     c = conn.cursor()
-    data = [product_id, url]
+    data = [product_id, url, image_id]
     c.executemany(update_image, (data,))
     c.close()
     conn.commit()
@@ -296,13 +296,13 @@ def image_delete(conn: sqlite3.Connection, image_id: str) -> None:
 
 def main():
     print("Welcome to The Solid Principles' Monolithic Inventory Management System")
-    print("Type help or ? to list commands.")
 
     while True:
         try:
             with sqlite3.connect("IMS.db") as conn:
                 init_database(conn)
 
+                print("Type help or ? to list commands.")
                 command = input(">>> ").strip()
     
                 if command in ("exit", "quit"):
@@ -329,7 +329,7 @@ def main():
                             print("New product id: " + pid)
                         case "supplier":
                             name = input("Enter supplier name: ").strip()
-                            email = input("Enter supplier email").strip()
+                            email = input("Enter supplier email: ").strip()
                             sid = supplier_create(conn, name, email)
                             print("New supplier id: " + sid)
                         case "category":
@@ -338,22 +338,20 @@ def main():
                             cid = category_create(conn, name, desc)
                             print("New category id: " + cid)
                         case "image":
-                            prod_id = input("Enter product id: ").strip()
+                            pid = input("Enter product id: ").strip()
                             url = input("Enter image URL: ").strip()
-                            iid = image_create(conn, prod_id, url)
+                            iid = image_create(conn, pid, url)
                             print("New image id: " + iid)
                         case "supplierProduct":
-                            print("Enter supplier id: ")
-                            sup_id = input(">>> ").strip()
-                            print("\nEnter product id: ")
-                            prod_id = input(">>> ").strip()
-                            supplierProduct_create(conn, sup_id, prod_id)
+                            sid = input("Enter supplier id: ").strip()
+                            pid = input("Enter product id: ").strip()
+                            supplierProduct_create(conn, sid, pid)
+                            print("Association created.")
                         case "categoryProduct":
-                            print("Enter category id: ")
-                            cat_id = input(">>> ").strip()
-                            print("\nEnter product id: ")
-                            prod_id = input(">>> ").strip()
-                            categoryProduct_create(conn, cat_id, prod_id)
+                            cid = input("Enter category id: ").strip()
+                            pid = input("Enter product id: ").strip()
+                            categoryProduct_create(conn, cid, pid)
+                            print("Association created.")
                 elif command == "read":
                     print("What type of record do you want to read: product, supplier, category, image, supplierProducts, categoryProducts")
                     read_type = input(">>> ").strip()
@@ -371,12 +369,10 @@ def main():
                             img_id = input("Enter image id: ").strip()
                             print(image_read(conn, img_id))
                         case "supplierProducts":
-                            print("Enter supplier id: ")
-                            sup_id = input(">>> ").strip()
+                            sup_id = input("Enter supplier id: ").strip()
                             supplierProducts_read(conn, sup_id)
                         case "categoryProducts":
-                            print("Enter category id: ")
-                            cat_id = input(">>> ").strip()
+                            cat_id = input("Enter category id: ").strip()
                             categoryProducts_read(conn, cat_id)
                 elif command == "update":
                     print("What type of record do you want to update: product, supplier, category, image")
@@ -403,7 +399,7 @@ def main():
                             img_id = input("Enter image id: ").strip()
                             prod_id = input("Enter new product id: ").strip()
                             url = input("Enter new image URL: ").strip()
-                            # print(image_update(conn, img_id, prod_id, url)) --- UNCOMMENT AND CHECK ARGS WHEN IMAGE UPDATE FUNCTION IS IMPLEMENTED
+                            print(image_update(conn, img_id, prod_id, url))
                 elif command == "delete":
                     print("What type of record do you want to delete: product, supplier, category, image")
                     read_type = input(">>> ").strip()
