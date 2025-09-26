@@ -335,7 +335,25 @@ def main():
                             url = input("Enter new image URL: ").strip()
                             # print(image_update(conn, img_id, prod_id, url)) --- UNCOMMENT AND CHECK ARGS WHEN IMAGE UPDATE FUNCTION IS IMPLEMENTED
                 elif command == "delete":
-                    print("Not yet implemented")
+                    print("What type of record do you want to delete: product, supplier, category, image")
+                    read_type = input(">>> ").strip()
+                    match read_type:
+                        case "product":
+                            prod_id = input("Enter product id: ").strip()
+                            product_delete(conn, prod_id)
+                            print("Product deleted.")
+                        case "supplier":
+                            sup_id = input("Enter supplier id: ").strip()
+                            supplier_delete(conn, sup_id)
+                            print("Supplier deleted.")
+                        case "category":
+                            cat_id = input("Enter category id: ").strip()
+                            category_delete(conn, cat_id)
+                            print("Category deleted.")
+                        case "image":
+                            img_id = input("Enter image id: ").strip()
+                            image_delete(conn, img_id)
+                            print("Image deleted.")
                 else:
                     print("ERR: Invalid command.")
         except KeyboardInterrupt:
