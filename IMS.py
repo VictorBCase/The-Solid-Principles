@@ -14,14 +14,22 @@ add_product = "INSERT INTO products(product_id, name, description, quantity, pri
 add_supplier = "INSERT INTO suppliers(supplier_id, name, contact_email) VALUES(?, ?, ?)"
 add_category = "INSERT INTO categories(category_id, name, description) VALUES(?, ?, ?)"
 add_image = "INSERT INTO images(image_id, product_id, url) VALUES(?, ?, ?)"
+
 get_product = "SELECT * FROM products WHERE product_id = ?" 
 get_supplier = "SELECT * FROM suppliers WHERE supplier_id = ?"
 get_category = "SELECT * FROM categories WHERE category_id = ?"
 get_image = "SELECT * FROM images WHERE image_id = ?"
+
 update_product = "UPDATE products SET name = ?, description = ?, quantity = ?, price = ? WHERE product_id = ?"
 update_supplier = "UPDATE suppliers SET name = ?, contact_email = ? WHERE supplier_id = ?"
 update_category = "UPDATE categories SET name = ?, description = ? WHERE category_id = ?"
 update_image = "UPDATE images SET product_id = ?, url = ? WHERE image_id = ?"
+
+delete_product = "DELETE FROM products WHERE product_id = ?"
+delete_supplier = "DELETE FROM suppliers WHERE supplier_id = ?"
+delete_category = "DELETE FROM categories WHERE category_id = ?"
+delete_image = "DELETE FROM images WHERE image_id = ?"
+
 
 # ------------------------- FUNCTIONS ---------------------------
 
@@ -137,7 +145,7 @@ def image_create(conn: sqlite3.Connection, product_id: str, url: str, image_id: 
     conn.commit()
     return iid
 
-#
+# PRODUCT READ
 def product_read(conn: sqlite3.Connection, product_id: str) -> str:
     c = conn.cursor() 
     c.execute(get_product, (product_id,))
@@ -145,7 +153,7 @@ def product_read(conn: sqlite3.Connection, product_id: str) -> str:
     c.close()
     return str(row)
 
-#
+# SUPPLIER READ
 def supplier_read(conn: sqlite3.Connection, supplier_id: str) -> str:
     c = conn.cursor()
     c.execute(get_supplier, (supplier_id,))
@@ -153,7 +161,7 @@ def supplier_read(conn: sqlite3.Connection, supplier_id: str) -> str:
     c.close()
     return str(row)
 
-#
+# CATEGORY READ
 def category_read(conn: sqlite3.Connection, category_id: str) -> str:
     c = conn.cursor()
     c.execute(get_category, (category_id,))
@@ -161,7 +169,7 @@ def category_read(conn: sqlite3.Connection, category_id: str) -> str:
     c.close()
     return str(row)
 
-#
+# IMAGE READ
 def image_read(conn: sqlite3.Connection, image_id: str) -> str:
     c = conn.cursor()
     c.execute(get_image, (image_id,))
@@ -169,7 +177,7 @@ def image_read(conn: sqlite3.Connection, image_id: str) -> str:
     c.close()
     return str(row)
 
-#
+# PRODUCT UPDATE
 def product_update(conn: sqlite3.Connection, product_id: str, name: str, description: str, quantity: int, price: str) -> str:
     c = conn.cursor()
     data = [name, description, quantity, price, product_id]
@@ -178,7 +186,7 @@ def product_update(conn: sqlite3.Connection, product_id: str, name: str, descrip
     conn.commit()
     return product_read(conn, str(product_id))
 
-#
+# SUPPLIER UPDATE
 def supplier_update(conn: sqlite3.Connection, supplier_id: str, name: str, contact_email: str) -> str:
     c = conn.cursor()
     data = [name, contact_email, supplier_id]
@@ -187,7 +195,7 @@ def supplier_update(conn: sqlite3.Connection, supplier_id: str, name: str, conta
     conn.commit()
     return supplier_read(conn, str(supplier_id))
 
-# 
+# CATEGORY UPDATE
 def category_update(conn: sqlite3.Connection, category_id: str, name: str, description: str) -> str:
     c = conn.cursor()
     data = [name, description, category_id]
@@ -195,6 +203,36 @@ def category_update(conn: sqlite3.Connection, category_id: str, name: str, descr
     c.close()
     conn.commit()
     return category_read(conn, str(category_id))
+
+# PRODUCT DELETE
+def product_delete(conn: sqlite3.Connection, product_id: str) -> None:
+    c = conn.cursor()
+    c.execute(delete_product, (product_id,))
+    conn.commit()
+    c.close()
+
+# SUPPLIER DELETE
+def supplier_delete(conn: sqlite3.Connection, supplier_id: str) -> None:
+    c = conn.cursor()
+    c.execute(delete_supplier, (supplier_id,))
+    conn.commit()
+    c.close()
+
+# CATEGORY DELETE
+def category_delete(conn: sqlite3.Connection, category_id: str) -> None:
+    c = conn.cursor()
+    c.execute(delete_category, (category_id,))
+    conn.commit()
+    c.close()
+
+# IMAGE DELETE
+def image_delete(conn: sqlite3.Connection, image_id: str) -> None:
+    c = conn.cursor()
+    c.execute(delete_image, (image_id,))
+    conn.commit()
+    c.close()
+
+
 
 #---------------- CLI ARGUMENT PARSER -------------------
  
