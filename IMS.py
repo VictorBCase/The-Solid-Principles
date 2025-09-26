@@ -38,7 +38,7 @@ delete_supplier = "DELETE FROM suppliers WHERE supplier_id = ?"
 delete_category = "DELETE FROM categories WHERE category_id = ?"
 delete_image = "DELETE FROM images WHERE image_id = ?"
 delete_supplierProduct = "DELETE FROM supplierProducts WHERE supplier_id = ? AND product_id = ?"
-delere_categoryProduct = "DELETE FROM categoryProducts WHERE category_id = ? AND product_id = ?"
+delete_categoryProduct = "DELETE FROM categoryProducts WHERE category_id = ? AND product_id = ?"
 
 # ------------------------- FUNCTIONS ---------------------------
 
@@ -102,6 +102,21 @@ def init_database(conn: sqlite3.Connection):
     	FOREIGN KEY(supplier_id) REFERENCES suppliers(supplier_id) ON DELETE CASCADE,
     	FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE
     );
+
+    CREATE TRIGGER IF NOT EXISTS sp_after_del AFTER DELETE ON supplierProducts
+    BEGIN
+        DELETE FROM suppliers WHERE suppliers.supplier_id = OLD.supplier_id AND NOT EXISTS(
+            SELECT * FROM supplierProducts sp WHERE sp.supplier_id = OLD.supplier_id
+        );
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS cp_after_del AFTER DELETE ON categoryProducts
+    BEGIN
+        DELETE FROM categories WHERE categories.category_id = OLD.category_id AND NOT EXISTS(
+            SELECT * FROM categoryProducts cp WHERE cp.category_id = OLD.category_id
+        );
+    END;
+
     """)
     conn.commit()
 
@@ -125,23 +140,25 @@ def product_create(conn: sqlite3.Connection, name: str, description: Optional[st
     return pid
 
 # SUPPLIER CREATE: UUID, Name, Contact
-def supplier_create(conn: sqlite3.Connection, name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
+def supplier_create(conn: sqlite3.Connection, product_id: str, name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
     sid = gen_uuid(supplier_id)
     c = conn.cursor()
     data = [sid, name, contact_email]
     c.executemany(add_supplier, (data,)) #sql code to be added here once other functions done
     c.close()
     conn.commit()
+    supplierProduct_create(conn, sid, product_id)
     return sid
 
 # CATEGORY CREATE: UUID, Name, Description
-def category_create(conn: sqlite3.Connection, name: str, description: Optional[str], category_id: Optional[str] = None) -> str:
+def category_create(conn: sqlite3.Connection, product_id: str, name: str, description: Optional[str], category_id: Optional[str] = None) -> str:
     cid = gen_uuid(category_id)
     c = conn.cursor()
     data = [cid, name, description]
     c.executemany(add_category, (data,)) #sql code to be added here once other functions done
     c.close()
     conn.commit()
+    categoryProduct_create(conn, cid, product_id)
     return cid
 
 # IMAGE CREATE: UUID, ProductID, Url
@@ -284,6 +301,22 @@ def image_delete(conn: sqlite3.Connection, image_id: str) -> None:
     conn.commit()
     c.close()
 
+# SUPPLIER PRODUCT DELETE
+def supplierProduct_delete(conn: sqlite3.Connection, supplier_id: str, product_id: str) -> None:
+    c = conn.cursor()
+    data = [supplier_id, product_id]
+    c.executemany(delete_supplierProduct, (data,))
+    conn.commit()
+    c.close()
+
+# CATEGORY PRODUCT DELETE
+def categoryProduct_delete(conn: sqlite3.Connection, category_id: str, product_id: str) -> None:
+    c = conn.cursor()
+    data = [category_id, product_id]
+    c.executemany(delete_categoryProduct, (data,))
+    conn.commit()
+    c.close()
+
 #---------------- CLI ARGUMENT PARSER -------------------
  
 # Arguments to be Parsed in CLI:
@@ -328,14 +361,16 @@ def main():
                             pid = product_create(conn, name, desc, quant, price)
                             print("New product id: " + pid)
                         case "supplier":
+                            pid = input("Enter product id supplied by supplier: ").strip()
                             name = input("Enter supplier name: ").strip()
                             email = input("Enter supplier email: ").strip()
-                            sid = supplier_create(conn, name, email)
+                            sid = supplier_create(conn, pid, name, email)
                             print("New supplier id: " + sid)
                         case "category":
+                            pid = input("Enter product id in category: ").strip()
                             name = input("Enter category name: ").strip()
                             desc = input("Enter category description: ").strip()
-                            cid = category_create(conn, name, desc)
+                            cid = category_create(conn, pid, name, desc)
                             print("New category id: " + cid)
                         case "image":
                             pid = input("Enter product id: ").strip()
@@ -401,7 +436,7 @@ def main():
                             url = input("Enter new image URL: ").strip()
                             print(image_update(conn, img_id, prod_id, url))
                 elif command == "delete":
-                    print("What type of record do you want to delete: product, supplier, category, image")
+                    print("What type of record do you want to delete: product, supplier, category, image, supplierProduct, categoryProduct")
                     read_type = input(">>> ").strip()
                     match read_type:
                         case "product":
@@ -420,6 +455,16 @@ def main():
                             img_id = input("Enter image id: ").strip()
                             image_delete(conn, img_id)
                             print("Image deleted.")
+                        case "supplierProduct":
+                            sid = input("Enter supplier id: ").strip()
+                            pid = input("Enter product id: ").strip()
+                            supplierProduct_delete(conn, sid, pid)
+                            print("Association deleted.");
+                        case "categoryProduct":
+                            cid = input("Enter category id: ").strip()
+                            pid = input("Enter product id: ").strip()
+                            categoryProduct_delete(conn, cid, pid)
+                            print("Association deleted.");
                 else:
                     print("ERR: Invalid command.")
         except KeyboardInterrupt:
