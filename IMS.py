@@ -355,7 +355,7 @@ def main():
                             prod_id = input(">>> ").strip()
                             categoryProduct_create(conn, cat_id, prod_id)
                 elif command == "read":
-                    print("What type of record do you want to read: product, supplier, category, image", "supplierProducts, categoryProducts")
+                    print("What type of record do you want to read: product, supplier, category, image, supplierProducts, categoryProducts")
                     read_type = input(">>> ").strip()
                     match read_type:
                         case "product":
