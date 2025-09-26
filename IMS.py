@@ -9,6 +9,7 @@ from typing import Optional
 import uuid
 
 # queries -> i think its best to define them up here
+
 add_product = """INSERT INTO products(product_id, name, description, quantity, price)
                  VALUES(?, ?, ?, ?, ?)"""
 add_supplier = """INSERT INTO suppliers(supplier_id, name, contact_email)
@@ -17,6 +18,8 @@ add_category = """INSERT INTO categories(category_id, name, description)
                  VALUES(?, ?, ?)"""
 add_image = """INSERT INTO images(image_id, product_id, url)
                  VALUES(?, ?, ?)"""
+get_product = """SELECT * FROM products 
+                 WHERE product_id = ?"""
 
 # ------------------------- FUNCTIONS ---------------------------
 
@@ -66,15 +69,17 @@ def init_database(connection: sqlite3.Connection):
     );
     
     CREATE TABLE IF NOT EXISTS categoryProducts (
-    	category_id TEXT PRIMARY KEY,
-    	product_id TEXT PRIMARY KEY,
+    	category_id TEXT,
+    	product_id TEXT,
+        PRIMARY KEY (category_id, product_id),
     	FOREIGN KEY(category_id) REFERENCES categories(category_id) ON DELETE CASCADE,
     	FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE
     );
     
     CREATE TABLE IF NOT EXISTS supplierProducts (
-    	supplier_id TEXT PRIMARY KEY,
-    	product_id TEXT PRIMARY KEY,
+    	supplier_id TEXT,
+    	product_id TEXT,
+        PRIMARY KEY (supplier_id, product_id),
     	FOREIGN KEY(supplier_id) REFERENCES suppliers(supplier_id) ON DELETE CASCADE,
     	FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE
     );                    
@@ -98,16 +103,18 @@ def init_database(connection: sqlite3.Connection):
 # PRODUCT CREATE: UUID, Name, Description, Quantity, Price 
 def product_create(conn: sqlite3.Connection, name: str, description: Optional[str], quantity: int, price: str, product_id: Optional[str]=None) -> str:
     pid = gen_uuid(product_id)
-
-    conn.execute(add_product, pid, name, description, quantity, price) #sql code to be added here once other functions done
+    c = conn.cursor()
+    data = [pid, name, description, quantity, price]
+    c.executemany(add_product, (data,)) #sql code to be added here once other functions done
     conn.commit()
     return pid
 
 # SUPPLIER CREATE: UUID, Name, Contact
 def supplier_create(conn: sqlite3.Connection, name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
     sid = gen_uuid(supplier_id)
-   
-    conn.execute(add_supplier, sid, name, contact) #sql code to be added here once other functions done
+    c = conn.cursor()
+    data = [sid, name, contact_email]
+    c.executemany(add_supplier, (data,)) #sql code to be added here once other functions done
     conn.commit()
     return sid
 
@@ -115,7 +122,27 @@ def supplier_create(conn: sqlite3.Connection, name: str, contact_email: str, sup
 # CATEGORY CREATE: UUID, Name, Description
 def category_create(conn: sqlite3.Connection, name: str, description: Optional[str], category_id: Optional[str]=None) -> str:
     cid = gen_uuid(category_id)
-   
-    conn.execute(add_category, cid, name, description) #sql code to be added here once other functions done
+    c = conn.cursor()
+    data = [cid, name, description]
+    c.executemany(add_category, (data,)) #sql code to be added here once other functions done
     conn.commit()
     return cid
+
+#
+def product_read(conn: sqlite3.Connection, product_id: str) -> str:
+    c = conn.cursor() 
+    c.execute(get_product, [str(product_id)])
+    row = c.fetchone()
+    return str(row)
+
+#
+
+try:
+    with sqlite3.connect("IMS.db") as conn:
+        init_database(conn)
+        out = product_create(conn, "laptop", "portable computer", 1, 100)
+        print(out)
+        print(product_read(conn, [out]))
+        pass
+except sqlite3.OperationalError as error:
+    print("Failed to open/modify database:", error)
