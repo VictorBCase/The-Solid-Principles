@@ -333,7 +333,7 @@ def main():
         conn = sqlite3.connect("")
         init_database(conn)
     except sqlite3.OperationalError as error:
-        print("\nGoodbye!")
+        print("\nDatabase error: ", error)
         exit()
 
     while True:
