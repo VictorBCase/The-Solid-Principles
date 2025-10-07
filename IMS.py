@@ -14,11 +14,19 @@ add_product = "INSERT INTO products(product_id, name, description, quantity, pri
 add_supplier = "INSERT INTO suppliers(supplier_id, name, contact_email) VALUES(?, ?, ?)"
 add_category = "INSERT INTO categories(category_id, name, description) VALUES(?, ?, ?)"
 add_image = "INSERT INTO images(image_id, product_id, url) VALUES(?, ?, ?)"
+add_supplierProduct = "INSERT INTO supplierProducts(supplier_id, product_id) VALUES (?, ?)"
+add_categoryProduct = "INSERT INTO categoryProducts(category_id, product_id) VALUES (?, ?)"
 
 get_product = "SELECT * FROM products WHERE product_id = ?" 
 get_supplier = "SELECT * FROM suppliers WHERE supplier_id = ?"
 get_category = "SELECT * FROM categories WHERE category_id = ?"
 get_image = "SELECT * FROM images WHERE image_id = ?"
+get_supplierProducts = "SELECT p.product_id, p.name, p.description FROM products p INNER JOIN supplierProducts sp ON p.product_id = sp.product_id WHERE sp.supplier_id = ?"
+get_categoryProducts = "SELECT p.product_id, p.name, p.description FROM products p INNER JOIN categoryProducts cp ON p.product_id = cp.product_id WHERE cp.category_id = ?"
+# these could be used to access these records using the product id rather than the 
+#supplier/category id
+get_productSuppliers = "SELECT s.supplier_id, s.name, s.contact_email FROM suppliers s INNER JOIN supplierProducts sp ON s.supplier_id = sp.supplier_id WHERE sp.product_id = ?"
+get_productSuppliers = "SELECT c.category_id, c.name, c.description FROM categories c INNER JOIN categoryProducts cp ON c.category_id = cp.category_id WHERE cp.product_id = ?"
 
 update_product = "UPDATE products SET name = ?, description = ?, quantity = ?, price = ? WHERE product_id = ?"
 update_supplier = "UPDATE suppliers SET name = ?, contact_email = ? WHERE supplier_id = ?"
@@ -29,7 +37,8 @@ delete_product = "DELETE FROM products WHERE product_id = ?"
 delete_supplier = "DELETE FROM suppliers WHERE supplier_id = ?"
 delete_category = "DELETE FROM categories WHERE category_id = ?"
 delete_image = "DELETE FROM images WHERE image_id = ?"
-
+delete_supplierProduct = "DELETE FROM supplierProducts WHERE supplier_id = ? AND product_id = ?"
+delete_categoryProduct = "DELETE FROM categoryProducts WHERE category_id = ? AND product_id = ?"
 
 # ------------------------- FUNCTIONS ---------------------------
 
@@ -93,6 +102,21 @@ def init_database(conn: sqlite3.Connection):
     	FOREIGN KEY(supplier_id) REFERENCES suppliers(supplier_id) ON DELETE CASCADE,
     	FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE
     );
+
+    CREATE TRIGGER IF NOT EXISTS sp_after_del AFTER DELETE ON supplierProducts
+    BEGIN
+        DELETE FROM suppliers WHERE suppliers.supplier_id = OLD.supplier_id AND NOT EXISTS(
+            SELECT * FROM supplierProducts sp WHERE sp.supplier_id = OLD.supplier_id
+        );
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS cp_after_del AFTER DELETE ON categoryProducts
+    BEGIN
+        DELETE FROM categories WHERE categories.category_id = OLD.category_id AND NOT EXISTS(
+            SELECT * FROM categoryProducts cp WHERE cp.category_id = OLD.category_id
+        );
+    END;
+
     """)
     conn.commit()
 
@@ -116,23 +140,25 @@ def product_create(conn: sqlite3.Connection, name: str, description: Optional[st
     return pid
 
 # SUPPLIER CREATE: UUID, Name, Contact
-def supplier_create(conn: sqlite3.Connection, name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
+def supplier_create(conn: sqlite3.Connection, product_id: str, name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
     sid = gen_uuid(supplier_id)
     c = conn.cursor()
     data = [sid, name, contact_email]
     c.executemany(add_supplier, (data,)) #sql code to be added here once other functions done
     c.close()
     conn.commit()
+    supplierProduct_create(conn, sid, product_id)
     return sid
 
 # CATEGORY CREATE: UUID, Name, Description
-def category_create(conn: sqlite3.Connection, name: str, description: Optional[str], category_id: Optional[str] = None) -> str:
+def category_create(conn: sqlite3.Connection, product_id: str, name: str, description: Optional[str], category_id: Optional[str] = None) -> str:
     cid = gen_uuid(category_id)
     c = conn.cursor()
     data = [cid, name, description]
     c.executemany(add_category, (data,)) #sql code to be added here once other functions done
     c.close()
     conn.commit()
+    categoryProduct_create(conn, cid, product_id)
     return cid
 
 # IMAGE CREATE: UUID, ProductID, Url
@@ -144,6 +170,22 @@ def image_create(conn: sqlite3.Connection, product_id: str, url: str, image_id: 
     c.close()
     conn.commit()
     return iid
+
+# SUPPLIER PRODUCT CREATE
+def supplierProduct_create(conn: sqlite3.Connection, supplier_id: str, product_id: str) -> None:
+    c = conn.cursor()
+    data = [supplier_id, product_id]
+    c.executemany(add_supplierProduct, (data,))
+    c.close()
+    conn.commit()
+
+# CATEGORY PRODUCT CREATE
+def categoryProduct_create(conn: sqlite3.Connection, category_id: str, product_id: str) -> None:
+    c = conn.cursor()
+    data = [category_id, product_id]
+    c.executemany(add_categoryProduct, (data,))
+    c.close()
+    conn.commit()
 
 # PRODUCT READ
 def product_read(conn: sqlite3.Connection, product_id: str) -> str:
@@ -177,6 +219,24 @@ def image_read(conn: sqlite3.Connection, image_id: str) -> str:
     c.close()
     return str(row)
 
+# SUPPLIER PRODUCTS READ
+def supplierProducts_read(conn: sqlite3.Connection, supplier_id: str) -> None:
+    c = conn.cursor()
+    c.execute(get_supplierProducts, (supplier_id,))
+    rows = c.fetchall()
+    c.close()
+    for row in rows:
+        print(str(row))
+
+# CATEGORY PRODUCRS READ
+def categoryProducts_read(conn: sqlite3.Connection, category_id: str) -> None:
+    c = conn.cursor()
+    c.execute(get_categoryProducts, (category_id,))
+    rows = c.fetchall()
+    c.close()
+    for row in rows:
+        print(str(row))
+
 # PRODUCT UPDATE
 def product_update(conn: sqlite3.Connection, product_id: str, name: str, description: str, quantity: int, price: str) -> str:
     c = conn.cursor()
@@ -203,6 +263,15 @@ def category_update(conn: sqlite3.Connection, category_id: str, name: str, descr
     c.close()
     conn.commit()
     return category_read(conn, str(category_id))
+
+# IMAGE UPDATE
+def image_update(conn: sqlite3.Connection, image_id: str, product_id: str, url: str) -> str:
+    c = conn.cursor()
+    data = [product_id, url, image_id]
+    c.executemany(update_image, (data,))
+    c.close()
+    conn.commit()
+    return image_read(conn, str(image_id))
 
 # PRODUCT DELETE
 def product_delete(conn: sqlite3.Connection, product_id: str) -> None:
@@ -232,7 +301,21 @@ def image_delete(conn: sqlite3.Connection, image_id: str) -> None:
     conn.commit()
     c.close()
 
+# SUPPLIER PRODUCT DELETE
+def supplierProduct_delete(conn: sqlite3.Connection, supplier_id: str, product_id: str) -> None:
+    c = conn.cursor()
+    data = [supplier_id, product_id]
+    c.executemany(delete_supplierProduct, (data,))
+    conn.commit()
+    c.close()
 
+# CATEGORY PRODUCT DELETE
+def categoryProduct_delete(conn: sqlite3.Connection, category_id: str, product_id: str) -> None:
+    c = conn.cursor()
+    data = [category_id, product_id]
+    c.executemany(delete_categoryProduct, (data,))
+    conn.commit()
+    c.close()
 
 #---------------- CLI ARGUMENT PARSER -------------------
  
@@ -246,93 +329,152 @@ def image_delete(conn: sqlite3.Connection, image_id: str) -> None:
 
 def main():
     print("Welcome to The Solid Principles' Monolithic Inventory Management System")
-    print("Type help or ? to list commands.")
+    try:
+        conn = sqlite3.connect("")
+        init_database(conn)
+    except sqlite3.OperationalError as error:
+        print("\nDatabase error: ", error)
+        exit()
 
     while True:
         try:
-            with sqlite3.connect("IMS.db") as conn:
-                init_database(conn)
-
+                print("Type help or ? to list commands.")
                 command = input(">>> ").strip()
     
                 if command in ("exit", "quit"):
                     print("Terminating session.")
                     break
-                elif command == "help" or command == "?":
+                elif command in ("help", "?"):
                     print("Available commands: help, create, read, update, delete, exit, quit")
                 elif command == "create":
-                    print("What type of record do you want to create: product, supplier, category, image")
+                    print("What type of record do you want to create: product, supplier, category, image, supplierProduct, categoryProduct")
                     create_type = input(">>> ").strip()
                     match create_type:
                         case "product":
-                            print("Enter product name: ")
-                            name = input(">>> ").strip()
-                            print("\nEnter product description: ")
-                            desc = input(">>> ").strip()
+                            name = input("Enter product name: ").strip()
+                            desc = input("Enter product description: ").strip()
                             quant = -1
                             while quant == -1:
-                                print("\nEnter product quantity: ")
-                                quant_string = input(">>> ").strip()
+                                quant_string = input("Enter product quantity: ").strip()
                                 try:
                                     quant = int(quant_string)
                                 except ValueError:
-                                    print("\nERR: You must enter an integer for quantity.")
-                            print("\nEnter product price: ")
-                            price = input(">>> ").strip()
+                                    print("ERR: You must enter an integer for quantity.")
+                            price = input("Enter product price: ").strip()
                             pid = product_create(conn, name, desc, quant, price)
                             print("New product id: " + pid)
                         case "supplier":
-                            print("Enter supplier name: ")
-                            name = input(">>> ").strip()
-                            print("\nEnter supplier's email:")
-                            email = input(">>> ").strip()
-                            sid = supplier_create(conn, name, email)
+                            pid = input("Enter product id supplied by supplier: ").strip()
+                            name = input("Enter supplier name: ").strip()
+                            email = input("Enter supplier email: ").strip()
+                            sid = supplier_create(conn, pid, name, email)
                             print("New supplier id: " + sid)
                         case "category":
-                            print("Enter category name: ")
-                            name = input(">>> ").strip()
-                            print("\nEnter cateogry description: ")
-                            desc = input(">>> ").strip()
-                            cid = category_create(conn, name, desc)
+                            pid = input("Enter product id in category: ").strip()
+                            name = input("Enter category name: ").strip()
+                            desc = input("Enter category description: ").strip()
+                            cid = category_create(conn, pid, name, desc)
                             print("New category id: " + cid)
                         case "image":
-                            print("Enter product id: ")
-                            prod_id = input(">>> ").strip()
-                            print("\nEnter image URL: ")
-                            url = input(">>> ").strip()
-                            iid = image_create(conn, prod_id, url)
+                            pid = input("Enter product id: ").strip()
+                            url = input("Enter image URL: ").strip()
+                            iid = image_create(conn, pid, url)
                             print("New image id: " + iid)
+                        case "supplierProduct":
+                            sid = input("Enter supplier id: ").strip()
+                            pid = input("Enter product id: ").strip()
+                            supplierProduct_create(conn, sid, pid)
+                            print("Association created.")
+                        case "categoryProduct":
+                            cid = input("Enter category id: ").strip()
+                            pid = input("Enter product id: ").strip()
+                            categoryProduct_create(conn, cid, pid)
+                            print("Association created.")
                 elif command == "read":
-                    print("What type of record do you want to read: product, supplier, category, image")
+                    print("What type of record do you want to read: product, supplier, category, image, supplierProducts, categoryProducts")
                     read_type = input(">>> ").strip()
                     match read_type:
                         case "product":
-                            print("Enter product id: ")
-                            prod_id = input(">>> ").strip()
+                            prod_id = input("Enter product id: ").strip()
                             print(product_read(conn, prod_id))
                         case "supplier":
-                            print("Enter supplier id: ")
-                            sup_id = input(">> ").strip()
+                            sup_id = input("Enter supplier id: ").strip()
                             print(supplier_read(conn, sup_id))
                         case "category":
-                            print("Enter category id: ")
-                            cat_id = input(">>> ").strip()
+                            cat_id = input("Enter category id: ").strip()
                             print(category_read(conn, cat_id))
                         case "image":
-                            print("Enter image id: ")
-                            img_id = input(">>> ").strip()
+                            img_id = input("Enter image id: ").strip()
                             print(image_read(conn, img_id))
+                        case "supplierProducts":
+                            sup_id = input("Enter supplier id: ").strip()
+                            supplierProducts_read(conn, sup_id)
+                        case "categoryProducts":
+                            cat_id = input("Enter category id: ").strip()
+                            categoryProducts_read(conn, cat_id)
                 elif command == "update":
-                    print("Not yet implemented")
+                    print("What type of record do you want to update: product, supplier, category, image")
+                    update_type = input(">>> ").strip()
+                    match update_type:
+                        case "product":
+                            prod_id = input("Enter product id: ").strip()
+                            name = input("Enter new product name: ").strip()
+                            desc = input("Enter new product description: ").strip()
+                            quantity = input("Enter new product quantity: ").strip()
+                            price = input("Enter new product price: ").strip()
+                            print("New record: " + product_update(conn, prod_id, name, desc, quantity, price))
+                        case "supplier":
+                            sup_id = input("Enter supplier id: ").strip()
+                            name = input("Enter new supplier name: ").strip()
+                            email = input("Enter new supplier email: ").strip()
+                            print(supplier_update(conn, sup_id, name, email))
+                        case "category":
+                            cat_id = input("Enter category id: ").strip()
+                            name = input("Enter new category name: ").strip()
+                            desc = input("Enter new category description: ").strip()
+                            print(category_update(conn, cat_id, name, desc))
+                        case "image":
+                            img_id = input("Enter image id: ").strip()
+                            prod_id = input("Enter new product id: ").strip()
+                            url = input("Enter new image URL: ").strip()
+                            print(image_update(conn, img_id, prod_id, url))
                 elif command == "delete":
-                    print("Not yet implemented")
+                    print("What type of record do you want to delete: product, supplier, category, image, supplierProduct, categoryProduct")
+                    read_type = input(">>> ").strip()
+                    match read_type:
+                        case "product":
+                            prod_id = input("Enter product id: ").strip()
+                            product_delete(conn, prod_id)
+                            print("Product deleted.")
+                        case "supplier":
+                            sup_id = input("Enter supplier id: ").strip()
+                            supplier_delete(conn, sup_id)
+                            print("Supplier deleted.")
+                        case "category":
+                            cat_id = input("Enter category id: ").strip()
+                            category_delete(conn, cat_id)
+                            print("Category deleted.")
+                        case "image":
+                            img_id = input("Enter image id: ").strip()
+                            image_delete(conn, img_id)
+                            print("Image deleted.")
+                        case "supplierProduct":
+                            sid = input("Enter supplier id: ").strip()
+                            pid = input("Enter product id: ").strip()
+                            supplierProduct_delete(conn, sid, pid)
+                            print("Association deleted.");
+                        case "categoryProduct":
+                            cid = input("Enter category id: ").strip()
+                            pid = input("Enter product id: ").strip()
+                            categoryProduct_delete(conn, cid, pid)
+                            print("Association deleted.");
                 else:
                     print("ERR: Invalid command.")
         except KeyboardInterrupt:
             print("\nGoodbye!")
             break
         except sqlite3.OperationalError as error:
-            print("\nCould not open database!")
+            print("\nDatabase error: ", error)
             break
 
 if __name__ == "__main__":
