@@ -1,4 +1,4 @@
-#IMS_Layered.py
+# DB.py - database python code
 # pip install psycopg2-binary to install dependencies for psycopg - python library for postgresql
 
 import psycopg2
