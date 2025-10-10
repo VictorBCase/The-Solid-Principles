@@ -10,6 +10,7 @@ function App() {
 		image: 3
 	};
 	const [ portal, setPortal ] = useState(null);
+
 	const [ inputFields, setInputFields ] = useState({
 		product: [
 			["name", "text"],
@@ -30,18 +31,20 @@ function App() {
 			["url", "text"]
 		]
 	});
+
 	const [ productList, setProductList ] = useState(['product1', 'product2', 'product3']);
+	const [ supplierList, setSupplierList ] = useState(['sup1', 'sup2', 'sup3', 'sup4']);
 
 	function Portal() {
 		switch(portal) {
 			case portals.product:
 				return <Product fields={inputFields.product} products={productList} />;
 			case portals.supplier:
-				return <Supplier />;
+				// return <Supplier fields={inputFields.supplier} suppliers={supplierList} />;
 			case portals.category:
-				return <Category />;
+				// return <Category />;
 			case portals.image:
-				return <Image />;
+				// return <Image />;
 			default:
 				return <></>;
 		}
