@@ -1,26 +1,23 @@
 import { useState } from 'react';
 
-function Product({fields, products, create, remove}) {
+function Supplier({fields, suppliers}) {
 
     // supported operations
     const RUDs = {
         view: "get",
         edit: "edit",
         delete: "del",
-        associate: "assoc",
-        dissassociate: "diss"
     };
 
-    // mock product entry
-    const product = {name: "phone", description: "mobile device", quantity: 0, price: 34.5};
+    // mock supplier entry
+    const supplier = {name: "fairphone", contact: "email"};
 
     // state variables for the menu
     const [edit, setEdit] = useState(null);
     const [result, setResult] = useState(null);
-    const [requireId, setRequireId] = useState(null);
 
     // validation msg -> contents potentially provided by middleware response
-    const [message, setMessage] = useState("quantity and price must be greater than zero.");
+    const [message, setMessage] = useState("fields must be non-empty.");
 
     // handle create/edit inputs
     const handleFields = (data) => {
@@ -31,17 +28,9 @@ function Product({fields, products, create, remove}) {
         console.log(inputs);
         if (edit != null)
             setEdit(null);
-        else
-            create();
+        // else
+            // create();
     };
-
-    // handle supplier/category associations
-    const handleAssociation = (data) => {
-        let type = data.get("type");
-        let id = data.get("id");
-        console.log([type, id]);
-        setRequireId(null);
-    }
 
     // handle CRUD inputs
     const handleRUD = (data) => {
@@ -49,20 +38,14 @@ function Product({fields, products, create, remove}) {
         let prod = data.get("prod");
         switch(type) {
             case RUDs.edit:
-                setEdit(product);
+                setEdit(supplier);
                 break;
             case RUDs.delete:
-                remove();
-                break;
-            case RUDs.associate:
-                setRequireId(RUDs.associate);
-                break;
-            case RUDs.dissassociate:
-                setRequireId(RUDs.dissassociate);
+                // remove();
                 break;
             case RUDs.view:
             default:
-                setResult(product);
+                setResult(supplier);
                 break;
         }
     };
@@ -92,10 +75,10 @@ function Product({fields, products, create, remove}) {
     function FieldForm({formAction}) {
         return (
             <form action={formAction}>
-                <p>{edit == null ? "create" : "modify"} product:</p>
+                <p>{edit == null ? "create" : "modify"} supplier:</p>
                 {fields.map((data) => (
                     <>
-                        <label>product {data[0]}:
+                        <label>supplier {data[0]}:
                             {edit == null ?
                                 <input type={data[1]} name={data[0]} />
                             :
@@ -117,28 +100,6 @@ function Product({fields, products, create, remove}) {
                 <>
                     <button onClick={() => setEdit(null)}>cancel edit</button>
                     <FieldForm formAction={handleFields} />
-                </>
-            );
-        }
-        if (requireId != null) {
-            // association interface
-            return (
-                <>
-                    <button onClick={() => setRequireId(null)}>back</button>
-                    <form action={handleAssociation}>
-                        <label>
-                            <input type="radio" name="type" value="supplier" defaultChecked />supplier
-                        </label>
-                        <label>
-                            <input type="radio" name="type" value="category" />category
-                        </label>
-                        <br />
-                        <label>provide id to {requireId == RUDs.associate ? "associate" : "dissasociate"} with this product:
-                            <input type="text" name="id" />
-                            <button type="submit">confirm</button>
-                        </label>
-                        <ValidationMsg />
-                    </form>
                 </>
             );
         }
@@ -164,23 +125,13 @@ function Product({fields, products, create, remove}) {
                                 <input type="radio" name="type" value={RUDs.delete} />delete
                             </label>
                         </li>
-                        <li>
-                            <label>
-                                <input type="radio" name="type" value={RUDs.associate} />associate
-                            </label>
-                        </li>
-                        <li>
-                            <label>
-                                <input type="radio" name="type" value={RUDs.dissassociate} />dissassociate
-                            </label>
-                        </li>
                     </ul>
-                    <p>on product:</p>
+                    <p>on supplier:</p>
                     <ul>
-                        {products.map((product) => (
-                            <li key={product}>
+                        {suppliers.map((supplier) => (
+                            <li key={supplier}>
                                 <label>
-                                    <input type="radio" name="prod" value={product} />{product}
+                                    <input type="radio" name="prod" value={supplier} />{supplier}
                                 </label>
                             </li>
                         ))}
@@ -193,11 +144,11 @@ function Product({fields, products, create, remove}) {
 
     return (
         <>
-            <h2>product portal</h2>
+            <h2>supplier portal</h2>
             <Result />
             <Menu />
         </>
     );
 }
 
-export default Product;
+export default Supplier;
