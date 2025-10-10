@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function Product({fields, products}) {
+function Product({fields, products, create, remove}) {
 
     const RUDs = {
         view: "get",
@@ -24,6 +24,8 @@ function Product({fields, products}) {
         console.log(inputs);
         if (edit != null)
             setEdit(null);
+        else
+            create();
     };
 
     const handleAssociation = (data) => {
@@ -41,7 +43,7 @@ function Product({fields, products}) {
                 setEdit(product);
                 break;
             case RUDs.delete:
-                console.log("delete " + prod);
+                remove();
                 break;
             case RUDs.associate:
                 setRequireId(RUDs.associate);
