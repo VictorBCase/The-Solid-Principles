@@ -13,8 +13,8 @@ function App() {
 	const [ inputFields, setInputFields ] = useState({
 		product: [
 			["name", "text"],
-			["desc", "text"],
-			["stock", "number"],
+			["description", "text"],
+			["quantity", "number"],
 			["price", "number"]
 		],
 		supplier: [
