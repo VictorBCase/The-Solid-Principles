@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Product from './portals/Product.jsx';
+import Supplier from './portals/Supplier.jsx';
 
 function App() {
 
@@ -11,6 +12,7 @@ function App() {
 	};
 	const [ portal, setPortal ] = useState(null);
 
+	// passed down to each portal
 	const inputFields = {
 		product: [
 			["name", "text"],
@@ -36,13 +38,14 @@ function App() {
 	const [ productList, setProductList ] = useState(['product1', 'product2', 'product3']);
 	const [ supplierList, setSupplierList ] = useState(['sup1', 'sup2', 'sup3', 'sup4']);
 
-	// requests to middleware go here
+	// async requests to middleware go here
 	async function createProduct() {
 		setProductList([...productList, 'new_product']);
 	}
 
 	async function removeProduct() {
-		setProductList(productList.slice(0, supplierList.length - 2));
+		let temp = productList.slice(0, productList.length - 1);
+		setProductList(temp);
 	}
 
 	function Portal() {
@@ -55,7 +58,10 @@ function App() {
 					remove={removeProduct}
 				/>;
 			case portals.supplier:
-				// return <Supplier fields={inputFields.supplier} suppliers={supplierList} />;
+				return <Supplier
+					fields={inputFields.supplier}
+					suppliers={supplierList}
+				/>;
 			case portals.category:
 				// return <Category />;
 			case portals.image:
@@ -68,6 +74,7 @@ function App() {
 	return (
 		<>
 			<h1>Inventory Management System</h1>
+			<p>The Solid Principles - Victor Boyd, Michael Warner, Ricardo Olazabal</p>
 			<p>choose a portal:</p>
 			<ul>
 				<li><button onClick={() => setPortal(portals.product)}>product</button></li>
