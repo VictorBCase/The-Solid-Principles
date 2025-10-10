@@ -11,7 +11,7 @@ function App() {
 	};
 	const [ portal, setPortal ] = useState(null);
 
-	const [ inputFields, setInputFields ] = useState({
+	const inputFields = {
 		product: [
 			["name", "text"],
 			["description", "text"],
@@ -30,7 +30,7 @@ function App() {
 			["product", "text"],
 			["url", "text"]
 		]
-	});
+	};
 
 	// mock outputs of middleware requests
 	const [ productList, setProductList ] = useState(['product1', 'product2', 'product3']);
@@ -70,10 +70,10 @@ function App() {
 			<h1>Inventory Management System</h1>
 			<p>choose a portal:</p>
 			<ul>
-				<li onClick={() => setPortal(portals.product)}>products</li>
-				<li onClick={() => setPortal(portals.supplier)}>suppliers</li>
-				<li>categories</li>
-				<li>images</li>
+				<li><button onClick={() => setPortal(portals.product)}>product</button></li>
+				<li><button onClick={() => setPortal(portals.supplier)}>supplier</button></li>
+				<li><button>category</button></li>
+				<li><button>image</button></li>
 			</ul>
 			<Portal />
 		</>
