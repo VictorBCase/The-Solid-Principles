@@ -2,6 +2,7 @@
 # pip install psycopg2-binary to install dependencies for psycopg - python library for postgresql
 
 from typing import Optional
+from xmlrpc.server import SimpleXMLRPCServer
 import psycopg2
 from contextlib import contextmanager
 import uuid
@@ -259,3 +260,28 @@ def supplierProducts_delete(supplier_id, product_id):
             """, (supplier_id, product_id))
             print("Supplier-Product link deleted.")
 
+if __name__ == "__main__":
+    server = SimpleXMLRPCServer(("0.0.0.0", 8000), allow_none=True)
+    server.register_function(product_create, "product_create")
+    server.register_function(product_read, "product_read")
+    server.register_function(product_create, "product_create")
+    server.register_function(product_update, "product_update")
+    server.register_function(supplier_create, "supplier_create")
+    server.register_function(supplier_read, "supplier_read")
+    server.register_function(supplier_delete, "supplier_delete")
+    server.register_function(supplier_update, "supplier_update")
+    server.register_function(category_update, "category_update")
+    server.register_function(category_create, "category_create")
+    server.register_function(category_read, "category_read")
+    server.register_function(category_delete, "category_delete")
+    server.register_function(image_create, "image_create")
+    server.register_function(image_read, "image_read")
+    server.register_function(image_delete, "image_delete")
+    server.register_function(image_update, "image_update")
+    server.register_function(categoryProducts_create, "categoryProducts_create")
+    server.register_function(categoryProducts_delete, "categoryProducts_delete")
+    server.register_function(categoryProducts_read, "categoryProducts_read")
+    server.register_function(supplierProducts_create, "supplierProducts_create")
+    server.register_function(supplierProducts_read, "supplierProducts_read")
+    server.register_function(supplierProducts_delete, "supplierProducts_delete")
+    server.serve_forever()
