@@ -32,8 +32,12 @@ def gen_uuid():
 
 # Check for empty input
 def validate_nonempty(field_name: str, value: str):
-    if not isinstance(value, str) or not value.strip():
-        raise Exception(f"{field_name} must be a non-empty string.")
+    if value is None:
+        raise ValueError(f"{field_name} cannot be None.")
+    value = str(value).strip()
+    if not value:
+        raise ValueError(f"{field_name} must be a non-empty string.")
+
 
 # Check for positive numbers
 def validate_positive(field_name: str, value):
@@ -142,11 +146,11 @@ def product_delete(product_id: str) -> None:
 
 
 #  SUPPLIER CRUD
-def supplier_create(name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
+def supplier_create(name: str, contact_email: str) -> str:
     try:
         validate_nonempty("name", name)
         validate_nonempty("contact_email", contact_email)
-        sid = gen_uuid(supplier_id)
+        sid = gen_uuid()
         with get_conn() as conn:
             with conn.cursor() as c:
                 c.execute("""
@@ -195,12 +199,12 @@ def supplier_delete(supplier_id: str) -> None:
 
 
 #  CATEGORY CRUD
-def category_create(name: str, description: Optional[str], category_id: Optional[str] = None) -> str:
+def category_create(name: str, description: Optional[str]) -> str:
     try:
         validate_nonempty("name", name)
         if description is not None:
             validate_nonempty("description", description)
-        cid = gen_uuid(category_id)
+        cid = gen_uuid()
         with get_conn() as conn:
             with conn.cursor() as c:
                 c.execute("""
@@ -250,11 +254,11 @@ def category_delete(category_id: str) -> None:
 
 
 #  IMAGE CRUD
-def image_create(product_id: str, url: str, image_id: Optional[str] = None) -> str:
+def image_create(product_id: str, url: str) -> str:
     try:
         validate_nonempty("product_id", product_id)
         validate_nonempty("url", url)
-        iid = gen_uuid(image_id)
+        iid = gen_uuid()
         with get_conn() as conn:
             with conn.cursor() as c:
                 c.execute("""
