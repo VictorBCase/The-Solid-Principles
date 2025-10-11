@@ -11,14 +11,14 @@ app.use(express.json());
 // rpc connection
 const client = xmlrpc.createClient({host:'localhost',port: 8000, path: "/"});
 
-client.methodCall("add", [1, 2], (error, value) => {
-	if (error) console.log("error");
-	else console.log(value);
-});
-
 // api
 app.post('/api/IMS', (req, res) => {
-
+	
+	// rpc requests will go here
+	client.methodCall("add", [1, 2], (error, value) => {
+		if (error) console.log("error");
+		else console.log(value);
+	});
 });
 
 app.listen(PORT, () => {
