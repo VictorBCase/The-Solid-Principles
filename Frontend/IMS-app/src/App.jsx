@@ -39,18 +39,314 @@ function App() {
 	const [ productList, setProductList ] = useState(['product1', 'product2', 'product3']);
 	const [ supplierList, setSupplierList ] = useState(['sup1', 'sup2', 'sup3', 'sup4']);
 
-	// async requests to middleware go here
-	async function createProduct() {
-		setProductList([...productList, 'new_product']);
+	// api
+	const API = 'http://localhost:5050/api/IMS';
+
+	// api calls
+	async function createProduct(name, desc, quantity, price) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'product_create',
+					name: name,
+					description: desc,
+					quantity: quantity,
+					price: price
+				})
+			});
+		} catch(error) { console.log(error); }
 	}
 
-	async function removeProduct() {
-		let temp = productList.slice(0, productList.length - 1);
-		setProductList(temp);
+	async function viewProduct(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'product_read',
+					p_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
 	}
 
-	async function add() {
-	
+	async function removeProduct(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'product_delete',
+					p_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function updateProduct(id, name, desc, quantity, price) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'product_update',
+					p_id: id,
+					name: name,
+					description: desc,
+					quantity: quantity,
+					price: price
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function createSupplier(name, contact) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplier_create',
+					name: name,
+					contact: contact
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function viewSupplier(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplier_read',
+					s_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function removeSupplier(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplier_delete',
+					s_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function updateSupplier(id, name, contact) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplier_update',
+					s_id: id,
+					name: name,
+					contact: contact
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function createCategory(name, desc) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'category_create',
+					name: name,
+					description: desc
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function viewCategory(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'category_read',
+					c_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function removeCategory(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'category_delete',
+					c_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function updateCategory(id, name, desc) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'category_update',
+					c_id: id,
+					name: name,
+					description: desc
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function createImage(p_id, url) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'image_create',
+					p_id: p_id,
+					url: url
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function viewImage(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'image_read',
+					i_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function removeImage(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'image_delete',
+					i_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function updateImage(id, p_id, url) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'image_update',
+					i_id: id,
+					p_id: p_id,
+					url: url
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function associateProdSup(p_id, s_id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplierProducts_create',
+					p_id: p_id,
+					s_id: s_id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function dissassociateProdSup(p_id, s_id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplierProducts_delete',
+					p_id: p_id,
+					s_id: s_id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function viewSupplierProducts(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplierProducts_read',
+					s_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function associateProdCat(p_id, c_id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'categoryProducts_create',
+					p_id: p_id,
+					c_id: c_id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function dissassociateProdCat(p_id, c_id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'categoryProducts_delete',
+					p_id: p_id,
+					c_id: c_id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function viewCategoryProducts(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplierProducts_read',
+					c_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
 	}
 
 	function Portal() {
