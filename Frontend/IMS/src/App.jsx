@@ -13,7 +13,6 @@ function App() {
 		category: 2,
 		image: 3
 	};
-	const [ portal, setPortal ] = useState(null);
 
 	// passed down to each portal [name, input type]
 	const inputFields = {
@@ -37,9 +36,29 @@ function App() {
 		]
 	};
 
-	// mock outputs of middleware requests
-	const [ productList, setProductList ] = useState(['product1', 'product2', 'product3']);
-	const [ supplierList, setSupplierList ] = useState(['sup1', 'sup2', 'sup3', 'sup4']);
+	const operations = {
+		product: {
+			view: "get",
+			edit: "edit",
+			delete: "del",
+			associate: "assoc",
+			dissassociate: "diss"
+		},
+		supplier: {
+		
+		},
+		category: {
+		
+		},
+		image: {
+
+		}
+	};
+
+	// state variables
+	const [portal, setPortal] = useState(null);
+	const [results, setResults] = useState(null);
+	const [validationMsg, setVaidationMsg] = useState("");
 
 	// api
 	const API = 'http://localhost:8080/api/IMS';
@@ -47,7 +66,7 @@ function App() {
 	// api calls
 	async function createProduct(name, desc, quantity, price) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -58,12 +77,16 @@ function App() {
 					price: price
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let id = data.p_id;
+			return id;
+		} catch(error) { console.error(error); }
 	}
 
 	async function viewProduct(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -71,15 +94,17 @@ function App() {
 					p_id: id
 				})
 			});
-			if (res.status > 299) return; // handle error
-			res = await res.json();
-			let product = res.product;
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let product = data.product;
+			console.log(product);
+			return product;
+		} catch(error) { console.error(error); }
 	}
 
 	async function removeProduct(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -87,12 +112,14 @@ function App() {
 					p_id: id
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
 		} catch(error) { console.log(error); }
 	}
 
 	async function updateProduct(id, name, desc, quantity, price) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -104,12 +131,14 @@ function App() {
 					price: price
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
 		} catch(error) { console.log(error); }
 	}
 
 	async function createSupplier(name, contact) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -123,7 +152,7 @@ function App() {
 
 	async function viewSupplier(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -136,7 +165,7 @@ function App() {
 
 	async function removeSupplier(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -149,7 +178,7 @@ function App() {
 
 	async function updateSupplier(id, name, contact) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -164,7 +193,7 @@ function App() {
 
 	async function createCategory(name, desc) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -178,7 +207,7 @@ function App() {
 
 	async function viewCategory(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -191,7 +220,7 @@ function App() {
 
 	async function removeCategory(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -204,7 +233,7 @@ function App() {
 
 	async function updateCategory(id, name, desc) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -219,7 +248,7 @@ function App() {
 
 	async function createImage(p_id, url) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -233,7 +262,7 @@ function App() {
 
 	async function viewImage(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -246,7 +275,7 @@ function App() {
 
 	async function removeImage(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -259,7 +288,7 @@ function App() {
 
 	async function updateImage(id, p_id, url) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -274,7 +303,7 @@ function App() {
 
 	async function associateProdSup(p_id, s_id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -288,7 +317,7 @@ function App() {
 
 	async function dissassociateProdSup(p_id, s_id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -302,7 +331,7 @@ function App() {
 
 	async function viewSupplierProducts(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -315,7 +344,7 @@ function App() {
 
 	async function associateProdCat(p_id, c_id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -329,7 +358,7 @@ function App() {
 
 	async function dissassociateProdCat(p_id, c_id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -343,7 +372,7 @@ function App() {
 
 	async function viewCategoryProducts(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -361,8 +390,8 @@ function App() {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'products_read'})
 			});
-			if (res.status > 299) return; // handle error
-			const data = await res.json();
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
 			let products = data.list;
 			return products;
 		} catch(error) { console.error(error); }
@@ -370,7 +399,7 @@ function App() {
 
 	async function listSuppliers() {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'suppliers_read'})
@@ -380,7 +409,7 @@ function App() {
 
 	async function listCategories() {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'categories_read'})
@@ -390,7 +419,7 @@ function App() {
 
 	async function listImages() {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'images_read'})
@@ -400,7 +429,7 @@ function App() {
 
 	async function listSupplierProducts(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -413,7 +442,7 @@ function App() {
 
 	async function listCategoryProducts(id) {
 		try {
-			await fetch(API, {
+			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -422,52 +451,6 @@ function App() {
 				})
 			});
 		} catch(error) { console.log(error); }
-	}
-
-	function Portal() {
-		switch(portal) {
-			case portals.product:
-				return <Product 
-					fields={inputFields.product}
-					list={listProducts}
-					create={createProduct}
-					read={viewProduct}
-					update={updateProduct}
-					remove={removeProduct}
-				/>;
-			case portals.supplier:
-				return <Supplier
-					fields={inputFields.supplier}
-					suppliers={supplierList} //
-					list={listSuppliers}
-					create={createSupplier}
-					read={viewSupplier}
-					update={updateSupplier}
-					remove={removeSupplier}
-					readProducts={listSupplierProducts}
-				/>;
-			case portals.category:
-				return <Category
-					fields={inputFields.category}
-					list={listCategories}
-					create={createCategory}
-					read={viewCategory}
-					update={updateSupplier}
-					remove={removeCategory}
-					readProducts={listCategoryProducts}
-				/>;
-			case portals.image:
-				return <Image
-					fields={inputFields.image}
-					list={listImages}
-					create={createImage}
-					read={viewImage}
-					update={updateImage}
-					remove={removeImage}
-				/>;
-			default:
-				return <></>;
-		}
 	}
 
 	return (
@@ -481,7 +464,56 @@ function App() {
 				<li><button onClick={() => setPortal(portals.category)}>category</button></li>
 				<li><button onClick={() => setPortal(portals.image)}>image</button></li>
 			</ul>
-			<Portal />
+			{
+				portal == portals.product &&
+				<Product 
+					fields={inputFields.product}
+					operations={operations.product}
+					list={listProducts}
+					create={createProduct}
+					read={viewProduct}
+					update={updateProduct}
+					remove={removeProduct}
+					message={validationMsg}
+					clearMsg={() => setVaidationMsg('')}
+				/>
+			}
+			{
+				portal == portals.supplier &&
+				<Supplier
+					fields={inputFields.supplier}
+					suppliers={supplierList} //
+					list={listSuppliers}
+					create={createSupplier}
+					read={viewSupplier}
+					update={updateSupplier}
+					remove={removeSupplier}
+					readProducts={viewSupplierProducts}
+				/>
+			}
+			{
+				portal == portals.category &&
+				<Category
+					fields={inputFields.category}
+					list={listCategories}
+					create={createCategory}
+					read={viewCategory}
+					update={updateSupplier}
+					remove={removeCategory}
+					readProducts={viewCategoryProducts}
+				/>
+			}
+			{
+				portal == portals.image &&
+				<Image
+					fields={inputFields.image}
+					list={listImages}
+					create={createImage}
+					read={viewImage}
+					update={updateImage}
+					remove={removeImage}
+				/>
+			}
 		</>
 	);
 }
