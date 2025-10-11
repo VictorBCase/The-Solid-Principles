@@ -21,6 +21,9 @@ app.use(express.static(frontendBuildPath));
 
 // api
 app.post('/api/IMS', (req, res) => {
+	// very unsecure
+	let origin = req.headers.origin;
+	res.header('Access-Control-Allow-Origin', origin);
 	let method = req.body.meth;
 	switch(method) {
 		case 'products_read':
