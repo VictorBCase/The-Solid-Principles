@@ -62,7 +62,7 @@ app.post('/api/IMS', (req, res) => {
 				req.body.quantity, 
 				req.body.price
 			], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: "Error: Failed to create."});
 				else {
 					res.status(200).json({product: val});
 				}

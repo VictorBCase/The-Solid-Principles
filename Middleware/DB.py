@@ -63,8 +63,8 @@ def images_read() -> Optional[list]:
 # ========================== CRUD FUNCTIONS ==================================
 
 #  PRODUCT CRUD
-def product_create(name: str, description: Optional[str], quantity: int, price: str, product_id: Optional[str] = None) -> str:
-    pid = gen_uuid(product_id)
+def product_create(name: str, description: Optional[str], quantity: int, price: str) -> str:
+    pid = gen_uuid()
     with get_conn() as conn:
         with conn.cursor() as c:
             c.execute("""
