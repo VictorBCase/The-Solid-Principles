@@ -30,6 +30,35 @@ def get_conn():
 def gen_uuid():
     return str(uuid.uuid4())
 
+# ============================ LIST FUNCTIONS ============================
+
+def products_read() -> Optional[list]:
+	with get_conn() as conn:
+		with conn.cursor() as c:
+			c.execute("""SELECT (product_id) FROM products""")
+			return c.fetchall()
+
+
+def suppliers_read() -> Optional[list]:
+	with get_conn() as conn:
+		with conn.cursor() as c:
+			c.execute("""SELECT (supplier_id) FROM suppliers""")
+			return c.fetchall()
+
+
+def categories_read() -> Optional[list]:
+	with get_conn() as conn:
+		with conn.cursor() as c:
+			c.execute("""SELECT (category_id) FROM categories""")
+			return c.fetchall()
+
+
+def images_read() -> Optional[list]:
+	with get_conn() as conn:
+		with conn.cursor() as c:
+			c.execute("""SELECT (image_id) FROM images""")
+			return c.fetchall()
+
 
 # ========================== CRUD FUNCTIONS ==================================
 
@@ -192,7 +221,7 @@ def image_delete(image_id: str) -> None:
 #----------------------- RELATIONSHIP TABLES CRUD --------------------------
 
 # CATEGORY-PRODUCTS CRUD
-def categoryProducts_create(category_id, product_id):
+def categoryProducts_create(category_id, product_id) -> None:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -200,9 +229,10 @@ def categoryProducts_create(category_id, product_id):
                 VALUES (%s, %s)
                 ON CONFLICT DO NOTHING
             """, (category_id, product_id))
-            print("Category-Product link created.")
+			conn.commit()
 
-def categoryProducts_read(category_id):
+
+def categoryProducts_read(category_id) -> Optional[list]:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -211,23 +241,21 @@ def categoryProducts_read(category_id):
                 JOIN products p ON cp.product_id = p.product_id
                 WHERE cp.category_id = %s
             """, (category_id,))
-            rows = cur.fetchall()
-            print(f"Products in category {category_id}:")
-            for row in rows:
-                print(row)
+            return cur.fetchall()
 
-def categoryProducts_delete(category_id, product_id):
+
+def categoryProducts_delete(category_id, product_id) -> None:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
                 DELETE FROM category_products
                 WHERE category_id = %s AND product_id = %s
             """, (category_id, product_id))
-            print("Category-Product link deleted.")
+            conn.commit()
 
 
 # SUPPLIER-PRODUCTS CRUD
-def supplierProducts_create(supplier_id, product_id):
+def supplierProducts_create(supplier_id, product_id) -> None:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -235,9 +263,10 @@ def supplierProducts_create(supplier_id, product_id):
                 VALUES (%s, %s)
                 ON CONFLICT DO NOTHING
             """, (supplier_id, product_id))
-            print("Supplier-Product link created.")
+            conn.commit()
 
-def supplierProducts_read(supplier_id):
+
+def supplierProducts_read(supplier_id) -> Optional[list]:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -246,25 +275,28 @@ def supplierProducts_read(supplier_id):
                 JOIN products p ON sp.product_id = p.product_id
                 WHERE sp.supplier_id = %s
             """, (supplier_id,))
-            rows = cur.fetchall()
-            print(f"Products supplied by {supplier_id}:")
-            for row in rows:
-                print(row)
+            return cur.fetchall()
 
-def supplierProducts_delete(supplier_id, product_id):
+
+def supplierProducts_delete(supplier_id, product_id) -> None:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
                 DELETE FROM supplier_products
                 WHERE supplier_id = %s AND product_id = %s
             """, (supplier_id, product_id))
-            print("Supplier-Product link deleted.")
+            conn.commit()
+
 
 if __name__ == "__main__":
     server = SimpleXMLRPCServer(("0.0.0.0", 8000), allow_none=True)
+	server.register_function(products_read, "products_read")
+	server.register_function(suppliers_read, "suppliers_read")
+	server.register_function(categories_read, "categories_read")
+	server.register_function(images_read, "images_read")
     server.register_function(product_create, "product_create")
     server.register_function(product_read, "product_read")
-    server.register_function(product_create, "product_create")
+    server.register_function(product_create, "product_delete")
     server.register_function(product_update, "product_update")
     server.register_function(supplier_create, "supplier_create")
     server.register_function(supplier_read, "supplier_read")
