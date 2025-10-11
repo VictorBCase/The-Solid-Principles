@@ -34,7 +34,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'suppliers_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to read suppliers."});
+				if (err) res.status(400);
 				else {
 					res.status(200).json({list: val});
 				}
@@ -42,7 +42,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'categories_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to read categories"});
+				if (err) res.status(400);
 				else {
 					res.status(200).json({list: val});
 				}
@@ -50,7 +50,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'images_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to read images."});
+				if (err) res.status(400);
 				else {
 					res.status(200).json({list: val});
 				}
@@ -108,143 +108,113 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'supplier_create':
 			client.methodCall("supplier_create", [req.body.name, req.body.contact], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to create supplier."});
+				if (err) res.status(400);
 				else {
-					res.status(200).json({supplier: val});
+					res.status(200).json({product: val});
 				}
 			});
 			break;
 		case 'supplier_read':
 			client.methodCall("supplier_read", [req.body.s_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to read supplier."})
-				else {
-					res.status(200).json({supplier: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'supplier_delete':
 			client.methodCall("supplier_delete", [req.body.s_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to delete supplier."})
-				else {
-					res.status(200).json({supplier: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'supplier_update':
 			client.methodCall(method, [req.body.s_id, req.body.name, req.body.contact], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to read supplier."})
-				else {
-					res.status(200).json({supplier: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'category_create':
 			client.methodCall(method, [req.body.name, req.body.description], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to create category."})
-				else {
-					res.status(200).json({category: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'category_read':
 			client.methodCall(method, [req.body.c_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to read category."})
-				else {
-					res.status(200).json({category: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'category_delete':
 			client.methodCall(method, [req.body.c_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to delete category."})
-				else {
-					res.status(200).json({category: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'category_update':
 			client.methodCall(method, [req.body.c_id, req.body.name, req.body.description], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to update category."})
-				else {
-					res.status(200).json({category: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'image_create':
 			client.methodCall(method, [req.body.p_id, req.body.url], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to create image."})
-				else {
-					res.status(200).json({image: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'image_read':
 			client.methodCall(method, [req.body.i_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to read image."})
-				else {
-					res.status(200).json({image: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'image_delete':
 			client.methodCall(method, [req.body.i_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to delete image."})
-				else {
-					res.status(200).json({image: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'image_update':
 			client.methodCall(method, [req.body.i_id, req.body.p_id, req.body.url], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to update image."})
-				else {
-					res.status(200).json({image: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'supplierProducts_create':
 			client.methodCall(method, [req.body.s_id, req.body.p_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to create association."})
-				else {
-					res.status(200).json({association: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'supplierProducts_delete':
 			client.methodCall(method, [req.body.s_id, req.body.p_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to delete association."})
-				else {
-					res.status(200).json({association: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'supplierProducts_read':
 			client.methodCall(method, [req.body.s_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to read association."});
+				if (err) res.status(400);
 				else {
-					res.status(200).json({association: val});
+					res.status(200).json({list: val});
 				}
 			});
 			break;
 		case 'categoryProducts_create':
 			client.methodCall(method, [req.body.c_id, req.body.p_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to create association."})
-				else {
-					res.status(200).json({association: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'categoryProducts_delete':
 			client.methodCall(method, [req.body.c_id, req.body.p_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to delete association."})
-				else {
-					res.status(200).json({association: val})
-				}
+				if (err) return err;
+				return val;
 			});
 			break;
 		case 'categoryProducts_read':
 			client.methodCall(method, [req.body.c_id], (err, val) => {
-				if (err) res.status(400).json({error: "Failed to read association."});
+				if (err) res.status(400);
 				else {
 					res.status(200).json({list: val});
 				}
