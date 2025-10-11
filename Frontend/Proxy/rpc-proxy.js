@@ -5,17 +5,17 @@ import xmlrpc from 'xmlrpc';
 // express server
 const app = express();
 const PORT = 5000;
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
 // rpc connection
 const client = xmlrpc.createClient({host:'localhost', port: 8000, path: "/"});
 
 // api
 app.post('/api/IMS', (req, res) => {
-	// very unsecure
-	let origin = req.headers.origin;
-	res.header('Access-Control-Allow-Origin', origin);
+	// let origin = req.headers.origin;
+	// res.header('Access-Control-Allow-Origin', origin);
+	console.log(req.body);
 	let method = req.body.meth;
 	switch(method) {
 		case 'products_read':
