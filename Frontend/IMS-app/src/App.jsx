@@ -349,13 +349,82 @@ function App() {
 		} catch(error) { console.log(error); }
 	}
 
+	async function listProducts() {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({meth: 'products_read'})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function listSuppliers() {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({meth: 'suppliers_read'})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function listCategories() {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({meth: 'categories_read'})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function listImages() {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({meth: 'images_read'})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function listSupplierProducts(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'suppliersProducts_read',
+					s_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
+	async function listCategoryProducts(id) {
+		try {
+			await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'categoryProducts_read',
+					c_id: id
+				})
+			});
+		} catch(error) { console.log(error); }
+	}
+
 	function Portal() {
 		switch(portal) {
 			case portals.product:
 				return <Product 
 					fields={inputFields.product}
 					products={productList}
+					list={listProducts}
 					create={createProduct}
+					read={viewProduct}
+					update={updateProduct}
 					remove={removeProduct}
 				/>;
 			case portals.supplier:

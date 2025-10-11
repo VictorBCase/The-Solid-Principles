@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Product({fields, products, create, remove}) {
+function Product({fields, products, list, create, read, update, remove}) {
 
     // supported operations
     const RUDs = {
