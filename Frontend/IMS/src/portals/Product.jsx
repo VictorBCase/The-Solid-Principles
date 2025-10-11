@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Product({fields, products, list, create, read, update, remove}) {
+function Product({fields, list, create, read, update, remove}) {
 
     // supported operations
     const RUDs = {
@@ -18,6 +18,7 @@ function Product({fields, products, list, create, read, update, remove}) {
     const [edit, setEdit] = useState(null);
     const [result, setResult] = useState(null);
     const [requireId, setRequireId] = useState(null);
+	const [products, setProducts] = useState(null);
 
     // validation msg -> contents potentially provided by middleware response
     const [message, setMessage] = useState("quantity and price must be greater than zero.");
@@ -29,10 +30,11 @@ function Product({fields, products, list, create, read, update, remove}) {
             inputs[i][1] = data.get(inputs[i][0]);
         }
         console.log(inputs);
-        if (edit != null)
-            setEdit(null);
-        else
-            create();
+        if (edit != null) {
+			update(data.get("prod"), inputs[0][1], inputs[1][1], inputs[2][1], inputs[3][1]);
+			setEdit(null);
+		} else
+            create(inputs[0][1], inputs[1][1], inputs[2][1], inputs[3][1]);
     };
 
     // handle supplier/category associations
@@ -43,6 +45,11 @@ function Product({fields, products, list, create, read, update, remove}) {
         setRequireId(null);
     }
 
+	async function getProduct(id) {
+		let temp = await read(id);
+		setResult(temp);
+	}
+
     // handle CRUD inputs
     const handleRUD = (data) => {
         let type = data.get("type");
@@ -52,7 +59,7 @@ function Product({fields, products, list, create, read, update, remove}) {
                 setEdit(product);
                 break;
             case RUDs.delete:
-                remove();
+                // remove();
                 break;
             case RUDs.associate:
                 setRequireId(RUDs.associate);
@@ -62,7 +69,7 @@ function Product({fields, products, list, create, read, update, remove}) {
                 break;
             case RUDs.view:
             default:
-                setResult(product);
+                getProduct(prod);
                 break;
         }
     };
@@ -110,6 +117,11 @@ function Product({fields, products, list, create, read, update, remove}) {
         );
     }
 
+	async function getProducts() {
+		let temp = list();
+		setProducts(temp);
+	}
+
     function Menu() {
         if (edit != null) {
             // edit interface
@@ -142,6 +154,9 @@ function Product({fields, products, list, create, read, update, remove}) {
                 </>
             );
         }
+		if (products == null) {
+			getProducts();
+		}
         // crud interface
         return (
             <>
@@ -177,13 +192,17 @@ function Product({fields, products, list, create, read, update, remove}) {
                     </ul>
                     <p>on product:</p>
                     <ul>
-                        {products.map((product) => (
-                            <li key={product}>
-                                <label>
-                                    <input type="radio" name="prod" value={product} />{product}
-                                </label>
-                            </li>
-                        ))}
+                        {products != null ?
+							products.map((product) => (
+								<li key={product}>
+									<label>
+										<input type="radio" name="prod" value={product} />{product}
+									</label>
+								</li>
+							))
+						:
+							<></>
+						}
                     </ul>
                     <button type="submit">confirm</button>
                 </form>

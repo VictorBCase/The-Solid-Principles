@@ -15,7 +15,7 @@ function App() {
 	};
 	const [ portal, setPortal ] = useState(null);
 
-	// passed down to each portal
+	// passed down to each portal [name, input type]
 	const inputFields = {
 		product: [
 			["name", "text"],
@@ -71,6 +71,9 @@ function App() {
 					p_id: id
 				})
 			});
+			if (res.status > 299) return; // handle error
+			res = await res.json();
+			let product = res.product;
 		} catch(error) { console.log(error); }
 	}
 
@@ -358,6 +361,10 @@ function App() {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'products_read'})
 			});
+			if (res.status > 299) return; // handle error
+			res = await res.JSON();
+			let products = res.list;
+			return products;
 		} catch(error) { console.log(error); }
 	}
 
@@ -422,7 +429,6 @@ function App() {
 			case portals.product:
 				return <Product 
 					fields={inputFields.product}
-					products={productList} //
 					list={listProducts}
 					create={createProduct}
 					read={viewProduct}
