@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Make sure useEffect is imported
 
 function Product({fields, list, create, read, update, remove}) {
 
@@ -24,17 +24,18 @@ function Product({fields, list, create, read, update, remove}) {
     const [message, setMessage] = useState("quantity and price must be greater than zero.");
 
     // handle create/edit inputs
-    const handleFields = (data) => {
+    async function handleFields(data) {
         let inputs = fields;
         for (let i = 0; i < inputs.length; i ++) {
             inputs[i][1] = data.get(inputs[i][0]);
         }
         console.log(inputs);
         if (edit != null) {
-			update(data.get("prod"), inputs[0][1], inputs[1][1], inputs[2][1], inputs[3][1]);
+			await update(data.get("prod"), inputs[0][1], inputs[1][1], inputs[2][1], inputs[3][1]);
 			setEdit(null);
 		} else
-            create(inputs[0][1], inputs[1][1], inputs[2][1], inputs[3][1]);
+            await create(inputs[0][1], inputs[1][1], inputs[2][1], inputs[3][1]);
+        getProducts();
     };
 
     // handle supplier/category associations
@@ -118,8 +119,10 @@ function Product({fields, list, create, read, update, remove}) {
     }
 
 	async function getProducts() {
-		let temp = list();
-		setProducts(temp);
+		let temp = await list();
+		if (temp !== undefined) {
+            setProducts(temp);
+        }
 	}
 
     function Menu() {
@@ -154,9 +157,13 @@ function Product({fields, list, create, read, update, remove}) {
                 </>
             );
         }
-		if (products == null) {
-			getProducts();
-		}
+		useEffect(() => {
+            // Only run this effect when the component mounts and 'products' is null
+            if (products === null) {
+                getProducts();
+            }
+        }, [products]); // Re-run only when 'products' changes (e.g., set to null elsewhere)
+
         // crud interface
         return (
             <>

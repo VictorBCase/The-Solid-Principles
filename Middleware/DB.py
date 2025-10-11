@@ -8,11 +8,11 @@ from contextlib import contextmanager
 import uuid
 
 DB_CONFIG = {
-    "dbname": "IMS Local", # DB Name
+    "dbname": "IMS_Local", # DB Name
     "user": "postgres",
     "password": "solid", # DB password for user postgres
-    "host": "",  # add when docker set up for containers
-    "port": 5433 # Postgresql port (otherwise try 5432)
+    "host": "data",  # add when docker set up for containers
+    "port": 5432 # Postgresql port (otherwise try 5432)
 }
 
 # Using contextmanager to handle database connection
@@ -63,8 +63,8 @@ def images_read() -> Optional[list]:
 # ========================== CRUD FUNCTIONS ==================================
 
 #  PRODUCT CRUD
-def product_create(name: str, description: Optional[str], quantity: int, price: str, product_id: Optional[str] = None) -> str:
-    pid = gen_uuid(product_id)
+def product_create(name: str, description: Optional[str], quantity: int, price: str) -> str:
+    pid = gen_uuid()
     with get_conn() as conn:
         with conn.cursor() as c:
             c.execute("""
