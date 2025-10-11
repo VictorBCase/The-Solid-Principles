@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  presentation:
+    build: ./Frontend
+    ports:
+      - "8080:5000"
+    depends_on:
+      - business
+    networks:
+      - frontend_net
+
+  business:
+    build: ./Business
+    networks:
+      - frontend_net
+      - backend_net
+
+  data:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: solid
+      POSTGRES_DB: appdb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - backend_net
+
+networks:
+  frontend_net:
+  backend_net:
+volumes:
+  db_data:
