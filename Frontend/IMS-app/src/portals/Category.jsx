@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Supplier({fields, suppliers, list, create, update, remove, listProducts}) {
+function Category({fields, list, create, update, remove, listProducts}) {
 
     // supported operations
     const RUDs = {
@@ -10,12 +10,13 @@ function Supplier({fields, suppliers, list, create, update, remove, listProducts
         delete: "del",
     };
 
-    // mock supplier entry
-    const supplier = {name: "fairphone", contact: "email"};
+    // mock category entry
+    const category = {name: "fairphone", description: "email"};
 
     // state variables for the menu
     const [edit, setEdit] = useState(null);
     const [result, setResult] = useState(null);
+	const [categories, setCategories] = useState([]);
 
     // validation msg -> contents potentially provided by middleware response
     const [message, setMessage] = useState("fields must be non-empty.");
@@ -39,14 +40,14 @@ function Supplier({fields, suppliers, list, create, update, remove, listProducts
         let prod = data.get("prod");
         switch(type) {
             case RUDs.edit:
-                setEdit(supplier);
+                setEdit(category);
                 break;
             case RUDs.delete:
                 // remove();
                 break;
             case RUDs.view:
             default:
-                setResult(supplier);
+                setResult(category);
                 break;
         }
     };
@@ -76,10 +77,10 @@ function Supplier({fields, suppliers, list, create, update, remove, listProducts
     function FieldForm({formAction}) {
         return (
             <form action={formAction}>
-                <p>{edit == null ? "create" : "modify"} supplier:</p>
+                <p>{edit == null ? "create" : "modify"} category:</p>
                 {fields.map((data) => (
                     <>
-                        <label>supplier {data[0]}:
+                        <label>category {data[0]}:
                             {edit == null ?
                                 <input type={data[1]} name={data[0]} />
                             :
@@ -132,12 +133,12 @@ function Supplier({fields, suppliers, list, create, update, remove, listProducts
                             </label>
                         </li>
                     </ul>
-                    <p>on supplier:</p>
+                    <p>on category:</p>
                     <ul>
-                        {suppliers.map((supplier) => (
-                            <li key={supplier}>
+                        {categories.map((category) => (
+                            <li key={category}>
                                 <label>
-                                    <input type="radio" name="prod" value={supplier} />{supplier}
+                                    <input type="radio" name="prod" value={category} />{category}
                                 </label>
                             </li>
                         ))}
@@ -150,11 +151,11 @@ function Supplier({fields, suppliers, list, create, update, remove, listProducts
 
     return (
         <>
-            <h2>supplier portal</h2>
+            <h2>category portal</h2>
             <Result />
             <Menu />
         </>
     );
 }
 
-export default Supplier;
+export default Category;
