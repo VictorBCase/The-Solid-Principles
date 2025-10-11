@@ -26,7 +26,7 @@ app.post('/api/IMS', (req, res) => {
 	switch(method) {
 		case 'products_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400).json({ error: 'Failed to read products' });
+				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
 					res.status(200).json({list: val});
 				}
@@ -34,7 +34,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'suppliers_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to read suppliers.'});
 				else {
 					res.status(200).json({list: val});
 				}
@@ -42,7 +42,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'categories_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to read categories.'});
 				else {
 					res.status(200).json({list: val});
 				}
@@ -50,7 +50,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'images_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to read images.'});
 				else {
 					res.status(200).json({list: val});
 				}
@@ -63,7 +63,7 @@ app.post('/api/IMS', (req, res) => {
 				req.body.quantity, 
 				req.body.price
 			], (err, val) => {
-				if (err) res.status(400).json({error: "Error: Failed to create."});
+				if (err) res.status(400).json({error: 'Failed to create product.'});
 				else {
 					res.status(200).json({p_id: val});
 				}
@@ -71,7 +71,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'product_read':
 			client.methodCall("product_read", [req.body.p_id], (err, val) => {
-				if (err) res.status(400).json({ error: 'Failed to read product' });
+				if (err) res.status(400).json({error: 'Failed to read product.'});
 				else {
 					let prod = {
 						p_id: val[0],
@@ -86,9 +86,9 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'product_delete':
 			client.methodCall("product_delete", [req.body.p_id], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to delete product.'})
 				else {
-					res.status(200).json({product: val});
+					res.status(200).json({val: val});
 				}
 			});
 			break;
@@ -100,101 +100,126 @@ app.post('/api/IMS', (req, res) => {
 				req.body.quantity, 
 				req.body.price
 			], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to update product.'});
 				else {
-					res.status(200).json({product: val});
+					res.status(200).json({val: val});
 				}
 			});
 			break;
 		case 'supplier_create':
 			client.methodCall("supplier_create", [req.body.name, req.body.contact], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to create supplier.'});
 				else {
-					res.status(200).json({product: val});
+					res.status(200).json({s_id: val});
 				}
 			});
 			break;
 		case 'supplier_read':
 			client.methodCall("supplier_read", [req.body.s_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to read supplier.'});
+				else {
+					let sup = {
+						s_id: val[0],
+						name: val[1],
+						contact: val[2]
+					};
+					res.status(200).json({supplier: sup});
+				}
 			});
 			break;
 		case 'supplier_delete':
 			client.methodCall("supplier_delete", [req.body.s_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to delete supplier.'});
+				else {
+					res.status(200).json({val: val});
+				}
 			});
 			break;
 		case 'supplier_update':
 			client.methodCall(method, [req.body.s_id, req.body.name, req.body.contact], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to update supplier.'});
+				else {
+					res.status(200).json({val: val});
+				}
 			});
 			break;
 		case 'category_create':
 			client.methodCall(method, [req.body.name, req.body.description], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to create category.'});
+				else res.status(200).json({c_id: val});
 			});
 			break;
 		case 'category_read':
 			client.methodCall(method, [req.body.c_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Could not read category.'});
+				else {
+					let cat = {
+						c_id: val[0],
+						name: val[1],
+						description: val[2]
+					};
+					res.status(200).json({category: cat});
+				}
 			});
 			break;
 		case 'category_delete':
 			client.methodCall(method, [req.body.c_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to delete category.'});
+				else res.status(200).json({val: val});
 			});
 			break;
 		case 'category_update':
 			client.methodCall(method, [req.body.c_id, req.body.name, req.body.description], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to update category.'});
+				else res.status(200).json({val: val});
 			});
 			break;
 		case 'image_create':
 			client.methodCall(method, [req.body.p_id, req.body.url], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to create image.'});
+				else res.status(200).json({i_id: val});
 			});
 			break;
 		case 'image_read':
 			client.methodCall(method, [req.body.i_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to read image.'});
+				else {
+					let img = {
+						i_id: val[0],
+						p_id: val[1],
+						url: val[2]
+					};
+					res.status(200).json({image: img});
+				}
 			});
 			break;
 		case 'image_delete':
 			client.methodCall(method, [req.body.i_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to delete image.'});
+				else res.status(200).json({val: val});
 			});
 			break;
 		case 'image_update':
 			client.methodCall(method, [req.body.i_id, req.body.p_id, req.body.url], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to update image.'});
+				else res.status(200).json({val: val});
 			});
 			break;
 		case 'supplierProducts_create':
 			client.methodCall(method, [req.body.s_id, req.body.p_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to associate product with supplier.'});
+				else res.status(200).json({val: val});
 			});
 			break;
 		case 'supplierProducts_delete':
 			client.methodCall(method, [req.body.s_id, req.body.p_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to delete association.'});
+				else res.status(200).json({val: val});
 			});
 			break;
 		case 'supplierProducts_read':
 			client.methodCall(method, [req.body.s_id], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
 					res.status(200).json({list: val});
 				}
@@ -202,26 +227,26 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'categoryProducts_create':
 			client.methodCall(method, [req.body.c_id, req.body.p_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to associate product with category.'});
+				else res.status(200).json({val: val});
 			});
 			break;
 		case 'categoryProducts_delete':
 			client.methodCall(method, [req.body.c_id, req.body.p_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to delete association.'});
+				else res.status(200).json({val: val});
 			});
 			break;
 		case 'categoryProducts_read':
 			client.methodCall(method, [req.body.c_id], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
 					res.status(200).json({list: val});
 				}
 			});
 			break;
 		default:
-			res.status(400).json({ error: `Method not found: ${method}` });
+			res.status(404).json({ error: `Method not found: ${method}` });
             break;
 	}
 });
