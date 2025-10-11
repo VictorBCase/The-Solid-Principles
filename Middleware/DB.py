@@ -24,13 +24,30 @@ def get_conn():
     finally:
         conn.close()
 
-# ========================= HELPER METHODS =========================
+# ========================= HELPER AND VALIDATION METHODS =========================
 
 # Generate UUID
 def gen_uuid():
     return str(uuid.uuid4())
 
-# ============================ LIST FUNCTIONS ============================
+# Check for empty input
+def validate_nonempty(field_name: str, value: str):
+    if not isinstance(value, str) or not value.strip():
+        raise Exception(f"{field_name} must be a non-empty string.")
+
+# Check for positive numbers
+def validate_positive(field_name: str, value):
+    if not isinstance(value, (int, float)) or value <= 0:
+        raise Exception(f"{field_name} must be a positive number.")
+
+# Check for negative numbers
+def validate_nonnegative(field_name: str, value):
+    if not isinstance(value, int) or value < 0:
+        raise Exception(f"{field_name} must be a non-negative integer.")
+    
+
+
+# =============================================== LIST FUNCTIONS ===============================================
 
 def products_read() -> Optional[list]:
 	with get_conn() as conn:
@@ -64,6 +81,7 @@ def images_read() -> Optional[list]:
 
 #  PRODUCT CRUD
 def product_create(name: str, description: Optional[str], quantity: int, price: str) -> str:
+ # Note: put validation methods here probably in try/catch
     pid = gen_uuid()
     with get_conn() as conn:
         with conn.cursor() as c:
