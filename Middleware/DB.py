@@ -229,7 +229,7 @@ def categoryProducts_create(category_id, product_id) -> None:
                 VALUES (%s, %s)
                 ON CONFLICT DO NOTHING
             """, (category_id, product_id))
-			conn.commit()
+            conn.commit()
 
 
 def categoryProducts_read(category_id) -> Optional[list]:
@@ -290,10 +290,10 @@ def supplierProducts_delete(supplier_id, product_id) -> None:
 
 if __name__ == "__main__":
     server = SimpleXMLRPCServer(("0.0.0.0", 8000), allow_none=True)
-	server.register_function(products_read, "products_read")
-	server.register_function(suppliers_read, "suppliers_read")
-	server.register_function(categories_read, "categories_read")
-	server.register_function(images_read, "images_read")
+    server.register_function(products_read, "products_read")
+    server.register_function(suppliers_read, "suppliers_read")
+    server.register_function(categories_read, "categories_read")
+    server.register_function(images_read, "images_read")
     server.register_function(product_create, "product_create")
     server.register_function(product_read, "product_read")
     server.register_function(product_create, "product_delete")
