@@ -1,8 +1,18 @@
 import { useState } from 'react';
+import { xmlrpc_client, xmlrpcmsg, xmlrpcval } from '@jsxmlrpc/jsxmlrpc';
+
 import Product from './portals/Product.jsx';
 import Supplier from './portals/Supplier.jsx';
 
 function App() {
+
+	const client = new xmlrpc_client("http://localhost:8000");
+
+	const msg = new xmlrpcmsg('add', [new xmlrpcval(1, 'int'), new xmlrpcval(2, 'int')]);
+
+	client.send(msg, (res, req) => {
+		console.log(res.value());
+	});
 
 	const portals = {
 		product: 0,
