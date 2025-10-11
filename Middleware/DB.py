@@ -81,16 +81,26 @@ def images_read() -> Optional[list]:
 
 #  PRODUCT CRUD
 def product_create(name: str, description: Optional[str], quantity: int, price: str) -> str:
- # Note: put validation methods here probably in try/catch
-    pid = gen_uuid()
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("""
-                INSERT INTO products (product_id, name, description, quantity, price)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (pid, name, description, quantity, price))
-            conn.commit()
-    return pid
+    try:
+        # Validation
+        validate_nonempty("name", name)
+        if description is not None:
+            validate_nonempty("description", description)
+        validate_nonnegative("quantity", quantity)
+        validate_positive("price", float(price))
+
+        pid = gen_uuid()
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    INSERT INTO products (product_id, name, description, quantity, price)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (pid, name, description, quantity, price))
+                conn.commit()
+        return pid
+
+    except Exception as e:
+        raise Exception(f"Failed to create product: {str(e)}")
 
 
 def product_read(product_id: str) -> Optional[tuple]:
@@ -105,15 +115,23 @@ def product_read(product_id: str) -> Optional[tuple]:
 
 
 def product_update(product_id: str, name: str, description: str, quantity: int, price: str) -> Optional[tuple]:
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("""
-                UPDATE products
-                SET name = %s, description = %s, quantity = %s, price = %s
-                WHERE product_id = %s
-            """, (name, description, quantity, price, product_id))
-            conn.commit()
-    return product_read(product_id)
+    try:
+        validate_nonempty("name", name)
+        if description is not None:
+            validate_nonempty("description", description)
+        validate_nonnegative("quantity", quantity)
+        validate_positive("price", float(price))
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    UPDATE products
+                    SET name = %s, description = %s, quantity = %s, price = %s
+                    WHERE product_id = %s
+                """, (name, description, quantity, price, product_id))
+                conn.commit()
+        return product_read(product_id)
+    except Exception as e:
+        raise Exception(f"Failed to update product: {str(e)}")  
 
 
 def product_delete(product_id: str) -> None:
@@ -125,15 +143,20 @@ def product_delete(product_id: str) -> None:
 
 #  SUPPLIER CRUD
 def supplier_create(name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
-    sid = gen_uuid(supplier_id)
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("""
-                INSERT INTO suppliers (supplier_id, name, contact_email)
-                VALUES (%s, %s, %s)
-            """, (sid, name, contact_email))
-            conn.commit()
-    return sid
+    try:
+        validate_nonempty("name", name)
+        validate_nonempty("contact_email", contact_email)
+        sid = gen_uuid(supplier_id)
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    INSERT INTO suppliers (supplier_id, name, contact_email)
+                    VALUES (%s, %s, %s)
+                """, (sid, name, contact_email))
+                conn.commit()
+        return sid
+    except Exception as e:
+        raise Exception(f"Failed to create Supplier: {str(e)}")
 
 
 def supplier_read(supplier_id: str) -> Optional[tuple]:
@@ -148,15 +171,20 @@ def supplier_read(supplier_id: str) -> Optional[tuple]:
 
 
 def supplier_update(supplier_id: str, name: str, contact_email: str) -> Optional[tuple]:
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("""
-                UPDATE suppliers
-                SET name = %s, contact_email = %s
-                WHERE supplier_id = %s
-            """, (name, contact_email, supplier_id))
-            conn.commit()
-    return supplier_read(supplier_id)
+    try:
+        validate_nonempty("name", name)
+        validate_nonempty("contact_email", contact_email)
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    UPDATE suppliers
+                    SET name = %s, contact_email = %s
+                    WHERE supplier_id = %s
+                """, (name, contact_email, supplier_id))
+                conn.commit()
+        return supplier_read(supplier_id)
+    except Exception as e:
+        raise Exception(f"Failed to update Supplier: {str(e)}")
 
 
 def supplier_delete(supplier_id: str) -> None:
@@ -168,15 +196,21 @@ def supplier_delete(supplier_id: str) -> None:
 
 #  CATEGORY CRUD
 def category_create(name: str, description: Optional[str], category_id: Optional[str] = None) -> str:
-    cid = gen_uuid(category_id)
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("""
-                INSERT INTO categories (category_id, name, description)
-                VALUES (%s, %s, %s)
-            """, (cid, name, description))
-            conn.commit()
-    return cid
+    try:
+        validate_nonempty("name", name)
+        if description is not None:
+            validate_nonempty("description", description)
+        cid = gen_uuid(category_id)
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    INSERT INTO categories (category_id, name, description)
+                    VALUES (%s, %s, %s)
+                """, (cid, name, description))
+                conn.commit()
+        return cid
+    except Exception as e:
+        raise Exception(f"Failed to create category: {str(e)}")
 
 
 def category_read(category_id: str) -> Optional[tuple]:
@@ -191,15 +225,21 @@ def category_read(category_id: str) -> Optional[tuple]:
 
 
 def category_update(category_id: str, name: str, description: str) -> Optional[tuple]:
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("""
-                UPDATE categories
-                SET name = %s, description = %s
-                WHERE category_id = %s
-            """, (name, description, category_id))
-            conn.commit()
-    return category_read(category_id)
+    try:
+        validate_nonempty("name", name)
+        if description is not None:
+            validate_nonempty("description", description)
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    UPDATE categories
+                    SET name = %s, description = %s
+                    WHERE category_id = %s
+                """, (name, description, category_id))
+                conn.commit()
+        return category_read(category_id)
+    except Exception as e:
+        raise Exception(f"Failed to update category: {str(e)}")
 
 
 def category_delete(category_id: str) -> None:
@@ -211,15 +251,20 @@ def category_delete(category_id: str) -> None:
 
 #  IMAGE CRUD
 def image_create(product_id: str, url: str, image_id: Optional[str] = None) -> str:
-    iid = gen_uuid(image_id)
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("""
-                INSERT INTO images (image_id, product_id, url)
-                VALUES (%s, %s, %s)
-            """, (iid, product_id, url))
-            conn.commit()
-    return iid
+    try:
+        validate_nonempty("product_id", product_id)
+        validate_nonempty("url", url)
+        iid = gen_uuid(image_id)
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    INSERT INTO images (image_id, product_id, url)
+                    VALUES (%s, %s, %s)
+                """, (iid, product_id, url))
+                conn.commit()
+        return iid
+    except Exception as e:
+        raise Exception(f"Failed to create image: {str(e)}")
 
 
 def image_read(image_id: str) -> Optional[tuple]:
@@ -234,15 +279,20 @@ def image_read(image_id: str) -> Optional[tuple]:
 
 
 def image_update(image_id: str, product_id: str, url: str) -> Optional[tuple]:
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("""
-                UPDATE images
-                SET product_id = %s, url = %s
-                WHERE image_id = %s
-            """, (product_id, url, image_id))
-            conn.commit()
-    return image_read(image_id)
+    try:
+        validate_nonempty("product_id", product_id)
+        validate_nonempty("url", url)
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    UPDATE images
+                    SET product_id = %s, url = %s
+                    WHERE image_id = %s
+                """, (product_id, url, image_id))
+                conn.commit()
+        return image_read(image_id)
+    except Exception as e:
+        raise Exception(f"Failed to update image: {str(e)}")
 
 
 def image_delete(image_id: str) -> None:
