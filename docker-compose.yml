@@ -19,8 +19,9 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: solid
-      POSTGRES_DB: appdb
+      POSTGRES_DB: IMS_Local
     volumes:
+      - ./Database/DB_schema.sql:/docker-entrypoint-initdb.d/DB_schema.sql
       - db_data:/var/lib/postgresql/data
     networks:
       - backend_net

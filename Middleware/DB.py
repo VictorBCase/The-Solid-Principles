@@ -8,11 +8,11 @@ from contextlib import contextmanager
 import uuid
 
 DB_CONFIG = {
-    "dbname": "IMS Local", # DB Name
+    "dbname": "IMS_Local", # DB Name
     "user": "postgres",
     "password": "solid", # DB password for user postgres
-    "host": "",  # add when docker set up for containers
-    "port": 5433 # Postgresql port (otherwise try 5432)
+    "host": "data",  # add when docker set up for containers
+    "port": 5432 # Postgresql port (otherwise try 5432)
 }
 
 # Using contextmanager to handle database connection
