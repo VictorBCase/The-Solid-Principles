@@ -2,13 +2,13 @@
 
 FROM node:20-alpine AS build
 
-WORKDIR /app/IMS-app
+WORKDIR /app/IMS
 
-COPY IMS-app/package*.json ./
+COPY IMS/package*.json ./
 
 RUN npm install
 
-COPY IMS-app/ .
+COPY IMS/ .
 
 RUN npm run build
 
@@ -24,7 +24,7 @@ RUN npm install
 
 COPY Proxy/ .
 
-COPY --from=build /app/IMS-app/build /app/Proxy/frontend-build
+COPY --from=build /app/IMS/dist /app/Proxy/frontend-build
 
 EXPOSE 5000
 
