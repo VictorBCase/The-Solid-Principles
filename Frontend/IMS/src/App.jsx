@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import Product from './portals/Product.jsx';
 import Supplier from './portals/Supplier.jsx';
+import Category from './portals/Category.jsx';
+import Image from './portals/Image.jsx';
 
 function App() {
 
@@ -13,7 +15,7 @@ function App() {
 	};
 	const [ portal, setPortal ] = useState(null);
 
-	// passed down to each portal
+	// passed down to each portal [name, input type]
 	const inputFields = {
 		product: [
 			["name", "text"],
@@ -69,6 +71,9 @@ function App() {
 					p_id: id
 				})
 			});
+			if (res.status > 299) return; // handle error
+			res = await res.json();
+			let product = res.product;
 		} catch(error) { console.log(error); }
 	}
 
@@ -356,6 +361,10 @@ function App() {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'products_read'})
 			});
+			if (res.status > 299) return; // handle error
+			res = await res.JSON();
+			let products = res.list;
+			return products;
 		} catch(error) { console.log(error); }
 	}
 
@@ -420,7 +429,6 @@ function App() {
 			case portals.product:
 				return <Product 
 					fields={inputFields.product}
-					products={productList}
 					list={listProducts}
 					create={createProduct}
 					read={viewProduct}
@@ -430,12 +438,33 @@ function App() {
 			case portals.supplier:
 				return <Supplier
 					fields={inputFields.supplier}
-					suppliers={supplierList}
+					suppliers={supplierList} //
+					list={listSuppliers}
+					create={createSupplier}
+					read={viewSupplier}
+					update={updateSupplier}
+					remove={removeSupplier}
+					readProducts={listSupplierProducts}
 				/>;
 			case portals.category:
-				// return <Category />;
+				return <Category
+					fields={inputFields.category}
+					list={listCategories}
+					create={createCategory}
+					read={viewCategory}
+					update={updateSupplier}
+					remove={removeCategory}
+					readProducts={listCategoryProducts}
+				/>;
 			case portals.image:
-				// return <Image />;
+				return <Image
+					fields={inputFields.image}
+					list={listImages}
+					create={createImage}
+					read={viewImage}
+					update={updateImage}
+					remove={removeImage}
+				/>;
 			default:
 				return <></>;
 		}
@@ -449,8 +478,8 @@ function App() {
 			<ul>
 				<li><button onClick={() => setPortal(portals.product)}>product</button></li>
 				<li><button onClick={() => setPortal(portals.supplier)}>supplier</button></li>
-				<li><button>category</button></li>
-				<li><button>image</button></li>
+				<li><button onClick={() => setPortal(portals.category)}>category</button></li>
+				<li><button onClick={() => setPortal(portals.image)}>image</button></li>
 			</ul>
 			<Portal />
 		</>

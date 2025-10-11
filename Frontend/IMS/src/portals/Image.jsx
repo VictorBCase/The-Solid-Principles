@@ -1,21 +1,21 @@
 import { useState } from 'react';
 
-function Supplier({fields, suppliers, list, create, update, remove, listProducts}) {
+function Image({fields, list, create, read, update, remove}) {
 
     // supported operations
     const RUDs = {
         view: "get",
-		viewProducts: "getProds",
         edit: "edit",
         delete: "del",
     };
 
-    // mock supplier entry
-    const supplier = {name: "fairphone", contact: "email"};
+    // mock image entry
+    const image = {product: "fairphone", url: "email"};
 
     // state variables for the menu
     const [edit, setEdit] = useState(null);
     const [result, setResult] = useState(null);
+	const [images, setImages] = useState([]);
 
     // validation msg -> contents potentially provided by middleware response
     const [message, setMessage] = useState("fields must be non-empty.");
@@ -39,14 +39,14 @@ function Supplier({fields, suppliers, list, create, update, remove, listProducts
         let prod = data.get("prod");
         switch(type) {
             case RUDs.edit:
-                setEdit(supplier);
+                setEdit(image);
                 break;
             case RUDs.delete:
                 // remove();
                 break;
             case RUDs.view:
             default:
-                setResult(supplier);
+                setResult(image);
                 break;
         }
     };
@@ -76,10 +76,10 @@ function Supplier({fields, suppliers, list, create, update, remove, listProducts
     function FieldForm({formAction}) {
         return (
             <form action={formAction}>
-                <p>{edit == null ? "create" : "modify"} supplier:</p>
+                <p>{edit == null ? "create" : "modify"} image:</p>
                 {fields.map((data) => (
                     <>
-                        <label>supplier {data[0]}:
+                        <label>image {data[0]}:
                             {edit == null ?
                                 <input type={data[1]} name={data[0]} />
                             :
@@ -116,11 +116,6 @@ function Supplier({fields, suppliers, list, create, update, remove, listProducts
                                 <input type="radio" name="type" value={RUDs.view} defaultChecked />view
                             </label>
                         </li>
-						<li>
-							<label>
-								<input type="radio" name="type" value={RUDs.viewProducts} />view products
-							</label>
-						</li>
                         <li>
                             <label>
                                 <input type="radio" name="type" value={RUDs.edit} />edit
@@ -132,12 +127,12 @@ function Supplier({fields, suppliers, list, create, update, remove, listProducts
                             </label>
                         </li>
                     </ul>
-                    <p>on supplier:</p>
+                    <p>on image:</p>
                     <ul>
-                        {suppliers.map((supplier) => (
-                            <li key={supplier}>
+                        {images.map((image) => (
+                            <li key={image}>
                                 <label>
-                                    <input type="radio" name="prod" value={supplier} />{supplier}
+                                    <input type="radio" name="prod" value={image} />{image}
                                 </label>
                             </li>
                         ))}
@@ -150,11 +145,11 @@ function Supplier({fields, suppliers, list, create, update, remove, listProducts
 
     return (
         <>
-            <h2>supplier portal</h2>
+            <h2>image portal</h2>
             <Result />
             <Menu />
         </>
     );
 }
 
-export default Supplier;
+export default Image;

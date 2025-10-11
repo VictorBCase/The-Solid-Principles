@@ -25,23 +25,31 @@ app.post('/api/IMS', (req, res) => {
 	switch(method) {
 		case 'products_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400);
+				else {
+					res.status(200).json({list: val});
+				}
 			});
 		case 'suppliers_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400);
+				else {
+					res.status(200).json({list: val});
+				}
 			});
 		case 'categories_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400);
+				else {
+					res.status(200).json({list: val});
+				}
 			});
 		case 'images_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400);
+				else {
+					res.status(200).json({list: val});
+				}
 			});
 		case 'product_create':
 			client.methodCall("product_create", [
@@ -50,13 +58,17 @@ app.post('/api/IMS', (req, res) => {
 				req.body.quantity, 
 				req.body.price
 			], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400);
+				else {
+					res.status(200).json({product: val});
+				}
 			});
 		case 'product_read':
 			client.methodCall("product_read", [req.body.p_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400);
+				else {
+					res.status(200).json({product: val});
+				}
 			});
 		case 'product_delete':
 			client.methodCall("product_delete", [req.body.p_id], (err, val) => {
@@ -146,8 +158,10 @@ app.post('/api/IMS', (req, res) => {
 			});
 		case 'supplierProducts_read':
 			client.methodCall(method, [req.body.s_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400);
+				else {
+					res.status(200).json({list: val});
+				}
 			});
 		case 'categoryProducts_create':
 			client.methodCall(method, [req.body.c_id, req.body.p_id], (err, val) => {
@@ -161,8 +175,10 @@ app.post('/api/IMS', (req, res) => {
 			});
 		case 'categoryProducts_read':
 			client.methodCall(method, [req.body.c_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400);
+				else {
+					res.status(200).json({list: val});
+				}
 			});
 		default:
 	}
