@@ -140,7 +140,11 @@ def supplier_read(supplier_id: str) -> Optional[tuple]:
     with get_conn() as conn:
         with conn.cursor() as c:
             c.execute("SELECT * FROM suppliers WHERE supplier_id = %s", (supplier_id,))
-            return c.fetchone()
+            row = c.fetchall()[0]
+            ret = []
+            for data in row:
+                ret.append(str(data))
+            return ret
 
 
 def supplier_update(supplier_id: str, name: str, contact_email: str) -> Optional[tuple]:
@@ -179,7 +183,11 @@ def category_read(category_id: str) -> Optional[tuple]:
     with get_conn() as conn:
         with conn.cursor() as c:
             c.execute("SELECT * FROM categories WHERE category_id = %s", (category_id,))
-            return c.fetchone()
+            row = c.fetchall()[0]
+            ret = []
+            for data in row:
+                ret.append(str(data))
+            return ret
 
 
 def category_update(category_id: str, name: str, description: str) -> Optional[tuple]:
@@ -218,7 +226,11 @@ def image_read(image_id: str) -> Optional[tuple]:
     with get_conn() as conn:
         with conn.cursor() as c:
             c.execute("SELECT * FROM images WHERE image_id = %s", (image_id,))
-            return c.fetchone()
+            row = c.fetchall()[0]
+            ret = []
+            for data in row:
+                ret.append(str(data))
+            return ret
 
 
 def image_update(image_id: str, product_id: str, url: str) -> Optional[tuple]:
