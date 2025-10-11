@@ -60,7 +60,7 @@ function Category({fields, ops, myOps, list, create, read, update, remove, readP
 			inputs.push(data.get(fields[i][0]));
 		}
 		if (edit != null) {
-			let id = edit["p_id"];
+			let id = edit["c_id"];
 			await update(id, ...inputs);
 			setEdit(null);
 		} else {
