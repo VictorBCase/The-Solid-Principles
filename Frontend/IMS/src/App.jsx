@@ -523,23 +523,31 @@ function App() {
 				portal == portals.category &&
 				<Category
 					fields={inputFields.category}
+					ops={ops}
+					myOps={portalOps.category}
 					list={listCategories}
 					create={createCategory}
 					read={viewCategory}
-					update={updateSupplier}
+					update={updateCategory}
 					remove={removeCategory}
 					readProducts={viewCategoryProducts}
+					message={validationMsg}
+					clearMsg={() => setVaidationMsg('')}
 				/>
 			}
 			{
 				portal == portals.image &&
 				<Image
 					fields={inputFields.image}
+					ops={ops}
+					myOps={portalOps.image}
 					list={listImages}
 					create={createImage}
 					read={viewImage}
 					update={updateImage}
 					remove={removeImage}
+					message={validationMsg}
+					clearMsg={() => setVaidationMsg('')}
 				/>
 			}
 		</>

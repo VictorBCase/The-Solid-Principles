@@ -51,7 +51,7 @@ function Supplier({fields, ops, myOps, list, create, read, update, remove, readP
     const [edit, setEdit] = useState(null);
     const [result, setResult] = useState(null);
     const [requireId, setRequireId] = useState(null);
-	const [suppliers, setProducts] = useState(null);
+	const [suppliers, setSuppliers] = useState(null);
 
     // handle create/edit inputs
     const handleFields = async (data) => {
@@ -67,30 +67,8 @@ function Supplier({fields, ops, myOps, list, create, read, update, remove, readP
             let id = await create(...inputs);
 			setResult(id);
 		}
-        setProducts(null);
+        setSuppliers(null);
     };
-
-    // handle supplier/category associations
-    const handleAssociation = async (data) => {
-        let type = data.get("type");
-        let id = data.get("id");
-		switch(requireId) {
-			case ops.assoc:
-				if (type == "supplier")
-					await associateSup(edit, id);
-				else
-					await associateCat(edit, id);
-				break;
-			default:
-				if (type == "supplier")
-					await disassociateSup(edit, id);
-				else
-					await disassociateCat(edit, id);
-				break;
-		}
-		setEdit(null);
-        setRequireId(null);
-    }
 
     // handle CRUD inputs
     const handleOps = async (data) => {
@@ -107,10 +85,11 @@ function Supplier({fields, ops, myOps, list, create, read, update, remove, readP
                 break;
             case ops.del:
                 remove(id);
-				setProducts(null);
+				setSuppliers(null);
                 break;
             case ops.prods:
-				await readProducts();
+				let prods = await readProducts();
+				setResult(prods);
 				break;
             case ops.view:
                 supplier = await read(id);
@@ -119,17 +98,17 @@ function Supplier({fields, ops, myOps, list, create, read, update, remove, readP
         }
     };
 
-	async function getProducts() {
+	async function getSuppliers() {
 		let temp = await list();
 		if (temp !== undefined) {
-            setProducts(temp);
+            setSuppliers(temp);
         }
 	}
 
 	useEffect(() => {
 		// Only run this effect when the component mounts and 'suppliers' is null
 		if (suppliers === null) {
-			getProducts();
+			getSuppliers();
 		}
 	}, [suppliers]); // Re-run only when 'suppliers' changes (e.g., set to null elsewhere)
 
