@@ -356,16 +356,16 @@ function App() {
 
 	async function listProducts() {
 		try {
-			await fetch(API, {
+			const res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'products_read'})
 			});
 			if (res.status > 299) return; // handle error
-			res = await res.JSON();
-			let products = res.list;
+			const data = await res.json();
+			let products = data.list;
 			return products;
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function listSuppliers() {
