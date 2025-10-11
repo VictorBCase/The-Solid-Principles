@@ -42,7 +42,7 @@ function App() {
 	const [ supplierList, setSupplierList ] = useState(['sup1', 'sup2', 'sup3', 'sup4']);
 
 	// api
-	const API = 'http://localhost:5050/api/IMS';
+	const API = 'http://localhost:5000/api/IMS';
 
 	// api calls
 	async function createProduct(name, desc, quantity, price) {
