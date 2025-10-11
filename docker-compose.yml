@@ -1,0 +1,33 @@
+services:
+  presentation:
+    build: ./Frontend
+    ports:
+      - "8080:5000"
+    depends_on:
+      - middleware
+    networks:
+      - frontend_net
+
+  middleware:
+    build: ./Middleware
+    networks:
+      - frontend_net
+      - backend_net
+
+  data:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: solid
+      POSTGRES_DB: IMS_Local
+    volumes:
+      - ./Database/DB_schema.sql:/docker-entrypoint-initdb.d/DB_schema.sql
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - backend_net
+
+networks:
+  frontend_net:
+  backend_net:
+volumes:
+  db_data:

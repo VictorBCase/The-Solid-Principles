@@ -75,7 +75,7 @@ function App() {
 	const [validationMsg, setVaidationMsg] = useState("");
 
 	// api
-	const API = 'http://localhost:5000/api/IMS';
+	const API = 'http://localhost:8080/api/IMS';
 
 	// api calls
 	async function createProduct(name, desc, quantity, price) {
