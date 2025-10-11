@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import Product from './portals/Product.jsx';
 import Supplier from './portals/Supplier.jsx';
 
@@ -46,6 +47,10 @@ function App() {
 	async function removeProduct() {
 		let temp = productList.slice(0, productList.length - 1);
 		setProductList(temp);
+	}
+
+	async function add() {
+	
 	}
 
 	function Portal() {
