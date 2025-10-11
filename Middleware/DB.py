@@ -296,7 +296,7 @@ if __name__ == "__main__":
     server.register_function(images_read, "images_read")
     server.register_function(product_create, "product_create")
     server.register_function(product_read, "product_read")
-    server.register_function(product_create, "product_delete")
+    server.register_function(product_delete, "product_delete")
     server.register_function(product_update, "product_update")
     server.register_function(supplier_create, "supplier_create")
     server.register_function(supplier_read, "supplier_read")
