@@ -21,6 +21,7 @@ app.use(express.static(frontendBuildPath));
 
 // api
 app.post('/api/IMS', (req, res) => {
+	console.log(req.body);
 	let method = req.body.meth;
 	switch(method) {
 		case 'products_read':
@@ -64,15 +65,22 @@ app.post('/api/IMS', (req, res) => {
 			], (err, val) => {
 				if (err) res.status(400).json({error: "Error: Failed to create."});
 				else {
-					res.status(200).json({product: val});
+					res.status(200).json({p_id: val});
 				}
 			});
 			break;
 		case 'product_read':
 			client.methodCall("product_read", [req.body.p_id], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({ error: 'Failed to read product' });
 				else {
-					res.status(200).json({product: val});
+					let prod = {
+						p_id: val[0],
+						name: val[1],
+						description: val[2],
+						quantity: val[3],
+						price: val[4]
+					};
+					res.status(200).json({product: prod});
 				}
 			});
 			break;

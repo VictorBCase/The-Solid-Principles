@@ -76,10 +76,14 @@ def product_create(name: str, description: Optional[str], quantity: int, price: 
 
 
 def product_read(product_id: str) -> Optional[tuple]:
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("SELECT * FROM products WHERE product_id = %s", (product_id,))
-            return c.fetchone()
+	with get_conn() as conn:
+		with conn.cursor() as c:
+			c.execute("""SELECT * FROM products WHERE product_id = %s""", (product_id,))
+			row = c.fetchall()[0]
+			ret = []
+			for data in row:
+				ret.append(str(data))
+			return ret
 
 
 def product_update(product_id: str, name: str, description: str, quantity: int, price: str) -> Optional[tuple]:

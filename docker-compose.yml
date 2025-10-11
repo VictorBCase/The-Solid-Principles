@@ -10,6 +10,8 @@ services:
 
   middleware:
     build: ./Middleware
+    environment:
+      - PYTHONUNBUFFERED=1
     networks:
       - frontend_net
       - backend_net
