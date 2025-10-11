@@ -42,16 +42,24 @@ function App() {
 			edit: "edit",
 			delete: "del",
 			associate: "assoc",
-			dissassociate: "diss"
+			disassociate: "diss"
 		},
 		supplier: {
-		
+			view: "get",
+			edit: "edit",
+			delete: "del",
+			products: "prods",
 		},
 		category: {
-		
+			view: "get",
+			edit: "edit",
+			delete: "del",
+			products: "prods",
 		},
 		image: {
-
+			view: "get",
+			edit: "edit",
+			delete: "del"
 		}
 	};
 
@@ -78,7 +86,11 @@ function App() {
 				})
 			});
 			let data = await res.json();
-			if (res.status > 299) return console.error(data);
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
 			let id = data.p_id;
 			return id;
 		} catch(error) { console.error(error); }
@@ -315,7 +327,7 @@ function App() {
 		} catch(error) { console.log(error); }
 	}
 
-	async function dissassociateProdSup(p_id, s_id) {
+	async function disassociateProdSup(p_id, s_id) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
@@ -356,7 +368,7 @@ function App() {
 		} catch(error) { console.log(error); }
 	}
 
-	async function dissassociateProdCat(p_id, c_id) {
+	async function disassociateProdCat(p_id, c_id) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
@@ -475,6 +487,10 @@ function App() {
 					update={updateProduct}
 					remove={removeProduct}
 					message={validationMsg}
+					associateSup={associateProdSup}
+					associateCat={associateProdCat}
+					disassociateSup={disassociateProdSup}
+					disassociateCat={disassociateProdCat}
 					clearMsg={() => setVaidationMsg('')}
 				/>
 			}

@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'; // Make sure useEffect is imported
 
 // validation message html
-const ValidationMsg = ({message, clear}) => {
+const ValidationMsg = ({message}) => {
 	if (message == '') return <></>;
 	return (
 		<>
 			<p name="msg" style={{color: "red"}}>{message}</p>
-			<button onClick={() => clear()}>clear</button>
 		</>
 	);
 }
@@ -46,7 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Product({fields, operations, list, create, read, update, remove, message, clearMsg}) {
+function Product({fields, operations, list, create, read, update, remove, associateSup, associateCat, disassociateSup, disassociateCat, message, clearMsg}) {
 
     // state variables for the menu
     const [edit, setEdit] = useState(null);
@@ -77,11 +76,13 @@ function Product({fields, operations, list, create, read, update, remove, messag
         let type = data.get("type");
         let id = data.get("id");
         console.log([type, id]);
+		setEdit(null);
         setRequireId(null);
     }
 
     // handle CRUD inputs
     const handleOps = async (data) => {
+		clearMsg();
         let type = data.get("type");
         let id = data.get("prod");
 		let product;
@@ -95,10 +96,12 @@ function Product({fields, operations, list, create, read, update, remove, messag
 				setProducts(null);
                 break;
             case operations.associate:
-                setRequireId(operations.associate);
+				setRequireId(operations.associate);
+				setEdit(id);
                 break;
             case operations.dissassociate:
                 setRequireId(operations.dissassociate);
+				setEdit(id);
                 break;
             case operations.view:
             default:
@@ -115,17 +118,12 @@ function Product({fields, operations, list, create, read, update, remove, messag
         }
 	}
 
-	async function getProduct(id) {
-		let temp = await read(id);
-		setResult(temp);
-	}
-
     function Menu() {
         if (requireId != null) {
             // association interface
             return (
                 <>
-                    <button onClick={() => setRequireId(null)}>back</button>
+                    <button onClick={() => {setEdit(null); setRequireId(null);}}>cancel</button>
                     <form action={handleAssociation}>
                         <label>
                             <input type="radio" name="type" value="supplier" defaultChecked />supplier
@@ -138,7 +136,7 @@ function Product({fields, operations, list, create, read, update, remove, messag
                             <input type="text" name="id" />
                             <button type="submit">confirm</button>
                         </label>
-                        <ValidationMsg />
+                        <ValidationMsg message={message} />
                     </form>
                 </>
             );
@@ -153,6 +151,7 @@ function Product({fields, operations, list, create, read, update, remove, messag
         return (
             <>
                 <FieldForm fields={fields} edit={edit} close={() => setEdit(null)} formAction={handleFields} />
+				<ValidationMsg message={message} />
 				{edit === null &&
 					<form action={handleOps}>
 						<p>perform</p>
@@ -185,7 +184,7 @@ function Product({fields, operations, list, create, read, update, remove, messag
 						</ul>
 						<p>on product:</p>
 						<ul>
-							{products != null ?
+							{products != null &&
 								products.map((product) => (
 									<li key={product}>
 										<label>
@@ -193,8 +192,6 @@ function Product({fields, operations, list, create, read, update, remove, messag
 										</label>
 									</li>
 								))
-							:
-								<></>
 							}
 						</ul>
 						<button type="submit">confirm</button>
