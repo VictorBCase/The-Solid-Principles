@@ -32,28 +32,28 @@ def gen_uuid():
 
 # ============================ LIST FUNCTIONS ============================
 
-def products_read() -> list:
+def products_read() -> Optional[list]:
 	with get_conn() as conn:
 		with conn.cursor() as c:
 			c.execute("""SELECT (product_id) FROM products""")
 			return c.fetchall()
 
 
-def suppliers_read() -> list:
+def suppliers_read() -> Optional[list]:
 	with get_conn() as conn:
 		with conn.cursor() as c:
 			c.execute("""SELECT (supplier_id) FROM suppliers""")
 			return c.fetchall()
 
 
-def categories_read() -> list:
+def categories_read() -> Optional[list]:
 	with get_conn() as conn:
 		with conn.cursor() as c:
 			c.execute("""SELECT (category_id) FROM categories""")
 			return c.fetchall()
 
 
-def images_read() -> list:
+def images_read() -> Optional[list]:
 	with get_conn() as conn:
 		with conn.cursor() as c:
 			c.execute("""SELECT (image_id) FROM images""")
@@ -232,7 +232,7 @@ def categoryProducts_create(category_id, product_id) -> None:
 			conn.commit()
 
 
-def categoryProducts_read(category_id) -> list:
+def categoryProducts_read(category_id) -> Optional[list]:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -266,7 +266,7 @@ def supplierProducts_create(supplier_id, product_id) -> None:
             conn.commit()
 
 
-def supplierProducts_read(supplier_id) -> list:
+def supplierProducts_read(supplier_id) -> Optional[list]:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -296,7 +296,7 @@ if __name__ == "__main__":
 	server.register_function(images_read, "images_read")
     server.register_function(product_create, "product_create")
     server.register_function(product_read, "product_read")
-    server.register_function(product_create, "product_create")
+    server.register_function(product_create, "product_delete")
     server.register_function(product_update, "product_update")
     server.register_function(supplier_create, "supplier_create")
     server.register_function(supplier_read, "supplier_read")
