@@ -26,7 +26,7 @@ app.post('/api/IMS', (req, res) => {
 	switch(method) {
 		case 'products_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400).json({ error: 'Failed to read products' });
+				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
 					res.status(200).json({list: val});
 				}
@@ -34,7 +34,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'suppliers_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to read suppliers.'});
 				else {
 					res.status(200).json({list: val});
 				}
@@ -42,7 +42,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'categories_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to read categories.'});
 				else {
 					res.status(200).json({list: val});
 				}
@@ -50,7 +50,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'images_read':
 			client.methodCall(method, [], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to read images.'});
 				else {
 					res.status(200).json({list: val});
 				}
@@ -63,7 +63,7 @@ app.post('/api/IMS', (req, res) => {
 				req.body.quantity, 
 				req.body.price
 			], (err, val) => {
-				if (err) res.status(400).json({error: "Error: Failed to create."});
+				if (err) res.status(400).json({error: 'Failed to create product.'});
 				else {
 					res.status(200).json({p_id: val});
 				}
@@ -71,7 +71,7 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'product_read':
 			client.methodCall("product_read", [req.body.p_id], (err, val) => {
-				if (err) res.status(400).json({ error: 'Failed to read product' });
+				if (err) res.status(400).json({error: 'Failed to read product.'});
 				else {
 					let prod = {
 						p_id: val[0],
@@ -86,9 +86,9 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'product_delete':
 			client.methodCall("product_delete", [req.body.p_id], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to delete product.'})
 				else {
-					res.status(200).json({product: val});
+					res.status(200).json({val: val});
 				}
 			});
 			break;
@@ -100,36 +100,47 @@ app.post('/api/IMS', (req, res) => {
 				req.body.quantity, 
 				req.body.price
 			], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to update product.'});
 				else {
-					res.status(200).json({product: val});
+					res.status(200).json({val: val});
 				}
 			});
 			break;
 		case 'supplier_create':
 			client.methodCall("supplier_create", [req.body.name, req.body.contact], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to create supplier.'});
 				else {
-					res.status(200).json({product: val});
+					res.status(200).json({s_id: val});
 				}
 			});
 			break;
 		case 'supplier_read':
 			client.methodCall("supplier_read", [req.body.s_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to read supplier.'});
+				else {
+					let sup = {
+						s_id: val[0],
+						name: val[1],
+						contact: val[2]
+					};
+					res.status(200).json({supplier: sup});
+				}
 			});
 			break;
 		case 'supplier_delete':
 			client.methodCall("supplier_delete", [req.body.s_id], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to delete supplier.'});
+				else {
+					res.status(200).json({val: val});
+				}
 			});
 			break;
 		case 'supplier_update':
 			client.methodCall(method, [req.body.s_id, req.body.name, req.body.contact], (err, val) => {
-				if (err) return err;
-				return val;
+				if (err) res.status(400).json({error: 'Failed to update supplier.'});
+				else {
+					res.status(200).json({val: val});
+				}
 			});
 			break;
 		case 'category_create':
@@ -194,9 +205,9 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'supplierProducts_read':
 			client.methodCall(method, [req.body.s_id], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
-					res.status(200).json({list: val});
+					res.status(200).json({products: val});
 				}
 			});
 			break;
@@ -214,9 +225,9 @@ app.post('/api/IMS', (req, res) => {
 			break;
 		case 'categoryProducts_read':
 			client.methodCall(method, [req.body.c_id], (err, val) => {
-				if (err) res.status(400);
+				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
-					res.status(200).json({list: val});
+					res.status(200).json({products: val});
 				}
 			});
 			break;

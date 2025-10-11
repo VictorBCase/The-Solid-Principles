@@ -7,67 +7,6 @@ import Image from './portals/Image.jsx';
 
 function App() {
 
-	const portals = {
-		product: 0,
-		supplier: 1,
-		category: 2,
-		image: 3
-	};
-
-	// passed down to each portal [name, input type]
-	const inputFields = {
-		product: [
-			["name", "text"],
-			["description", "text"],
-			["quantity", "number"],
-			["price", "number"]
-		],
-		supplier: [
-			["name", "text"],
-			["contact", "text"]
-		],
-		category: [
-			["name", "text"],
-			["desc", "text"]
-		],
-		image: [
-			["product", "text"],
-			["url", "text"]
-		]
-	};
-
-	const operations = {
-		product: {
-			view: "get",
-			edit: "edit",
-			delete: "del",
-			associate: "assoc",
-			disassociate: "diss"
-		},
-		supplier: {
-			view: "get",
-			edit: "edit",
-			delete: "del",
-			products: "prods",
-		},
-		category: {
-			view: "get",
-			edit: "edit",
-			delete: "del",
-			products: "prods",
-		},
-		image: {
-			view: "get",
-			edit: "edit",
-			delete: "del"
-		}
-	};
-
-	// state variables
-	const [portal, setPortal] = useState(null);
-	const [results, setResults] = useState(null);
-	const [validationMsg, setVaidationMsg] = useState("");
-
 	// api
 	const API = 'http://localhost:8080/api/IMS';
 
@@ -416,6 +355,10 @@ function App() {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'suppliers_read'})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let suppliers = data.list;
+			return suppliers;
 		} catch(error) { console.log(error); }
 	}
 
@@ -426,6 +369,10 @@ function App() {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'categories_read'})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let categories = data.list;
+			return categories;
 		} catch(error) { console.log(error); }
 	}
 
@@ -436,6 +383,10 @@ function App() {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'images_read'})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let images = data.list;
+			return images;
 		} catch(error) { console.log(error); }
 	}
 
@@ -449,6 +400,10 @@ function App() {
 					s_id: id
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let products = data.list;
+			return products;
 		} catch(error) { console.log(error); }
 	}
 
@@ -462,8 +417,61 @@ function App() {
 					c_id: id
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let products = data.list;
+			return products;
 		} catch(error) { console.log(error); }
 	}
+
+	const portals = {
+		product: 0,
+		supplier: 1,
+		category: 2,
+		image: 3
+	};
+
+	const inputFields = {
+		product: [
+			["name", "text"],
+			["description", "text"],
+			["quantity", "number"],
+			["price", "number"]
+		],
+		supplier: [
+			["name", "text"],
+			["contact", "text"]
+		],
+		category: [
+			["name", "text"],
+			["desc", "text"]
+		],
+		image: [
+			["product", "text"],
+			["url", "text"]
+		]
+	};
+
+	const ops = {
+		view: "view",
+		edit: "edit",
+		del: "delete",
+		assoc: "associate",
+		disas: "disassociate",
+		prods: "products"
+	};
+
+	const portalOps = {
+		product: Array(ops.view, ops.edit, ops.del, ops.assoc, ops.disas),
+		supplier: Array(ops.view, ops.edit, ops.del, ops.prods),
+		category: Array(ops.view, ops.edit, ops.del, ops.prods),
+		image: Array(ops.view, ops.edit, ops.del)
+	};
+
+	// state variables
+	const [portal, setPortal] = useState(null);
+	const [results, setResults] = useState(null);
+	const [validationMsg, setVaidationMsg] = useState("");
 
 	return (
 		<>
@@ -480,17 +488,18 @@ function App() {
 				portal == portals.product &&
 				<Product 
 					fields={inputFields.product}
-					operations={operations.product}
+					ops={ops}
+					myOps={portalOps.product}
 					list={listProducts}
 					create={createProduct}
 					read={viewProduct}
 					update={updateProduct}
 					remove={removeProduct}
-					message={validationMsg}
 					associateSup={associateProdSup}
 					associateCat={associateProdCat}
 					disassociateSup={disassociateProdSup}
 					disassociateCat={disassociateProdCat}
+					message={validationMsg}
 					clearMsg={() => setVaidationMsg('')}
 				/>
 			}
@@ -498,13 +507,16 @@ function App() {
 				portal == portals.supplier &&
 				<Supplier
 					fields={inputFields.supplier}
-					suppliers={supplierList} //
+					ops={ops}
+					myOps={portalOps.supplier}
 					list={listSuppliers}
 					create={createSupplier}
 					read={viewSupplier}
 					update={updateSupplier}
 					remove={removeSupplier}
 					readProducts={viewSupplierProducts}
+					message={validationMsg}
+					clearMsg={() => setVaidationMsg('')}
 				/>
 			}
 			{
