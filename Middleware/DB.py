@@ -363,7 +363,15 @@ def supplierProducts_read(supplier_id) -> Optional[list]:
                 JOIN products p ON sp.product_id = p.product_id
                 WHERE sp.supplier_id = %s
             """, (supplier_id,))
-            return cur.fetchall()
+            results = []
+            for row in cur.fetchall():
+                product_id, name, price_decimal = row
+
+                price_str = str(price_decimal) 
+                
+                results.append((product_id, name, price_str))
+                
+            return results # Return the list with string prices
 
 
 def supplierProducts_delete(supplier_id, product_id) -> None:
