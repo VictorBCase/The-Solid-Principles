@@ -1,161 +1,157 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Make sure useEffect is imported
 
-function Category({fields, list, create, update, remove, listProducts}) {
+// validation message html
+const ValidationMsg = ({message}) => {
+	if (message == '') return <></>;
+	return (
+		<>
+			<p name="msg" style={{color: "red"}}>{message}</p>
+		</>
+	);
+}
 
-    // supported operations
-    const RUDs = {
-        view: "get",
-		viewProducts: "getProds",
-        edit: "edit",
-        delete: "del",
-    };
+// display view results
+const Result = ({result, clear}) => {
+	if (result == null) return <></>;
+	return (
+		<>
+			<p>result:</p>
+			<p>{result}</p>
+			<button onClick={() => clear()}>clear</button>
+			<br />
+		</>
+	);
+}
 
-    // mock category entry
-    const category = {name: "fairphone", description: "email"};
+// field form html
+const FieldForm = ({fields, edit, close, formAction}) => {
+	return (
+		<form action={formAction}>
+			{edit != null && <button onClick={() => close()}>cancel edit</button>}
+			<p>{edit == null ? "create" : "modify"} category:</p>
+			{fields.map((data) => (
+				<>
+					<label>category {data[0]}:
+						{edit == null ?
+							<input type={data[1]} name={data[0]} />
+						:
+							<input type={data[1]} name={data[0]} defaultValue={edit[data[0]]} />
+						}
+					</label>
+				</>
+			))}
+			<button type="submit">{edit == null ? "create" : "update"}</button>
+		</form>
+	);
+}
 
-    // state variables for the menu
-    const [edit, setEdit] = useState(null);
-    const [result, setResult] = useState(null);
-	const [categories, setCategories] = useState([]);
+function Category({fields, ops, myOps, list, create, read, update, remove, readProducts, message, clearMsg}) {
 
-    // validation msg -> contents potentially provided by middleware response
-    const [message, setMessage] = useState("fields must be non-empty.");
+	// state variables for the menu
+	const [edit, setEdit] = useState(null);
+	const [result, setResult] = useState(null);
+	const [requireId, setRequireId] = useState(null);
+	const [categories, setCategories] = useState(null);
 
-    // handle create/edit inputs
-    const handleFields = (data) => {
-        let inputs = fields;
-        for (let i = 0; i < inputs.length; i ++) {
-            inputs[i][1] = data.get(inputs[i][0]);
-        }
-        console.log(inputs);
-        if (edit != null)
-            setEdit(null);
-        // else
-            // create();
-    };
+	// handle create/edit inputs
+	const handleFields = async (data) => {
+		let inputs = [];
+		for (let i = 0; i < fields.length; i ++) {
+			inputs.push(data.get(fields[i][0]));
+		}
+		if (edit != null) {
+			let id = edit["c_id"];
+			await update(id, ...inputs);
+			setEdit(null);
+		} else {
+			let id = await create(...inputs);
+			setResult(id);
+		}
+		setCategories(null);
+	};
 
-    // handle CRUD inputs
-    const handleRUD = (data) => {
-        let type = data.get("type");
-        let prod = data.get("prod");
-        switch(type) {
-            case RUDs.edit:
-                setEdit(category);
-                break;
-            case RUDs.delete:
-                // remove();
-                break;
-            case RUDs.view:
-            default:
-                setResult(category);
-                break;
-        }
-    };
+	// handle CRUD inputs
+	const handleOps = async (data) => {
+		clearMsg();
+		let type = data.get("type");
+		let id = data.get("category");
+		if (id == null)
+			return;
+		let category;
+		switch(type) {
+			case ops.edit:
+				category = await read(id);
+				setEdit(category);
+				break;
+			case ops.del:
+				remove(id);
+				setCategories(null);
+				break;
+			case ops.prods:
+				let prods = await readProducts(id);
+				setResult(prods);
+				break;
+			case ops.view:
+				category = await read(id);
+				setResult(JSON.stringify(category));
+				break;
+		}
+	};
 
-    // display view results
-    function Result() {
-        if (result == null)
-            return <></>;
-        return (
-            <>
-                <p>view {result.name}:</p>
-                <p>some result</p>
-                <button onClick={() => setResult(null)}>clear result</button>
-                <br />
-            </>
-        );
-    }
+	async function getCategories() {
+		let temp = await list();
+		if (temp !== undefined) {
+			setCategories(temp);
+		}
+	}
 
-    // validation message html
-    function ValidationMsg() {
-        return (
-            <p name="msg" style={{color: "red"}}>{message}</p>
-        );
-    }
+	useEffect(() => {
+		// Only run this effect when the component mounts and 'categories' is null
+		if (categories === null) {
+			getCategories();
+		}
+	}, [categories]); // Re-run only when 'categories' changes (e.g., set to null elsewhere)
 
-    // field form html
-    function FieldForm({formAction}) {
-        return (
-            <form action={formAction}>
-                <p>{edit == null ? "create" : "modify"} category:</p>
-                {fields.map((data) => (
-                    <>
-                        <label>category {data[0]}:
-                            {edit == null ?
-                                <input type={data[1]} name={data[0]} />
-                            :
-                                <input type={data[1]} name={data[0]} value={edit[data[0]]} />
-                            }
-                        </label>
-                    </>
-                ))}
-                <button type="submit">{edit == null ? "create" : "update"}</button>
-                <ValidationMsg />
-            </form>
-        );
-    }
-
-    function Menu() {
-        if (edit != null) {
-            // edit interface
-            return (
-                <>
-                    <button onClick={() => setEdit(null)}>cancel edit</button>
-                    <FieldForm formAction={handleFields} />
-                </>
-            );
-        }
-        // crud interface
-        return (
-            <>
-                <FieldForm formAction={handleFields} />
-                <form action={handleRUD}>
-                    <p>perform</p>
-                    <ul>
-                        <li>
-                            <label>
-                                <input type="radio" name="type" value={RUDs.view} defaultChecked />view
-                            </label>
-                        </li>
-						<li>
-							<label>
-								<input type="radio" name="type" value={RUDs.viewProducts} />view products
-							</label>
-						</li>
-                        <li>
-                            <label>
-                                <input type="radio" name="type" value={RUDs.edit} />edit
-                            </label>
-                        </li>
-                        <li>
-                            <label>
-                                <input type="radio" name="type" value={RUDs.delete} />delete
-                            </label>
-                        </li>
-                    </ul>
-                    <p>on category:</p>
-                    <ul>
-                        {categories.map((category) => (
-                            <li key={category}>
-                                <label>
-                                    <input type="radio" name="prod" value={category} />{category}
-                                </label>
-                            </li>
-                        ))}
-                    </ul>
-                    <button type="submit">confirm</button>
-                </form>
-            </>
-        );
-    }
-
-    return (
-        <>
-            <h2>category portal</h2>
-            <Result />
-            <Menu />
-        </>
-    );
+	return (
+		<>
+			<h2>category portal</h2>
+			<Result result={result} clear={() => setResult(null)} />
+				<FieldForm fields={fields} edit={edit} close={() => setEdit(null)} formAction={handleFields} />
+				<ValidationMsg message={message} />
+				{edit === null &&
+					<form action={handleOps}>
+						<p>perform</p>
+						<ul>
+							<li>
+								<input type="radio" name="type" value={myOps[0]} defaultChecked />{myOps[0]}
+							</li>
+							<li>
+								<input type="radio" name="type" value={myOps[1]} />{myOps[1]}
+							</li>
+							<li>
+								<input type="radio" name="type" value={myOps[2]} />{myOps[2]}
+							</li>
+							<li>
+								<input type="radio" name="type" value={myOps[3]} />{myOps[3]}
+							</li>
+						</ul>
+						<p>on category:</p>
+						<ul>
+							{categories != null &&
+								categories.map((category) => (
+									<li key={category}>
+										<label>
+											<input type="radio" name="category" value={category} />{category}
+										</label>
+									</li>
+								))
+							}
+						</ul>
+						<button type="submit">confirm</button>
+					</form>
+				}
+		</>
+	);
 }
 
 export default Category;

@@ -7,59 +7,6 @@ import Image from './portals/Image.jsx';
 
 function App() {
 
-	const portals = {
-		product: 0,
-		supplier: 1,
-		category: 2,
-		image: 3
-	};
-
-	// passed down to each portal [name, input type]
-	const inputFields = {
-		product: [
-			["name", "text"],
-			["description", "text"],
-			["quantity", "number"],
-			["price", "number"]
-		],
-		supplier: [
-			["name", "text"],
-			["contact", "text"]
-		],
-		category: [
-			["name", "text"],
-			["desc", "text"]
-		],
-		image: [
-			["product", "text"],
-			["url", "text"]
-		]
-	};
-
-	const operations = {
-		product: {
-			view: "get",
-			edit: "edit",
-			delete: "del",
-			associate: "assoc",
-			dissassociate: "diss"
-		},
-		supplier: {
-		
-		},
-		category: {
-		
-		},
-		image: {
-
-		}
-	};
-
-	// state variables
-	const [portal, setPortal] = useState(null);
-	const [results, setResults] = useState(null);
-	const [validationMsg, setVaidationMsg] = useState("");
-
 	// api
 	const API = 'http://localhost:8080/api/IMS';
 
@@ -78,7 +25,11 @@ function App() {
 				})
 			});
 			let data = await res.json();
-			if (res.status > 299) return console.error(data);
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
 			let id = data.p_id;
 			return id;
 		} catch(error) { console.error(error); }
@@ -315,7 +266,7 @@ function App() {
 		} catch(error) { console.log(error); }
 	}
 
-	async function dissassociateProdSup(p_id, s_id) {
+	async function disassociateProdSup(p_id, s_id) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
@@ -356,7 +307,7 @@ function App() {
 		} catch(error) { console.log(error); }
 	}
 
-	async function dissassociateProdCat(p_id, c_id) {
+	async function disassociateProdCat(p_id, c_id) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
@@ -376,7 +327,7 @@ function App() {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					meth: 'supplierProducts_read',
+					meth: 'categoryProducts_read',
 					c_id: id
 				})
 			});
@@ -404,6 +355,10 @@ function App() {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'suppliers_read'})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let suppliers = data.list;
+			return suppliers;
 		} catch(error) { console.log(error); }
 	}
 
@@ -414,6 +369,10 @@ function App() {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'categories_read'})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let categories = data.list;
+			return categories;
 		} catch(error) { console.log(error); }
 	}
 
@@ -424,6 +383,10 @@ function App() {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({meth: 'images_read'})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let images = data.list;
+			return images;
 		} catch(error) { console.log(error); }
 	}
 
@@ -437,6 +400,10 @@ function App() {
 					s_id: id
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let products = data.list;
+			return products;
 		} catch(error) { console.log(error); }
 	}
 
@@ -450,8 +417,61 @@ function App() {
 					c_id: id
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let products = data.list;
+			return products;
 		} catch(error) { console.log(error); }
 	}
+
+	const portals = {
+		product: 0,
+		supplier: 1,
+		category: 2,
+		image: 3
+	};
+
+	const inputFields = {
+		product: [
+			["name", "text"],
+			["description", "text"],
+			["quantity", "number"],
+			["price", "number"]
+		],
+		supplier: [
+			["name", "text"],
+			["contact", "text"]
+		],
+		category: [
+			["name", "text"],
+			["desc", "text"]
+		],
+		image: [
+			["product", "text"],
+			["url", "text"]
+		]
+	};
+
+	const ops = {
+		view: "view",
+		edit: "edit",
+		del: "delete",
+		assoc: "associate",
+		disas: "disassociate",
+		prods: "products"
+	};
+
+	const portalOps = {
+		product: Array(ops.view, ops.edit, ops.del, ops.assoc, ops.disas),
+		supplier: Array(ops.view, ops.edit, ops.del, ops.prods),
+		category: Array(ops.view, ops.edit, ops.del, ops.prods),
+		image: Array(ops.view, ops.edit, ops.del)
+	};
+
+	// state variables
+	const [portal, setPortal] = useState(null);
+	const [results, setResults] = useState(null);
+	const [validationMsg, setVaidationMsg] = useState("");
 
 	return (
 		<>
@@ -468,12 +488,17 @@ function App() {
 				portal == portals.product &&
 				<Product 
 					fields={inputFields.product}
-					operations={operations.product}
+					ops={ops}
+					myOps={portalOps.product}
 					list={listProducts}
 					create={createProduct}
 					read={viewProduct}
 					update={updateProduct}
 					remove={removeProduct}
+					associateSup={associateProdSup}
+					associateCat={associateProdCat}
+					disassociateSup={disassociateProdSup}
+					disassociateCat={disassociateProdCat}
 					message={validationMsg}
 					clearMsg={() => setVaidationMsg('')}
 				/>
@@ -482,36 +507,47 @@ function App() {
 				portal == portals.supplier &&
 				<Supplier
 					fields={inputFields.supplier}
-					suppliers={supplierList} //
+					ops={ops}
+					myOps={portalOps.supplier}
 					list={listSuppliers}
 					create={createSupplier}
 					read={viewSupplier}
 					update={updateSupplier}
 					remove={removeSupplier}
 					readProducts={viewSupplierProducts}
+					message={validationMsg}
+					clearMsg={() => setVaidationMsg('')}
 				/>
 			}
 			{
 				portal == portals.category &&
 				<Category
 					fields={inputFields.category}
+					ops={ops}
+					myOps={portalOps.category}
 					list={listCategories}
 					create={createCategory}
 					read={viewCategory}
-					update={updateSupplier}
+					update={updateCategory}
 					remove={removeCategory}
 					readProducts={viewCategoryProducts}
+					message={validationMsg}
+					clearMsg={() => setVaidationMsg('')}
 				/>
 			}
 			{
 				portal == portals.image &&
 				<Image
 					fields={inputFields.image}
+					ops={ops}
+					myOps={portalOps.image}
 					list={listImages}
 					create={createImage}
 					read={viewImage}
 					update={updateImage}
 					remove={removeImage}
+					message={validationMsg}
+					clearMsg={() => setVaidationMsg('')}
 				/>
 			}
 		</>
