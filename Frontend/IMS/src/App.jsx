@@ -111,6 +111,11 @@ function App() {
 					s_id: id
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let supplier = data.supplier;
+			console.log(supplier);
+			return supplier;
 		} catch(error) { console.log(error); }
 	}
 
@@ -166,6 +171,11 @@ function App() {
 					c_id: id
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let category = data.category;
+			console.log(category);
+			return category;
 		} catch(error) { console.log(error); }
 	}
 
@@ -221,6 +231,11 @@ function App() {
 					i_id: id
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let image = data.image;
+			console.log(image);
+			return image;
 		} catch(error) { console.log(error); }
 	}
 
@@ -290,6 +305,11 @@ function App() {
 					s_id: id
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let prods = data.list;
+			console.log(prods);
+			return prods;
 		} catch(error) { console.log(error); }
 	}
 
@@ -331,6 +351,11 @@ function App() {
 					c_id: id
 				})
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let prods = data.list;
+			console.log(prods);
+			return prods;
 		} catch(error) { console.log(error); }
 	}
 
@@ -444,10 +469,10 @@ function App() {
 		],
 		category: [
 			["name", "text"],
-			["desc", "text"]
+			["description", "text"]
 		],
 		image: [
-			["product", "text"],
+			["p_id", "text"],
 			["url", "text"]
 		]
 	};

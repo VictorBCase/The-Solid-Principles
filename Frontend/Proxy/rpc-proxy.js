@@ -28,6 +28,7 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall(method, [], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
+					console.log(val);
 					res.status(200).json({list: val});
 				}
 			});
@@ -36,6 +37,7 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall(method, [], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read suppliers.'});
 				else {
+					console.log(val);
 					res.status(200).json({list: val});
 				}
 			});
@@ -44,6 +46,7 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall(method, [], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read categories.'});
 				else {
+					console.log(val);
 					res.status(200).json({list: val});
 				}
 			});
@@ -52,6 +55,7 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall(method, [], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read images.'});
 				else {
+					console.log(val);
 					res.status(200).json({list: val});
 				}
 			});
@@ -73,6 +77,7 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall("product_read", [req.body.p_id], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read product.'});
 				else {
+					console.log(val);
 					let prod = {
 						p_id: val[0],
 						name: val[1],
@@ -102,6 +107,7 @@ app.post('/api/IMS', (req, res) => {
 			], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to update product.'});
 				else {
+					console.log(val);
 					res.status(200).json({val: val});
 				}
 			});
@@ -118,6 +124,7 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall("supplier_read", [req.body.s_id], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read supplier.'});
 				else {
+					console.log(val);
 					let sup = {
 						s_id: val[0],
 						name: val[1],
@@ -153,6 +160,7 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall(method, [req.body.c_id], (err, val) => {
 				if (err) res.status(400).json({error: 'Could not read category.'});
 				else {
+					console.log(val);
 					let cat = {
 						c_id: val[0],
 						name: val[1],
@@ -184,6 +192,7 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall(method, [req.body.i_id], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read image.'});
 				else {
+					console.log(val);
 					let img = {
 						i_id: val[0],
 						p_id: val[1],
@@ -221,6 +230,7 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall(method, [req.body.s_id], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
+					console.log(val);
 					res.status(200).json({list: val});
 				}
 			});
@@ -241,6 +251,7 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall(method, [req.body.c_id], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
+					console.log(val);
 					res.status(200).json({list: val});
 				}
 			});
