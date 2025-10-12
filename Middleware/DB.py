@@ -329,7 +329,15 @@ def categoryProducts_read(category_id) -> Optional[list]:
                 JOIN products p ON cp.product_id = p.product_id
                 WHERE cp.category_id = %s
             """, (category_id,))
-            return cur.fetchall()
+            results = []
+            for row in cur.fetchall():
+                product_id, name, price_decimal = row
+
+                price_str = str(price_decimal) 
+                
+                results.append((product_id, name, price_str))
+                
+            return results
 
 
 def categoryProducts_delete(category_id, product_id) -> None:
@@ -363,7 +371,15 @@ def supplierProducts_read(supplier_id) -> Optional[list]:
                 JOIN products p ON sp.product_id = p.product_id
                 WHERE sp.supplier_id = %s
             """, (supplier_id,))
-            return cur.fetchall()
+            results = []
+            for row in cur.fetchall():
+                product_id, name, price_decimal = row
+
+                price_str = str(price_decimal) 
+                
+                results.append((product_id, name, price_str))
+                
+            return results
 
 
 def supplierProducts_delete(supplier_id, product_id) -> None:

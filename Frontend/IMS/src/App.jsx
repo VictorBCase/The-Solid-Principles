@@ -327,7 +327,7 @@ function App() {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					meth: 'supplierProducts_read',
+					meth: 'categoryProducts_read',
 					c_id: id
 				})
 			});
