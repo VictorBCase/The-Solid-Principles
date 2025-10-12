@@ -88,7 +88,7 @@ function Category({fields, ops, myOps, list, create, read, update, remove, readP
 				setCategories(null);
 				break;
 			case ops.prods:
-				let prods = await readProducts();
+				let prods = await readProducts(id);
 				setResult(prods);
 				break;
 			case ops.view:
