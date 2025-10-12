@@ -50,19 +50,20 @@ function Image({fields, ops, myOps, list, create, read, update, remove, message,
 	// state variables for the menu
 	const [edit, setEdit] = useState(null);
 	const [result, setResult] = useState(null);
-	const [requireId, setRequireId] = useState(null);
 	const [images, setImages] = useState(null);
 
 	// handle create/edit inputs
 	const handleFields = async (data) => {
+		clearMsg();
 		let inputs = [];
 		for (let i = 0; i < fields.length; i ++) {
 			inputs.push(data.get(fields[i][0]));
 		}
 		if (edit != null) {
 			let id = edit["i_id"];
-			await update(id, ...inputs);
-			setEdit(null);
+			let op = await update(id, ...inputs);
+			if (op) setEdit(null);
+			else return;
 		} else {
 			let id = await create(...inputs);
 			setResult(id);

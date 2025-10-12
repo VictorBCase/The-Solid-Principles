@@ -48,7 +48,6 @@ function App() {
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 			let product = data.product;
-			console.log(product);
 			return product;
 		} catch(error) { console.error(error); }
 	}
@@ -65,7 +64,7 @@ function App() {
 			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function updateProduct(id, name, desc, quantity, price) {
@@ -83,8 +82,14 @@ function App() {
 				})
 			});
 			let data = await res.json();
-			if (res.status > 299) return console.error(data);
-		} catch(error) { console.log(error); }
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+			return true;
+		} catch(error) { console.error(error); return false; }
 	}
 
 	async function createSupplier(name, contact) {
@@ -98,7 +103,13 @@ function App() {
 					contact: contact
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
 	}
 
 	async function viewSupplier(id) {
@@ -114,9 +125,8 @@ function App() {
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 			let supplier = data.supplier;
-			console.log(supplier);
 			return supplier;
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function removeSupplier(id) {
@@ -129,7 +139,7 @@ function App() {
 					s_id: id
 				})
 			});
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function updateSupplier(id, name, contact) {
@@ -144,7 +154,15 @@ function App() {
 					contact: contact
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+			return true;
+		} catch(error) { console.error(error); return false; }
 	}
 
 	async function createCategory(name, desc) {
@@ -158,7 +176,13 @@ function App() {
 					description: desc
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
 	}
 
 	async function viewCategory(id) {
@@ -174,9 +198,8 @@ function App() {
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 			let category = data.category;
-			console.log(category);
 			return category;
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function removeCategory(id) {
@@ -189,7 +212,7 @@ function App() {
 					c_id: id
 				})
 			});
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function updateCategory(id, name, desc) {
@@ -204,7 +227,15 @@ function App() {
 					description: desc
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+			return true;
+		} catch(error) { console.error(error); return false; }
 	}
 
 	async function createImage(p_id, url) {
@@ -218,7 +249,13 @@ function App() {
 					url: url
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
 	}
 
 	async function viewImage(id) {
@@ -234,9 +271,8 @@ function App() {
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 			let image = data.image;
-			console.log(image);
 			return image;
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function removeImage(id) {
@@ -249,7 +285,7 @@ function App() {
 					i_id: id
 				})
 			});
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function updateImage(id, p_id, url) {
@@ -264,7 +300,15 @@ function App() {
 					url: url
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+			return true;
+		} catch(error) { console.error(error); return false; }
 	}
 
 	async function associateProdSup(p_id, s_id) {
@@ -278,7 +322,13 @@ function App() {
 					s_id: s_id
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
 	}
 
 	async function disassociateProdSup(p_id, s_id) {
@@ -292,7 +342,13 @@ function App() {
 					s_id: s_id
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
 	}
 
 	async function viewSupplierProducts(id) {
@@ -308,9 +364,8 @@ function App() {
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 			let prods = data.list;
-			console.log(prods);
 			return prods;
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function associateProdCat(p_id, c_id) {
@@ -324,7 +379,13 @@ function App() {
 					c_id: c_id
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
 	}
 
 	async function disassociateProdCat(p_id, c_id) {
@@ -338,7 +399,13 @@ function App() {
 					c_id: c_id
 				})
 			});
-		} catch(error) { console.log(error); }
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
 	}
 
 	async function viewCategoryProducts(id) {
@@ -354,9 +421,8 @@ function App() {
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 			let prods = data.list;
-			console.log(prods);
 			return prods;
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function listProducts() {
@@ -384,7 +450,7 @@ function App() {
 			if (res.status > 299) return console.error(data);
 			let suppliers = data.list;
 			return suppliers;
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function listCategories() {
@@ -398,7 +464,7 @@ function App() {
 			if (res.status > 299) return console.error(data);
 			let categories = data.list;
 			return categories;
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	async function listImages() {
@@ -412,41 +478,7 @@ function App() {
 			if (res.status > 299) return console.error(data);
 			let images = data.list;
 			return images;
-		} catch(error) { console.log(error); }
-	}
-
-	async function listSupplierProducts(id) {
-		try {
-			let res = await fetch(API, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					meth: 'suppliersProducts_read',
-					s_id: id
-				})
-			});
-			let data = await res.json();
-			if (res.status > 299) return console.error(data);
-			let products = data.list;
-			return products;
-		} catch(error) { console.log(error); }
-	}
-
-	async function listCategoryProducts(id) {
-		try {
-			let res = await fetch(API, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					meth: 'categoryProducts_read',
-					c_id: id
-				})
-			});
-			let data = await res.json();
-			if (res.status > 299) return console.error(data);
-			let products = data.list;
-			return products;
-		} catch(error) { console.log(error); }
+		} catch(error) { console.error(error); }
 	}
 
 	const portals = {
@@ -504,10 +536,10 @@ function App() {
 			<p>The Solid Principles - Victor Boyd, Michael Warner, Ricardo Olazabal</p>
 			<p>choose a portal:</p>
 			<ul>
-				<li><button onClick={() => setPortal(portals.product)}>product</button></li>
-				<li><button onClick={() => setPortal(portals.supplier)}>supplier</button></li>
-				<li><button onClick={() => setPortal(portals.category)}>category</button></li>
-				<li><button onClick={() => setPortal(portals.image)}>image</button></li>
+				<li><button onClick={() => {setVaidationMsg(null); setPortal(portals.product)}}>product</button></li>
+				<li><button onClick={() => {setVaidationMsg(null); setPortal(portals.supplier)}}>supplier</button></li>
+				<li><button onClick={() => {setVaidationMsg(null); setPortal(portals.category)}}>category</button></li>
+				<li><button onClick={() => {setVaidationMsg(null); setPortal(portals.image)}}>image</button></li>
 			</ul>
 			{
 				portal == portals.product &&
