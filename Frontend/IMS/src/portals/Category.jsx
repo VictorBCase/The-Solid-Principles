@@ -50,7 +50,6 @@ function Category({fields, ops, myOps, list, create, read, update, remove, readP
 	// state variables for the menu
 	const [edit, setEdit] = useState(null);
 	const [result, setResult] = useState(null);
-	const [requireId, setRequireId] = useState(null);
 	const [categories, setCategories] = useState(null);
 
 	// handle create/edit inputs

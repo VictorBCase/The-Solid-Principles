@@ -107,7 +107,8 @@ def product_delete(product_id: str) -> None:
 
 #  SUPPLIER CRUD
 def supplier_create(name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
-    sid = gen_uuid(supplier_id)
+    print("call " + name + " " + contact_email)
+    sid = gen_uuid()
     with get_conn() as conn:
         with conn.cursor() as c:
             c.execute("""
@@ -146,7 +147,7 @@ def supplier_delete(supplier_id: str) -> None:
 
 #  CATEGORY CRUD
 def category_create(name: str, description: Optional[str], category_id: Optional[str] = None) -> str:
-    cid = gen_uuid(category_id)
+    cid = gen_uuid()
     with get_conn() as conn:
         with conn.cursor() as c:
             c.execute("""
@@ -185,7 +186,7 @@ def category_delete(category_id: str) -> None:
 
 #  IMAGE CRUD
 def image_create(product_id: str, url: str, image_id: Optional[str] = None) -> str:
-    iid = gen_uuid(image_id)
+    iid = gen_uuid()
     with get_conn() as conn:
         with conn.cursor() as c:
             c.execute("""
