@@ -252,8 +252,16 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall(method, [req.body.s_id], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
-					
-					res.status(200).json({list: val});
+					let prods = [];
+					for (let data of val) {
+						let prod = {
+							p_id: data[0],
+							name: data[1],
+							price: data[2]
+						};
+						prods.push(prod);
+					}
+					res.status(200).json({list: prods});
 				}
 			});
 			break;
@@ -273,8 +281,16 @@ app.post('/api/IMS', (req, res) => {
 			client.methodCall(method, [req.body.c_id], (err, val) => {
 				if (err) res.status(400).json({error: 'Failed to read products.'});
 				else {
-					
-					res.status(200).json({list: val});
+					let prods = [];
+					for (let data of val) {
+						let prod = {
+							p_id: data[0],
+							name: data[1],
+							price: data[2]
+						};
+						prods.push(prod);
+					}
+					res.status(200).json({list: prods});
 				}
 			});
 			break;

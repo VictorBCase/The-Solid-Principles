@@ -90,7 +90,7 @@ function Supplier({fields, ops, myOps, list, create, read, update, remove, readP
                 break;
             case ops.prods:
 				let prods = await readProducts(id);
-				setResult(prods);
+				setResult(JSON.stringify(prods));
 				break;
             case ops.view:
                 supplier = await read(id);

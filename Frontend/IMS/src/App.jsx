@@ -536,10 +536,10 @@ function App() {
 			<p>The Solid Principles - Victor Boyd, Michael Warner, Ricardo Olazabal</p>
 			<p>choose a portal:</p>
 			<ul>
-				<li><button onClick={() => {setVaidationMsg(null); setPortal(portals.product)}}>product</button></li>
-				<li><button onClick={() => {setVaidationMsg(null); setPortal(portals.supplier)}}>supplier</button></li>
-				<li><button onClick={() => {setVaidationMsg(null); setPortal(portals.category)}}>category</button></li>
-				<li><button onClick={() => {setVaidationMsg(null); setPortal(portals.image)}}>image</button></li>
+				<li><button onClick={() => {setVaidationMsg(''); setPortal(portals.product)}}>product</button></li>
+				<li><button onClick={() => {setVaidationMsg(''); setPortal(portals.supplier)}}>supplier</button></li>
+				<li><button onClick={() => {setVaidationMsg(''); setPortal(portals.category)}}>category</button></li>
+				<li><button onClick={() => {setVaidationMsg(''); setPortal(portals.image)}}>image</button></li>
 			</ul>
 			{
 				portal == portals.product &&
