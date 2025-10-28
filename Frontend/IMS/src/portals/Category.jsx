@@ -50,19 +50,20 @@ function Category({fields, ops, myOps, list, create, read, update, remove, readP
 	// state variables for the menu
 	const [edit, setEdit] = useState(null);
 	const [result, setResult] = useState(null);
-	const [requireId, setRequireId] = useState(null);
 	const [categories, setCategories] = useState(null);
 
 	// handle create/edit inputs
 	const handleFields = async (data) => {
+		clearMsg();
 		let inputs = [];
 		for (let i = 0; i < fields.length; i ++) {
 			inputs.push(data.get(fields[i][0]));
 		}
 		if (edit != null) {
 			let id = edit["c_id"];
-			await update(id, ...inputs);
-			setEdit(null);
+			let op = await update(id, ...inputs);
+			if (op) setEdit(null);
+			else return;
 		} else {
 			let id = await create(...inputs);
 			setResult(id);
@@ -89,7 +90,7 @@ function Category({fields, ops, myOps, list, create, read, update, remove, readP
 				break;
 			case ops.prods:
 				let prods = await readProducts(id);
-				setResult(prods);
+				setResult(JSON.stringify(prods));
 				break;
 			case ops.view:
 				category = await read(id);

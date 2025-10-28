@@ -55,14 +55,16 @@ function Product({fields, ops, myOps, list, create, read, update, remove, associ
 
     // handle create/edit inputs
     const handleFields = async (data) => {
+		clearMsg();
         let inputs = [];
         for (let i = 0; i < fields.length; i ++) {
             inputs.push(data.get(fields[i][0]));
         }
         if (edit != null) {
 			let id = edit["p_id"];
-			await update(id, ...inputs);
-			setEdit(null);
+			let op = await update(id, ...inputs);
+			if (op) setEdit(null);
+			else return;
 		} else {
             let id = await create(...inputs);
 			setResult(id);
@@ -72,6 +74,7 @@ function Product({fields, ops, myOps, list, create, read, update, remove, associ
 
     // handle supplier/category associations
     const handleAssociation = async (data) => {
+		// clearMsg();
         let type = data.get("type");
         let id = data.get("id");
 		switch(requireId) {
