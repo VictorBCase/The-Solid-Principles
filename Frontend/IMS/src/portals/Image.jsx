@@ -45,7 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Image({fields, ops, myOps, list, create, read, update, remove, message, clearMsg}) {
+function Image({fields, ops, myOps}) {
 
 	// api calls
 	const API = 'http://localhost:8080/api/imageService';

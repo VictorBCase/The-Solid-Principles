@@ -3,11 +3,7 @@ import psycopg2
 from contextlib import contextmanager
 import uuid
 import http.server
-
-# http server config ==========================================================
-PORT = 5050
-server_address = ('', PORT)
-handler = http.server.SimpleHTTPRequestHandler
+import json
 
 # database connection =========================================================
 DB_PORT = 5432
@@ -106,6 +102,19 @@ def product_delete(product_id: str) -> None:
 		with conn.cursor() as c:
 			c.execute("DELETE FROM products WHERE product_id = %s", (product_id,))
 			conn.commit()
+
+# http server config ==========================================================
+PORT = 5050
+server_address = ('productService', PORT)
+class productHandler(http.server.SimpleHTTPRequestHandler):
+	def do_GET(self):
+		data = {}
+		self.send_response(code=200, message='')
+		self.send_header(keyword='Content-type', value='application/json')
+    	self.end_headers()
+		self.wfile.write(json.dumps(data.encode('utf-8')))
+
+handler = productHandler()
 
 with server_class(server_address, handler) as httpd:
 	print(f"server running on port: {PORT}")

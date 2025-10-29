@@ -45,7 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Supplier({fields, ops, myOps, list, create, read, update, remove, readProducts, message, clearMsg}) {
+function Supplier({fields, ops, myOps}) {
 
 	// api calls
 	const API = 'http://localhost:8080/api/supplierService';

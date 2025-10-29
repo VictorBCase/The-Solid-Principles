@@ -45,7 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Category({fields, ops, myOps, list, create, read, update, remove, readProducts, message, clearMsg}) {
+function Category({fields, ops, myOps, list}) {
 
 	// api calls
 	const API = 'http://localhost:8080/api/categoryService';
