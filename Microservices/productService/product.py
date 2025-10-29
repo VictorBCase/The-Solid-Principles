@@ -2,7 +2,7 @@ from typing import Optional
 import psycopg2
 from contextlib import contextmanager
 import uuid
-import http.server
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 import json
 
 # database connection =========================================================
@@ -14,6 +14,7 @@ DB_CONFIG = {
 	"host": "data",  # add when docker set up for containers
 	"port": DB_PORT
 }
+
 @contextmanager
 def get_conn():
 	conn = psycopg2.connect(**DB_CONFIG)
@@ -105,7 +106,7 @@ def product_delete(product_id: str) -> None:
 
 # http server config ==========================================================
 
-class productHandler(http.server.SimpleHTTPRequestHandler):
+class productHandler(SimpleHTTPRequestHandler):
 	def do_GET(self):
 		i = self.path.index("?") + 1 # index of id in url
 		p_id = self.path[i:] # slice id from url
@@ -120,6 +121,6 @@ PORT = 5050
 server_address = ('productService', PORT)
 handler = productHandler()
 
-with server_class(server_address, handler) as httpd:
+with ThreadingHTTPServer(server_address, handler) as httpd:
 	print(f"server running on port: {PORT}")
 	httpd.serve_forever()
