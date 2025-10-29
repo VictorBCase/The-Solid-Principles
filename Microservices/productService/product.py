@@ -2,7 +2,7 @@ from typing import Optional
 import psycopg2
 from contextlib import contextmanager
 import uuid
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 import json
 
 # database connection =========================================================
@@ -108,17 +108,33 @@ def product_delete(product_id: str) -> None:
 app = FastAPI()
 
 @app.get("/")
-def read_root():
-	data = products_read()
-	# process data
+async def read_root():
+	data = await products_read()
 	return {"list": data}
 
 @app.get("/{p_id}")
-def read_product(p_id: string):
-	data = product_read(p_id)
-	# process data
+async def read_product(p_id: str):
+	data = await product_read(p_id)
 	return {"product": data}
 
 @app.put("/{p_id}")
-def update_product(p_id: string, request: Request):
-	# do something
+async def update_product(p_id: str, request: Request):
+	body = await request.json()
+	try:
+		data = await product_update(p_id, body.name, body.description, body.quantity, body.price)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=ex)
+	return {"product": data}
+
+@app.post("/")
+async def create_product(request: Request):
+	body = await request.json()
+	try:
+		data = await product_create(body.name, body.description, body.quantity, body.price)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=ex)
+	return {"p_id": data}
+
+@app.delete("/{p_id}")
+async def delete_product(p_id: str):
+	await product_delete(p_id)
