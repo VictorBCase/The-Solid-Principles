@@ -112,7 +112,7 @@ class productHandler(http.server.SimpleHTTPRequestHandler):
 		self.send_response(code=200, message='')
 		self.send_header(keyword='Content-type', value='application/json')
     	self.end_headers()
-		self.wfile.write(json.dumps(data.encode('utf-8')))
+		self.wfile.write(json.dumps(data).encode('utf-8'))
 
 handler = productHandler()
 
