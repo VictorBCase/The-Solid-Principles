@@ -104,16 +104,19 @@ def product_delete(product_id: str) -> None:
 			conn.commit()
 
 # http server config ==========================================================
-PORT = 5050
-server_address = ('productService', PORT)
+
 class productHandler(http.server.SimpleHTTPRequestHandler):
 	def do_GET(self):
-		data = {}
+		i = self.path.index("?") + 1 # index of id in url
+		p_id = self.path[i:] # slice id from url
+		data = {} # get the data
 		self.send_response(code=200, message='')
 		self.send_header(keyword='Content-type', value='application/json')
     	self.end_headers()
 		self.wfile.write(json.dumps(data).encode('utf-8'))
 
+PORT = 5050
+server_address = ('productService', PORT)
 handler = productHandler()
 
 with server_class(server_address, handler) as httpd:
