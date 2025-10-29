@@ -109,8 +109,9 @@ class productHandler(http.server.SimpleHTTPRequestHandler):
 	def do_GET(self):
 		i = self.path.index("?") + 1 # index of id in url
 		p_id = self.path[i:] # slice id from url
-		data = {} # get the data
-		self.send_response(code=200, message='')
+		prod = product_read(p_id) # this should be async ?
+		data = { "product": prod }
+		self.send_response(code=200, message='success')
 		self.send_header(keyword='Content-type', value='application/json')
     	self.end_headers()
 		self.wfile.write(json.dumps(data).encode('utf-8'))
