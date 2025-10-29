@@ -45,7 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Category({fields, ops, myOps, list}) {
+function Category({fields, ops, myOps, list, result, setResult}) {
 
 	// api calls
 	const API = 'http://localhost:8080/api/categoryService';
@@ -135,7 +135,6 @@ function Category({fields, ops, myOps, list}) {
 
 	// state variables for the menu
 	const [edit, setEdit] = useState(null);
-	const [result, setResult] = useState(null);
 	const [categories, setCategories] = useState(null);
 	const [message, setMessage] = useState("");
 

@@ -45,7 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Image({fields, ops, myOps}) {
+function Image({fields, ops, myOps, result, setResult}) {
 
 	// api calls
 	const API = 'http://localhost:8080/api/imageService';
@@ -135,7 +135,6 @@ function Image({fields, ops, myOps}) {
 
 	// state variables for the menu
 	const [edit, setEdit] = useState(null);
-	const [result, setResult] = useState(null);
 	const [images, setImages] = useState(null);
 	const [message, setMessage] = useState("");
 

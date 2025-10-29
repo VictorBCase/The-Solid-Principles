@@ -45,7 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Product({fields, ops, myOps}) {
+function Product({fields, ops, myOps, result, setResult}) {
 
 	// api calls
 	const API = 'http://localhost:8080/api/productService';
@@ -223,7 +223,6 @@ function Product({fields, ops, myOps}) {
 
     // state variables for the menu
     const [edit, setEdit] = useState(null);
-    const [result, setResult] = useState(null);
     const [requireId, setRequireId] = useState(null);
 	const [products, setProducts] = useState(null);
 	const [message, setMessage] = useState("");

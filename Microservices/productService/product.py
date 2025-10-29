@@ -2,7 +2,7 @@ from typing import Optional
 import psycopg2
 from contextlib import contextmanager
 import uuid
-from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+from fastapi import FastAPI, Request
 import json
 
 # database connection =========================================================
@@ -105,22 +105,20 @@ def product_delete(product_id: str) -> None:
 			conn.commit()
 
 # http server config ==========================================================
+app = FastAPI()
 
-class productHandler(SimpleHTTPRequestHandler):
-	def do_GET(self):
-		i = self.path.index("?") + 1 # index of id in url
-		p_id = self.path[i:] # slice id from url
-		prod = product_read(p_id) # this should be async ?
-		data = { "product": prod }
-		self.send_response(code=200, message='success')
-		self.send_header(keyword='Content-type', value='application/json')
-    	self.end_headers()
-		self.wfile.write(json.dumps(data).encode('utf-8'))
+@app.get("/")
+def read_root():
+	data = products_read()
+	# process data
+	return {"list": data}
 
-PORT = 5050
-server_address = ('productService', PORT)
-handler = productHandler()
+@app.get("/{p_id}")
+def read_product(p_id: string):
+	data = product_read(p_id)
+	# process data
+	return {"product": data}
 
-with ThreadingHTTPServer(server_address, handler) as httpd:
-	print(f"server running on port: {PORT}")
-	httpd.serve_forever()
+@app.put("/{p_id}")
+def update_product(p_id: string, request: Request):
+	# do something

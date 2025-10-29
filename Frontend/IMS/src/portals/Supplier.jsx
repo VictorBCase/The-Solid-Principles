@@ -45,7 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Supplier({fields, ops, myOps}) {
+function Supplier({fields, ops, myOps, result, setResult}) {
 
 	// api calls
 	const API = 'http://localhost:8080/api/supplierService';
@@ -135,7 +135,6 @@ function Supplier({fields, ops, myOps}) {
 
     // state variables for the menu
     const [edit, setEdit] = useState(null);
-    const [result, setResult] = useState(null);
 	const [suppliers, setSuppliers] = useState(null);
 	const [message, setMessage] = useState("");
 

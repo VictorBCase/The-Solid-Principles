@@ -40,19 +40,19 @@ function App() {
 		edit: "edit",
 		del: "delete",
 		assoc: "associate",
-		disas: "disassociate",
-		prods: "products"
+		disas: "disassociate"
 	};
 
 	const portalOps = {
 		product: Array(ops.view, ops.edit, ops.del, ops.assoc, ops.disas),
-		supplier: Array(ops.view, ops.edit, ops.del, ops.prods),
-		category: Array(ops.view, ops.edit, ops.del, ops.prods),
+		supplier: Array(ops.view, ops.edit, ops.del),
+		category: Array(ops.view, ops.edit, ops.del),
 		image: Array(ops.view, ops.edit, ops.del)
 	};
 
 	// state variables
 	const [portal, setPortal] = useState(null);
+	const [result, setResult] = useState(null);
 
 	return (
 		<>
