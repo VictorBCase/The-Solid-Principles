@@ -47,10 +47,97 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 
 function Category({fields, ops, myOps, list, create, read, update, remove, readProducts, message, clearMsg}) {
 
+	// api calls
+	const API = 'http://localhost:8080/api/categoryService';
+
+	async function listCategories() {
+		try {
+			let res = await fetch(API, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({meth: 'categories_read'})
+			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let categories = data.list;
+			return categories;
+		} catch(error) { console.error(error); }
+	}
+
+	async function createCategory(name, desc) {
+		try {
+			let res = await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'category_create',
+					name: name,
+					description: desc
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
+	}
+
+	async function viewCategory(id) {
+		try {
+			let res = await fetch(API + "?id=" + id, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'}
+			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let category = data.category;
+			return category;
+		} catch(error) { console.error(error); }
+	}
+
+	async function removeCategory(id) {
+		try {
+			let res = await fetch(API, {
+				method: 'DELETE',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'category_delete',
+					c_id: id
+				})
+			});
+		} catch(error) { console.error(error); }
+	}
+
+	async function updateCategory(id, name, desc) {
+		try {
+			let res = await fetch(API, {
+				method: 'PUT',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'category_update',
+					c_id: id,
+					name: name,
+					description: desc
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+			return true;
+		} catch(error) { console.error(error); return false; }
+	}
+
 	// state variables for the menu
 	const [edit, setEdit] = useState(null);
 	const [result, setResult] = useState(null);
 	const [categories, setCategories] = useState(null);
+	const [message, setMessage] = useState("");
 
 	// handle create/edit inputs
 	const handleFields = async (data) => {

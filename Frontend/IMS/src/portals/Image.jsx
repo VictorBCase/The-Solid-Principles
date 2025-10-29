@@ -47,10 +47,97 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 
 function Image({fields, ops, myOps, list, create, read, update, remove, message, clearMsg}) {
 
+	// api calls
+	const API = 'http://localhost:8080/api/imageService';
+
+	async function listImages() {
+		try {
+			let res = await fetch(API, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({meth: 'images_read'})
+			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let images = data.list;
+			return images;
+		} catch(error) { console.error(error); }
+	}
+
+	async function createImage(p_id, url) {
+		try {
+			let res = await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'image_create',
+					p_id: p_id,
+					url: url
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
+	}
+
+	async function viewImage(id) {
+		try {
+			let res = await fetch(API + "?id=" + id, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'}
+			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let image = data.image;
+			return image;
+		} catch(error) { console.error(error); }
+	}
+
+	async function removeImage(id) {
+		try {
+			let res = await fetch(API, {
+				method: 'DELETE',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'image_delete',
+					i_id: id
+				})
+			});
+		} catch(error) { console.error(error); }
+	}
+
+	async function updateImage(id, p_id, url) {
+		try {
+			let res = await fetch(API, {
+				method: 'PUT',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'image_update',
+					i_id: id,
+					p_id: p_id,
+					url: url
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+			return true;
+		} catch(error) { console.error(error); return false; }
+	}
+
 	// state variables for the menu
 	const [edit, setEdit] = useState(null);
 	const [result, setResult] = useState(null);
 	const [images, setImages] = useState(null);
+	const [message, setMessage] = useState("");
 
 	// handle create/edit inputs
 	const handleFields = async (data) => {

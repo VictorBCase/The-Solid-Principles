@@ -45,13 +45,188 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Product({fields, ops, myOps, list, create, read, update, remove, associateSup, associateCat, disassociateSup, disassociateCat, message, clearMsg}) {
+function Product({fields, ops, myOps}) {
+
+	// api calls
+	const API = 'http://localhost:8080/api/productService';
+
+	async function listProducts() {
+		try {
+			const res = await fetch(API, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({meth: 'products_read'})
+			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let products = data.list;
+			return products;
+		} catch(error) { console.error(error); }
+	}
+
+	async function createProduct(name, desc, quantity, price) {
+		try {
+			let res = await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'product_create',
+					name: name,
+					description: desc,
+					quantity: quantity,
+					price: price
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+			let id = data.p_id;
+			return id;
+		} catch(error) { console.error(error); }
+	}
+
+	async function viewProduct(id) {
+		try {
+			let res = await fetch(API + "?id=" + id, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'}
+			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let product = data.product;
+			return product;
+		} catch(error) { console.error(error); }
+	}
+
+	async function removeProduct(id) {
+		try {
+			let res = await fetch(API, {
+				method: 'DELETE',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'product_delete',
+					p_id: id
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+		} catch(error) { console.error(error); }
+	}
+
+	async function updateProduct(id, name, desc, quantity, price) {
+		try {
+			let res = await fetch(API, {
+				method: 'PUT',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'product_update',
+					p_id: id,
+					name: name,
+					description: desc,
+					quantity: quantity,
+					price: price
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+			return true;
+		} catch(error) { console.error(error); return false; }
+	}
+
+	async function associateProdSup(p_id, s_id) {
+		try {
+			let res = await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplierProducts_create',
+					p_id: p_id,
+					s_id: s_id
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
+	}
+
+	async function disassociateProdSup(p_id, s_id) {
+		try {
+			let res = await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplierProducts_delete',
+					p_id: p_id,
+					s_id: s_id
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
+	}
+
+	async function associateProdCat(p_id, c_id) {
+		try {
+			let res = await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'categoryProducts_create',
+					p_id: p_id,
+					c_id: c_id
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
+	}
+
+	async function disassociateProdCat(p_id, c_id) {
+		try {
+			let res = await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'categoryProducts_delete',
+					p_id: p_id,
+					c_id: c_id
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
+	}
 
     // state variables for the menu
     const [edit, setEdit] = useState(null);
     const [result, setResult] = useState(null);
     const [requireId, setRequireId] = useState(null);
 	const [products, setProducts] = useState(null);
+	const [message, setMessage] = useState("");
 
     // handle create/edit inputs
     const handleFields = async (data) => {
