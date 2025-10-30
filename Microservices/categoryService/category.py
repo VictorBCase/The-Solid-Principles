@@ -1,3 +1,5 @@
+# fastapi run product.py --host 0.0.0.2 --port 80
+
 from typing import Optional
 import psycopg2
 from contextlib import contextmanager
@@ -108,18 +110,15 @@ class Category(BaseModel):
 
 app = FastAPI()
 
-@app.get("/")
-async def read_root():
-	data = await categories_read()
-	return {"list": data}
-
 @app.get("/{c_id}")
-async def read_category(c_id: str):
-	data = await category_read(c_id)
-	return {"category": data}
+async def read_category(c_id: Optional[str] = None):
+	if (c_id is None):
+		return {"c_id": "empty"}
+	return {"c_id": c_id}
 
 @app.put("/{c_id}")
 async def update_category(c_id: str, cat: Category):
+	return {"category": cat}
 	try:
 		data = await category_update(c_id, cat.name, cat.description)
 	except Exception as ex:
@@ -128,6 +127,7 @@ async def update_category(c_id: str, cat: Category):
 
 @app.post("/")
 async def create_category(cat: Category):
+	return {"category": cat}
 	try:
 		data = await category_create(cat.name, cat.description)
 	except Exception as ex:
@@ -135,5 +135,5 @@ async def create_category(cat: Category):
 	return {"c_id": data}
 
 @app.delete("/{c_id}")
-def delete_category(c_id: str):
-	category_delete(c_id)
+def delete_image(c_id: str):
+	return {"c_id": c_id}

@@ -48,19 +48,14 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 function Product({fields, ops, myOps, result, setResult}) {
 
 	// api calls
-	const API = 'http://localhost:8080/api/productService';
+	const API = 'http://0.0.0.0:80/';
 
 	async function listProducts() {
 		try {
-			const res = await fetch(API, {
-				method: 'GET',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({meth: 'products_read'})
-			});
+			const res = await fetch(API, {method: 'GET'});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			let products = data.list;
-			return products;
+			return [];
 		} catch(error) { console.error(error); }
 	}
 
@@ -70,7 +65,6 @@ function Product({fields, ops, myOps, result, setResult}) {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					meth: 'product_create',
 					name: name,
 					description: desc,
 					quantity: quantity,
@@ -83,34 +77,25 @@ function Product({fields, ops, myOps, result, setResult}) {
 				let msg = data.error;
 				setVaidationMsg(msg);
 			}
-			let id = data.p_id;
-			return id;
+			return data["p_id"];
+			//let id = data.p_id;
+			//return id;
 		} catch(error) { console.error(error); }
 	}
 
 	async function viewProduct(id) {
 		try {
-			let res = await fetch(API + "?id=" + id, {
-				method: 'GET',
-				headers: {'Content-Type': 'application/json'}
-			});
+			let res = await fetch(API + "?p_id=" + id, {method: 'GET'});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			let product = data.product;
+			let product = data["product"];
 			return product;
 		} catch(error) { console.error(error); }
 	}
 
 	async function removeProduct(id) {
 		try {
-			let res = await fetch(API, {
-				method: 'DELETE',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					meth: 'product_delete',
-					p_id: id
-				})
-			});
+			let res = await fetch(API + id, {method: 'DELETE'});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 		} catch(error) { console.error(error); }
@@ -118,12 +103,10 @@ function Product({fields, ops, myOps, result, setResult}) {
 
 	async function updateProduct(id, name, desc, quantity, price) {
 		try {
-			let res = await fetch(API, {
+			let res = await fetch(API + id, {
 				method: 'PUT',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					meth: 'product_update',
-					p_id: id,
 					name: name,
 					description: desc,
 					quantity: quantity,
