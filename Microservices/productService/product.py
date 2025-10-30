@@ -3,6 +3,7 @@ import psycopg2
 from contextlib import contextmanager
 import uuid
 from fastapi import FastAPI, Request, HTTPException
+from pydantic import BaseModel
 import json
 
 # database connection =========================================================
@@ -105,6 +106,12 @@ def product_delete(product_id: str) -> None:
 			conn.commit()
 
 # http server config ==========================================================
+class Product(BaseModel):
+	name: str
+	description: str
+	quantity: int
+	price: str
+
 app = FastAPI()
 
 @app.get("/")
@@ -118,23 +125,21 @@ async def read_product(p_id: str):
 	return {"product": data}
 
 @app.put("/{p_id}")
-async def update_product(p_id: str, request: Request):
-	body = await request.json()
+async def update_product(p_id: str, prod: Product):
 	try:
-		data = await product_update(p_id, body.name, body.description, body.quantity, body.price)
+		data = await product_update(p_id, prod.name, prod.description, prod.quantity, prod.price)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=ex)
 	return {"product": data}
 
 @app.post("/")
-async def create_product(request: Request):
-	body = await request.json()
+async def create_product(prod: Product):
 	try:
-		data = await product_create(body.name, body.description, body.quantity, body.price)
+		data = await product_create(prod.name, prod.description, prod.quantity, prod.price)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=ex)
 	return {"p_id": data}
 
 @app.delete("/{p_id}")
-async def delete_product(p_id: str):
-	await product_delete(p_id)
+def delete_product(p_id: str):
+	product_delete(p_id)
