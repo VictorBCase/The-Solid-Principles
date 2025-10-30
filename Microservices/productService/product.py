@@ -5,6 +5,7 @@ import psycopg2
 from contextlib import contextmanager
 import uuid
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
 
@@ -115,6 +116,15 @@ class Product(BaseModel):
 	price: str
 
 app = FastAPI()
+
+origins = ["http://localhost:5173"]
+
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_methods=["*"],
+        allow_headers=["*"],
+)
 
 @app.get("/")
 async def read_products(p_id: Optional[str] = None):

@@ -5,6 +5,7 @@ import psycopg2
 from contextlib import contextmanager
 import uuid
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
 
@@ -109,6 +110,15 @@ class Category(BaseModel):
 	description: str
 
 app = FastAPI()
+
+origins = ["http://localhost:5173"]
+
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_methods=["*"],
+        allow_headers=["*"],
+)
 
 @app.get("/{c_id}")
 async def read_category(c_id: Optional[str] = None):

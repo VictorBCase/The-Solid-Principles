@@ -50,27 +50,21 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 	// api calls
 	const API = 'http://localhost:8080/api/supplierService';
 
-	async function listSuppliers() {
+	async function list() {
 		try {
-			let res = await fetch(API, {
-				method: 'GET',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({meth: 'suppliers_read'})
-			});
+			let res = await fetch(API, {method: 'GET'});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			let suppliers = data.list;
-			return suppliers;
+			return [];
 		} catch(error) { console.error(error); }
 	}
 
-	async function createSupplier(name, contact) {
+	async function create(name, contact) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					meth: 'supplier_create',
 					name: name,
 					contact: contact
 				})
@@ -81,10 +75,11 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 				let msg = data.error;
 				setVaidationMsg(msg);
 			}
+			return data["p_id"];
 		} catch(error) { console.error(error); }
 	}
 
-	async function viewSupplier(id) {
+	async function read(id) {
 		try {
 			let res = await fetch(API + "?id=" + id, {
 				method: 'GET',
@@ -92,32 +87,25 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			let supplier = data.supplier;
+			let supplier = data["supplier"];
 			return supplier;
 		} catch(error) { console.error(error); }
 	}
 
-	async function removeSupplier(id) {
+	async function remove(id) {
 		try {
-			let res = await fetch(API, {
-				method: 'DELETE',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					meth: 'supplier_delete',
-					s_id: id
-				})
-			});
+			let res = await fetch(API + id, {method: 'DELETE'});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
 		} catch(error) { console.error(error); }
 	}
 
-	async function updateSupplier(id, name, contact) {
+	async function update(id, name, contact) {
 		try {
-			let res = await fetch(API, {
+			let res = await fetch(API + id, {
 				method: 'PUT',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					meth: 'supplier_update',
-					s_id: id,
 					name: name,
 					contact: contact
 				})
@@ -140,7 +128,7 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 
     // handle create/edit inputs
     const handleFields = async (data) => {
-		clearMsg();
+		setMessage('');
         let inputs = [];
         for (let i = 0; i < fields.length; i ++) {
             inputs.push(data.get(fields[i][0]));
@@ -159,7 +147,7 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 
     // handle CRUD inputs
     const handleOps = async (data) => {
-		clearMsg();
+		setMessage('');
         let type = data.get("type");
         let id = data.get("supplier");
 		if (id == null)
