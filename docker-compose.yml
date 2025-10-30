@@ -28,8 +28,68 @@ services:
     networks:
       - backend_net
 
+#product_db:
+#    image: postgres:16
+#    container_name: product_db
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: solid
+#      POSTGRES_DB: productDB
+#    volumes:
+#      - ./productService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+#      - product_data:/var/lib/postgresql/data
+#    networks:
+#      - kong-net # for kong gateway
+
+#supplier_db:
+#    image: postgres:16
+#    container_name: supplier_db
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: solid
+#      POSTGRES_DB: productDB
+#    volumes:
+#      - ./supplierService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+#      - supplier_data:/var/lib/postgresql/data
+#    networks:
+#      - kong-net # for kong gateway
+
+#category_db:
+#    image: postgres:16
+#    container_name: category_db
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: solid
+#      POSTGRES_DB: categoryDB
+#    volumes:
+#      - ./categoryService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+#      - category_data:/var/lib/postgresql/data
+#    networks:
+#      - kong-net # for kong gateway
+
+#image_db:
+#    image: postgres:16
+#    container_name: image_db
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: solid
+#      POSTGRES_DB: imageDB
+#    volumes:
+#      - ./imageService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+#      - image_data:/var/lib/postgresql/data
+#    networks:
+#      - kong-net # for kong gateway
+
+
+
+
+
+
 networks:
   frontend_net:
   backend_net:
 volumes:
   db_data:
+
+
+  
