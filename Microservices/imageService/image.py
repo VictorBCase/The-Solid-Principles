@@ -1,0 +1,136 @@
+from typing import Optional
+import psycopg2
+from contextlib import contextmanager
+import uuid
+from fastapi import FastAPI, Request, HTTPException
+from pydantic import BaseModel
+import json
+
+# database connection =========================================================
+DB_PORT = 5432
+DB_CONFIG = {
+	"dbname": "imageDB",
+	"user": "postgres",
+	"password": "solid",
+	"host": "data",  # add when docker set up for containers
+	"port": DB_PORT
+}
+
+@contextmanager
+def get_conn():
+	conn = psycopg2.connect(**DB_CONFIG)
+	try:
+		yield conn
+	finally:
+		conn.close()
+
+# validation functions ========================================================
+def gen_uuid():
+	return str(uuid.uuid4())
+
+def validate_nonempty(field_name: str, value: str):
+	if value is None:
+		raise ValueError(f"{field_name} cannot be None.")
+	value = str(value).strip()
+	if not value:
+		raise ValueError(f"{field_name} must be a non-empty string.")
+
+def validate_positive(field_name: str, value):
+	if not isinstance(value, (int, float)) or value <= 0:
+		raise Exception(f"{field_name} must be a positive number.")
+
+def validate_nonnegative(field_name: str, value):
+	if not isinstance(value, int) or value < 0:
+		raise Exception(f"{field_name} must be a non-negative integer.")
+
+# database functions ==========================================================
+def images_read() -> Optional[list]:
+	with get_conn() as conn:
+		with conn.cursor() as c:
+			c.execute("""SELECT (image_id) FROM images""")
+			return c.fetchall()
+
+def image_create(product_id: str, url: str) -> str:
+    try:
+        validate_nonempty("product_id", product_id)
+        validate_nonempty("url", url)
+        iid = gen_uuid()
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    INSERT INTO images (image_id, product_id, url)
+                    VALUES (%s, %s, %s)
+                """, (iid, product_id, url))
+                conn.commit()
+        return iid
+    except Exception as e:
+        raise Exception(f"Failed to create image: {str(e)}")
+
+def image_read(image_id: str) -> Optional[tuple]:
+    with get_conn() as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM images WHERE image_id = %s", (image_id,))
+            row = c.fetchall()[0]
+            ret = []
+            for data in row:
+                ret.append(str(data))
+            return ret
+
+def image_update(image_id: str, product_id: str, url: str) -> Optional[tuple]:
+    try:
+        validate_nonempty("product_id", product_id)
+        validate_nonempty("url", url)
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    UPDATE images
+                    SET product_id = %s, url = %s
+                    WHERE image_id = %s
+                """, (product_id, url, image_id))
+                conn.commit()
+        return image_read(image_id)
+    except Exception as e:
+        raise Exception(f"Failed to update image: {str(e)}")
+
+def image_delete(image_id: str) -> None:
+    with get_conn() as conn:
+        with conn.cursor() as c:
+            c.execute("DELETE FROM images WHERE image_id = %s", (image_id,))
+            conn.commit()
+
+# http server config ==========================================================
+class Image(BaseModel):
+	name: str
+	url: str
+
+app = FastAPI()
+
+@app.get("/")
+async def read_root():
+	data = await images_read()
+	return {"list": data}
+
+@app.get("/{i_id}")
+async def read_image(i_id: str):
+	data = await image_read(i_id)
+	return {"image": data}
+
+@app.put("/{i_id}")
+async def update_image(i_id: str, img: Image):
+	try:
+		data = await image_update(i_id, img.name, img.url)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=ex)
+	return {"image": data}
+
+@app.post("/")
+async def create_image(img: Image):
+	try:
+		data = await image_create(img.name, img.url)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=ex)
+	return {"i_id": data}
+
+@app.delete("/{i_id}")
+def delete_image(i_id: str):
+	image_delete(i_id)

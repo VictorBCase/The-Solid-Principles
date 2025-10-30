@@ -45,12 +45,98 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Supplier({fields, ops, myOps, list, create, read, update, remove, readProducts, message, clearMsg}) {
+function Supplier({fields, ops, myOps, result, setResult}) {
+
+	// api calls
+	const API = 'http://localhost:8080/api/supplierService';
+
+	async function listSuppliers() {
+		try {
+			let res = await fetch(API, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({meth: 'suppliers_read'})
+			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let suppliers = data.list;
+			return suppliers;
+		} catch(error) { console.error(error); }
+	}
+
+	async function createSupplier(name, contact) {
+		try {
+			let res = await fetch(API, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplier_create',
+					name: name,
+					contact: contact
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+			}
+		} catch(error) { console.error(error); }
+	}
+
+	async function viewSupplier(id) {
+		try {
+			let res = await fetch(API + "?id=" + id, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'}
+			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			let supplier = data.supplier;
+			return supplier;
+		} catch(error) { console.error(error); }
+	}
+
+	async function removeSupplier(id) {
+		try {
+			let res = await fetch(API, {
+				method: 'DELETE',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplier_delete',
+					s_id: id
+				})
+			});
+		} catch(error) { console.error(error); }
+	}
+
+	async function updateSupplier(id, name, contact) {
+		try {
+			let res = await fetch(API, {
+				method: 'PUT',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					meth: 'supplier_update',
+					s_id: id,
+					name: name,
+					contact: contact
+				})
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+			return true;
+		} catch(error) { console.error(error); return false; }
+	}
 
     // state variables for the menu
     const [edit, setEdit] = useState(null);
-    const [result, setResult] = useState(null);
 	const [suppliers, setSuppliers] = useState(null);
+	const [message, setMessage] = useState("");
 
     // handle create/edit inputs
     const handleFields = async (data) => {

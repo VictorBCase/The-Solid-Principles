@@ -1,0 +1,139 @@
+from typing import Optional
+import psycopg2
+from contextlib import contextmanager
+import uuid
+from fastapi import FastAPI, Request, HTTPException
+from pydantic import BaseModel
+import json
+
+# database connection =========================================================
+DB_PORT = 5432
+DB_CONFIG = {
+	"dbname": "categoryDB",
+	"user": "postgres",
+	"password": "solid",
+	"host": "data",  # add when docker set up for containers
+	"port": DB_PORT
+}
+
+@contextmanager
+def get_conn():
+	conn = psycopg2.connect(**DB_CONFIG)
+	try:
+		yield conn
+	finally:
+		conn.close()
+
+# validation functions ========================================================
+def gen_uuid():
+	return str(uuid.uuid4())
+
+def validate_nonempty(field_name: str, value: str):
+	if value is None:
+		raise ValueError(f"{field_name} cannot be None.")
+	value = str(value).strip()
+	if not value:
+		raise ValueError(f"{field_name} must be a non-empty string.")
+
+def validate_positive(field_name: str, value):
+	if not isinstance(value, (int, float)) or value <= 0:
+		raise Exception(f"{field_name} must be a positive number.")
+
+def validate_nonnegative(field_name: str, value):
+	if not isinstance(value, int) or value < 0:
+		raise Exception(f"{field_name} must be a non-negative integer.")
+
+# database functions ==========================================================
+def categories_read() -> Optional[list]:
+	with get_conn() as conn:
+		with conn.cursor() as c:
+			c.execute("""SELECT (category_id) FROM categories""")
+			return c.fetchall()
+
+def category_create(name: str, description: Optional[str]) -> str:
+    try:
+        validate_nonempty("name", name)
+        if description is not None:
+            validate_nonempty("description", description)
+        cid = gen_uuid()
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    INSERT INTO categories (category_id, name, description)
+                    VALUES (%s, %s, %s)
+                """, (cid, name, description))
+                conn.commit()
+        return cid
+    except Exception as e:
+        raise Exception(f"Failed to create category: {str(e)}")
+
+def category_read(category_id: str) -> Optional[tuple]:
+    with get_conn() as conn:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM categories WHERE category_id = %s", (category_id,))
+            row = c.fetchall()[0]
+            ret = []
+            for data in row:
+                ret.append(str(data))
+            return ret
+
+def category_update(category_id: str, name: str, description: str) -> Optional[tuple]:
+    try:
+        validate_nonempty("name", name)
+        if description is not None:
+            validate_nonempty("description", description)
+        with get_conn() as conn:
+            with conn.cursor() as c:
+                c.execute("""
+                    UPDATE categories
+                    SET name = %s, description = %s
+                    WHERE category_id = %s
+                """, (name, description, category_id))
+                conn.commit()
+        return category_read(category_id)
+    except Exception as e:
+        raise Exception(f"Failed to update category: {str(e)}")
+
+
+def category_delete(category_id: str) -> None:
+    with get_conn() as conn:
+        with conn.cursor() as c:
+            c.execute("DELETE FROM categories WHERE category_id = %s", (category_id,))
+            conn.commit()
+
+# http server config ==========================================================
+class Category(BaseModel):
+	name: str
+	description: str
+
+app = FastAPI()
+
+@app.get("/")
+async def read_root():
+	data = await categories_read()
+	return {"list": data}
+
+@app.get("/{c_id}")
+async def read_category(c_id: str):
+	data = await category_read(c_id)
+	return {"category": data}
+
+@app.put("/{c_id}")
+async def update_category(c_id: str, cat: Category):
+	try:
+		data = await category_update(c_id, cat.name, cat.description)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=ex)
+	return {"category": data}
+
+@app.post("/")
+async def create_category(cat: Category):
+	try:
+		data = await category_create(cat.name, cat.description)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=ex)
+	return {"c_id": data}
+
+@app.delete("/{c_id}")
+def delete_category(c_id: str):
+	category_delete(c_id)
