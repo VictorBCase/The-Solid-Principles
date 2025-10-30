@@ -1,3 +1,5 @@
+# fastapi run product.py --host 0.0.0.1 --port 80
+
 from typing import Optional
 import psycopg2
 from contextlib import contextmanager
@@ -106,17 +108,14 @@ class Supplier(BaseModel):
 app = FastAPI()
 
 @app.get("/")
-async def read_root():
-	data = await suppliers_read()
-	return {"list": data}
-
-@app.get("/{s_id}")
-async def read_supplier(s_id: str):
-	data = await supplier_read(s_id)
-	return {"supplier": data}
+async def read_suppliers(s_id: Optional[str] = None):
+	if (s_id is None):
+		return {"s_id": "empty"}
+	return {"s_id": s_id}
 
 @app.put("/{s_id}")
 async def update_supplier(s_id: str, sup: Supplier):
+	return {"supplier": sup}
 	try:
 		data = await supplier_update(s_id, sup.name, sup.contact)
 	except Exception as ex:
@@ -125,6 +124,7 @@ async def update_supplier(s_id: str, sup: Supplier):
 
 @app.post("/")
 async def create_supplier(sup: Supplier):
+	return {"supplier": sup}
 	try:
 		data = await supplier_create(sup.name, sup.contact)
 	except Exception as ex:
@@ -133,4 +133,4 @@ async def create_supplier(sup: Supplier):
 
 @app.delete("/{s_id}")
 def delete_supplier(s_id: str):
-	supplier_delete(s_id)
+	return {"s_id": s_id}

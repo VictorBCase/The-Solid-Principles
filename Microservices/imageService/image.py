@@ -1,3 +1,5 @@
+# fastapi run product.py --host 0.0.0.3 --port 80
+
 from typing import Optional
 import psycopg2
 from contextlib import contextmanager
@@ -100,23 +102,20 @@ def image_delete(image_id: str) -> None:
 
 # http server config ==========================================================
 class Image(BaseModel):
-	name: str
+	p_id: str
 	url: str
 
 app = FastAPI()
 
 @app.get("/")
-async def read_root():
-	data = await images_read()
-	return {"list": data}
-
-@app.get("/{i_id}")
-async def read_image(i_id: str):
-	data = await image_read(i_id)
-	return {"image": data}
+async def read_images(i_id: Optional[str] = None):
+	if (i_id is None):
+		return {"i_id": "empty"}
+	return {"i_id": i_id}
 
 @app.put("/{i_id}")
 async def update_image(i_id: str, img: Image):
+	return {"image": img}
 	try:
 		data = await image_update(i_id, img.name, img.url)
 	except Exception as ex:
@@ -125,6 +124,7 @@ async def update_image(i_id: str, img: Image):
 
 @app.post("/")
 async def create_image(img: Image):
+	return {"image": img}
 	try:
 		data = await image_create(img.name, img.url)
 	except Exception as ex:
@@ -133,4 +133,4 @@ async def create_image(img: Image):
 
 @app.delete("/{i_id}")
 def delete_image(i_id: str):
-	image_delete(i_id)
+	return {"i_id": i_id}

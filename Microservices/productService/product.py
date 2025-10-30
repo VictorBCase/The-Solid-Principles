@@ -1,3 +1,5 @@
+# fastapi run product.py --host 0.0.0.0 --port 80
+
 from typing import Optional
 import psycopg2
 from contextlib import contextmanager
@@ -115,31 +117,30 @@ class Product(BaseModel):
 app = FastAPI()
 
 @app.get("/")
-async def read_root():
-	data = await products_read()
-	return {"list": data}
-
-@app.get("/{p_id}")
-async def read_product(p_id: str):
-	data = await product_read(p_id)
-	return {"product": data}
+async def read_products(p_id: Optional[str] = None):
+    if (p_id is None):
+        return {"p_id": "empty"} # return list
+    return {"p_id": p_id} # return product
 
 @app.put("/{p_id}")
 async def update_product(p_id: str, prod: Product):
-	try:
-		data = await product_update(p_id, prod.name, prod.description, prod.quantity, prod.price)
-	except Exception as ex:
-		raise HTTPException(status_code=400, detail=ex)
-	return {"product": data}
+    return {"product": prod}
+	#try:
+	#	data = await product_update(p_id, prod.name, prod.description, prod.quantity, prod.price)
+	#except Exception as ex:
+	#	raise HTTPException(status_code=400, detail=ex)
+	#return {"product": data}
 
 @app.post("/")
 async def create_product(prod: Product):
-	try:
-		data = await product_create(prod.name, prod.description, prod.quantity, prod.price)
-	except Exception as ex:
-		raise HTTPException(status_code=400, detail=ex)
-	return {"p_id": data}
+    return {"product": prod}
+	#try:
+	#	data = await product_create(prod.name, prod.description, prod.quantity, prod.price)
+	#except Exception as ex:
+	#	raise HTTPException(status_code=400, detail=ex)
+	#return {"p_id": data}
 
 @app.delete("/{p_id}")
 def delete_product(p_id: str):
-	product_delete(p_id)
+    return {"p_id": p_id}
+	#product_delete(p_id)
