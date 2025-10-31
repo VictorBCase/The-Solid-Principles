@@ -1,35 +1,150 @@
 services:
-  presentation:
-    build: ./Frontend
-    ports:
-      - "8080:5000"
-    depends_on:
-      - middleware
-    networks:
-      - frontend_net
-
-  middleware:
-    build: ./Middleware
+  # ============ GATEWAY ============
+  kong:
+    image: kong:3.5
+    container_name: kong
     environment:
-      - PYTHONUNBUFFERED=1
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    volumes:
+      - ./Microservices/Gateway/kong.yml:/kong/kong.yml
+    ports:
+      - "8000:8000" # public proxy
+      - "8001:8001" # admin API
+    depends_on:
+      - products_service
+      - suppliers_service
+      - categories_service
+      - images_service
     networks:
-      - frontend_net
-      - backend_net
+      - ims_net
 
-  data:
+  # ============ PRODUCTS ============
+  products_service:
+    build: ./Microservices/productService
+    container_name: products_service
+    environment:
+      - DB_NAME=product_db
+      - DB_USER=postgres
+      - DB_PASSWORD=solid
+      - DB_HOST=product_db
+      - DB_PORT=5432
+    depends_on:
+      - product_db
+    networks:
+      - ims_net
+
+  product_db:
     image: postgres:16
+    container_name: product_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: solid
-      POSTGRES_DB: IMS_Local
+      POSTGRES_DB: productDB
     volumes:
-      - ./Database/DB_schema.sql:/docker-entrypoint-initdb.d/DB_schema.sql
-      - db_data:/var/lib/postgresql/data
+      - ./Microservices/productService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - product_data:/var/lib/postgresql/data
     networks:
-      - backend_net
+      - ims_net # for kong gateway
+
+  # ============ SUPPLIERS ============
+  suppliers_service:
+    build: ./Microservices/supplierService
+    container_name: suppliers_service
+    environment:
+      - DB_NAME=supplier_db
+      - DB_USER=postgres
+      - DB_PASSWORD=solid
+      - DB_HOST=supplier_db
+      - DB_PORT=5432
+    depends_on:
+      - supplier_db
+    networks:
+      - ims_net
+  
+  supplier_db:
+    image: postgres:16
+    container_name: supplier_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: solid
+      POSTGRES_DB: productDB
+    volumes:
+      - ./Microservices/supplierService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - supplier_data:/var/lib/postgresql/data
+    networks:
+      - ims_net # for kong gateway
+
+  # ============ CATEGORIES ============
+  categories_service:
+    build: ./Microservices/categoryService
+    container_name: categories_service
+    environment:
+      - DB_NAME=categories_db
+      - DB_USER=postgres
+      - DB_PASSWORD=solid
+      - DB_HOST=categories_db
+      - DB_PORT=5432
+    depends_on:
+      - category_db
+    networks:
+      - ims_net
+  
+  category_db:
+    image: postgres:16
+    container_name: category_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: solid
+      POSTGRES_DB: categoryDB
+    volumes:
+      - ./Microservices/categoryService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - category_data:/var/lib/postgresql/data
+    networks:
+      - ims_net # for kong gateway
+
+  # ============ IMAGES ============
+  images_service:
+    build: ./Microservices/imageService
+    container_name: images_service
+    environment:
+      - DB_NAME=image_db
+      - DB_USER=postgres
+      - DB_PASSWORD=solid
+      - DB_HOST=image_db
+      - DB_PORT=5432
+    depends_on:
+      - image_db
+    networks:
+      - ims_net
+  
+  image_db:
+    image: postgres:16
+    container_name: image_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: solid
+      POSTGRES_DB: imageDB
+    volumes:
+      - ./Microservices/imageService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - image_data:/var/lib/postgresql/data
+    networks:
+      - ims_net # for kong gateway
 
 networks:
-  frontend_net:
-  backend_net:
+  ims_net:
 volumes:
-  db_data:
+  product_data:
+  supplier_data:
+  category_data:
+  image_data:
+
+
+
+  
