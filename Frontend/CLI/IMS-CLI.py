@@ -40,25 +40,25 @@ def main():
 						payload = {'name': name, 'description': desc, 'quantity': int(quant), 'price': price}
 						r = requests.post(product_url, json=payload)
 						#if (r.status_code > 299):
-						print(r.json())
+						print(json.loads(r.content))
 					case "supplier":
 						name = input("Enter supplier name: ").strip()
 						email = input("Enter supplier email: ").strip()
 						payload = {'name': name, 'contact': email}
 						r = requests.post(supplier_url, json=payload)
-						print(r.json())
+						print(json.loads(r.content))
 					case "category":
 						name = input("Enter category name: ").strip()
 						desc = input("Enter category description: ").strip()
 						payload = {'name': name, 'description': desc}
 						r = requests.post(category_url, json=payload)
-						print(r.json())
+						print(json.loads(r.content))
 					case "image":
 						pid = input("Enter product id: ").strip()
 						url = input("Enter image URL: ").strip()
 						payload = {'p_id': pid, 'url': url}
 						r = requests.post(image_url, json=payload)
-						print(r.json())
+						print(json.loads(r.content))
 					case "supplierProduct":
 						sid = input("Enter supplier id: ").strip()
 						pid = input("Enter product id: ").strip()
@@ -76,19 +76,19 @@ def main():
 					case "product":
 						prod_id = input("Enter product id: ").strip()
 						r = requests.get(product_url + "?p_id=" + prod_id)
-						print(r)
+						print(json.loads(r.content))
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.get(supplier_url + "?s_id=" + sup_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						r = requests.get(category_url + "?c_id=" + cat_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						r = requests.get(image_url + "?i_id=" + img_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "supplierProducts":
 						sup_id = input("Enter supplier id: ").strip()
 						supplierProducts_read(conn, sup_id)
@@ -108,28 +108,28 @@ def main():
 						payload = {'name': name, 'description': desc, 'quantity': int(quant), 'price': price}
 						r = requests.put(product_url + prod_id, json=payload)
 						#if (r.status_code > 299):
-						print(r.json())
+						print(json.loads(r.content))
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						name = input("Enter new supplier name: ").strip()
 						email = input("Enter new supplier email: ").strip()
 						payload = {'name': name, 'contact': email}
 						r = requests.put(supplier_url + sup_id, json=payload)
-						print(r.json())
+						print(json.loads(r.content))
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						name = input("Enter new category name: ").strip()
 						desc = input("Enter new category description: ").strip()
 						payload = {'name': name, 'description': desc}
 						r = requests.put(category_url + cat_id, json=payload)
-						print(r.json())
+						print(json.loads(r.content))
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						prod_id = input("Enter new product id: ").strip()
 						url = input("Enter new image URL: ").strip()
 						payload = {'p_id': prod_id, 'url': url}
 						r = requests.put(image_url + img_id, json=payload)
-						print(r.json())
+						print(json.loads(r.content))
 			elif command == "delete":
 				print("What type of record do you want to delete: product, supplier, category, image, supplierProduct, categoryProduct")
 				read_type = input(">>> ").strip()
@@ -137,19 +137,19 @@ def main():
 					case "product":
 						prod_id = input("Enter product id: ").strip()
 						r = requests.delete(product_url + prod_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.delete(supplier_url + sup_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						r = requests.delete(category_url + cat_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						r = requests.delete(image_url + img_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "supplierProduct":
 						sid = input("Enter supplier id: ").strip()
 						pid = input("Enter product id: ").strip()
