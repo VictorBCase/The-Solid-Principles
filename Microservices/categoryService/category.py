@@ -116,20 +116,11 @@ def categoryProducts_read(category_id: str) -> Optional[list]:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT p.product_id, p.name, p.price
-                FROM category_products cp
-                JOIN products p ON cp.product_id = p.product_id
-                WHERE cp.category_id = %s
-            """, (category_id,))
-            results = []
-            for row in cur.fetchall():
-                product_id, name, price_decimal = row
-
-                price_str = str(price_decimal) 
-                
-                results.append((product_id, name, price_str))
-                
-            return results
+                SELECT (product_id)
+                FROM category_products
+                WHERE category_id = %s
+            """, (category_id))
+            return cur.fetchall()
 
 def categoryProducts_delete(category_id: str, product_id: str) -> None:
     with get_conn() as conn:
