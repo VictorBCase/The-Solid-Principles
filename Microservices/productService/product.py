@@ -129,7 +129,7 @@ app.add_middleware(
 )
 
 @app.options("/")
-async def preflight_handler():
+def preflight_handler():
 	headers = {
         "Access-Control-Allow-Origin": "http://http://localhost:5173",
         "Access-Control-Allow-Methods": "POST, GET",
@@ -138,29 +138,29 @@ async def preflight_handler():
 	return Response(status_code=200, headers=headers)
 
 @app.get("/")
-async def read_products(p_id: Optional[str] = None):
-	if (p_id is None):
-		data = await products_read()
+def read_products(p_id: Optional[str] = None):
+	if (p_id is None or p_id == ""):
+		data = products_read()
 		return {"products": data}
-	data = await product_read(p_id)
+	data = product_read(p_id)
 	return {"product": data}
 
 @app.put("/{p_id}")
-async def update_product(p_id: str, prod: Product):
+def update_product(p_id: str, prod: Product):
 	try:
-		data = await product_update(p_id, prod.name, prod.description, prod.quantity, prod.price)
+		data = product_update(p_id, prod.name, prod.description, prod.quantity, prod.price)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=ex)
 	return {"product": data}
 
 @app.post("/")
-async def create_product(prod: Product):
+def create_product(prod: Product):
 	try:
-		data = await product_create(prod.name, prod.description, prod.quantity, prod.price)
+		data = product_create(prod.name, prod.description, prod.quantity, prod.price)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=ex)
 	return {"p_id": data}
 
 @app.delete("/{p_id}")
-async def delete_product(p_id: str):
+def delete_product(p_id: str):
 	product_delete(p_id)
