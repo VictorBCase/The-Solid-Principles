@@ -188,13 +188,26 @@ def create_category(cat: Category):
 	return {"c_id": data}
 
 @app.delete("/{c_id}")
-def delete_image(c_id: str):
-	return {"c_id": c_id}
+def delete_category(c_id: str):
+    try:
+        category_delete(c_id)
+        return {"deleted": c_id}
+    except Exception as ex:
+        raise HTTPException(status_code=400, detail=str(ex))
 
-@app.delete("/product/{p_id}")
-def delete_association(p_id: str):
-	return {"p_id": p_id}
+# ASSOCIATIONS =================================================
+app.delete("/{c_id}/product/{p_id}")
+def delete_association(c_id: str, p_id: str):
+    try:
+        categoryProducts_delete(c_id, p_id)
+        return {"message": f"Product {p_id} unlinked from category {c_id}"}
+    except Exception as ex:
+        raise HTTPException(status_code=400, detail=str(ex))
 
-@app.post("/{c_id}")
+@app.post("/{c_id}/product/{p_id}")
 def associate_product(c_id: str, p_id: str):
-	return {"c_id": c_id, "p_id": p_id}
+    try:
+        categoryProducts_create(c_id, p_id)
+        return {"message": f"Product {p_id} linked to category {c_id}"}
+    except Exception as ex:
+        raise HTTPException(status_code=400, detail=str(ex))
