@@ -5,7 +5,7 @@ import uuid
 from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-# import requests
+import requests
 import json
 
 # URLs ========================================================================
@@ -109,6 +109,8 @@ def product_delete(product_id: str) -> None:
 		with conn.cursor() as c:
 			c.execute("DELETE FROM products WHERE product_id = %s", (product_id,))
 			conn.commit()
+	requests.delete(supplier_url + "products/" + product_id)
+	requests.delete(category_url + "products/" + product_id)
 
 # http server config ==========================================================
 class Product(BaseModel):
