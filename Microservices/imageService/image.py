@@ -12,10 +12,10 @@ import json
 # database connection =========================================================
 DB_PORT = 5432
 DB_CONFIG = {
-	"dbname": "image_db",
+	"dbname": "imageDB",
 	"user": "postgres",
 	"password": "solid",
-	"host": "image_db",  # add when docker set up for containers
+	"host": "data",  # add when docker set up for containers
 	"port": DB_PORT
 }
 
