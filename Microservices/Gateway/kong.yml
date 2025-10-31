@@ -1,0 +1,83 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: products
+    url: http://products_service:8000
+    routes:
+      - name: products-read
+        methods: [GET]
+        paths: ["/products"]
+        strip_path: true
+      - name: products-create
+        methods: [POST]
+        paths: [/products]
+        strip_path: true
+      - name: products-update
+        methods: [PUT]
+        paths: ["/products"]
+        strip_path: true
+      - name: products-delete
+        methods: [DELETE]
+        paths: ["/products"]
+        strip_path: true
+
+  - name: suppliers
+    url: http://suppliers_service:8000
+    routes:
+      - name: suppliers-read
+        methods: [GET]
+        paths: ["/suppliers/*"]
+        strip_path: true
+      - name: suppliers-create
+        methods: [POST]
+        paths: [/suppliers]
+        strip_path: true
+      - name: suppliers-update
+        methods: [PUT]
+        paths: ["/suppliers/*"]
+        strip_path: true
+      - name: suppliers-delete
+        methods: [DELETE]
+        paths: ["/suppliers/*"]
+        strip_path: true
+
+  - name: categories
+    url: http://categories_service:8000
+    routes:
+      - name: categories-read
+        methods: [GET]
+        paths: ["/categories/*"]
+        strip_path: true
+      - name: categories-create
+        methods: [POST]
+        paths: [/categories]
+        strip_path: true
+      - name: categories-update
+        methods: [PUT]
+        paths: ["/categories/*"]
+        strip_path: true
+      - name: categories-delete
+        methods: [DELETE]
+        paths: ["/categories/*"]
+        strip_path: true
+
+  - name: images
+    url: http://images_service:8000
+    routes:
+      - name: images-read
+        methods: [GET]
+        paths: ["/images/*"]
+        strip_path: true
+      - name: images-create
+        methods: [POST]
+        paths: [/images]
+        strip_path: true
+      - name: images-update
+        methods: [PUT]
+        paths: ["/images/*"]
+        strip_path: true
+      - name: images-delete
+        methods: [DELETE]
+        paths: ["/images/*"]
+        strip_path: true

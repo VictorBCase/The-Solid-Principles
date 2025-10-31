@@ -10,13 +10,12 @@ from pydantic import BaseModel
 import json
 
 # database connection =========================================================
-DB_PORT = 5432
 DB_CONFIG = {
 	"dbname": "supplierDB",
 	"user": "postgres",
 	"password": "solid",
 	"host": "data",  # add when docker set up for containers
-	"port": DB_PORT
+	"port": 5432
 }
 
 @contextmanager
@@ -54,91 +53,93 @@ def suppliers_read() -> Optional[list]:
 			return c.fetchall()
 
 def supplier_create(name: str, contact_email: str, supplier_id: Optional[str] = None) -> str:
-    try:
-        validate_nonempty("name", name)
-        validate_nonempty("contact_email", contact_email)
-        sid = gen_uuid(supplier_id)
-        with get_conn() as conn:
-            with conn.cursor() as c:
-                c.execute("""
-                    INSERT INTO suppliers (supplier_id, name, contact_email)
-                    VALUES (%s, %s, %s)
-                """, (sid, name, contact_email))
-                conn.commit()
-        return sid
-    except Exception as e:
-        raise Exception(f"Failed to create Supplier: {str(e)}")
+	try:
+		validate_nonempty("name", name)
+		validate_nonempty("contact_email", contact_email)
+		sid = gen_uuid(supplier_id)
+		with get_conn() as conn:
+			with conn.cursor() as c:
+				c.execute("""
+					INSERT INTO suppliers (supplier_id, name, contact_email)
+					VALUES (%s, %s, %s)
+				""", (sid, name, contact_email))
+				conn.commit()
+		return sid
+	except Exception as e:
+		raise Exception(f"Failed to create Supplier: {str(e)}")
 
 def supplier_read(supplier_id: str) -> Optional[tuple]:
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("SELECT * FROM suppliers WHERE supplier_id = %s", (supplier_id,))
-            row = c.fetchall()[0]
-            ret = []
-            for data in row:
-                ret.append(str(data))
-            return ret
+	with get_conn() as conn:
+		with conn.cursor() as c:
+			c.execute("SELECT * FROM suppliers WHERE supplier_id = %s", (supplier_id,))
+			row = c.fetchall()[0]
+			ret = []
+			for data in row:
+				ret.append(str(data))
+			return ret
 
 def supplier_update(supplier_id: str, name: str, contact_email: str) -> Optional[tuple]:
-    try:
-        validate_nonempty("name", name)
-        validate_nonempty("contact_email", contact_email)
-        with get_conn() as conn:
-            with conn.cursor() as c:
-                c.execute("""
-                    UPDATE suppliers
-                    SET name = %s, contact_email = %s
-                    WHERE supplier_id = %s
-                """, (name, contact_email, supplier_id))
-                conn.commit()
-        return supplier_read(supplier_id)
-    except Exception as e:
-        raise Exception(f"Failed to update Supplier: {str(e)}")
+	try:
+		validate_nonempty("name", name)
+		validate_nonempty("contact_email", contact_email)
+		with get_conn() as conn:
+			with conn.cursor() as c:
+				c.execute("""
+					UPDATE suppliers
+					SET name = %s, contact_email = %s
+					WHERE supplier_id = %s
+				""", (name, contact_email, supplier_id))
+				conn.commit()
+		return supplier_read(supplier_id)
+	except Exception as e:
+		raise Exception(f"Failed to update Supplier: {str(e)}")
 
 def supplier_delete(supplier_id: str) -> None:
-    with get_conn() as conn:
-        with conn.cursor() as c:
-            c.execute("DELETE FROM suppliers WHERE supplier_id = %s", (supplier_id,))
-            conn.commit()
+	with get_conn() as conn:
+		with conn.cursor() as c:
+			c.execute("DELETE FROM suppliers WHERE supplier_id = %s", (supplier_id,))
+			conn.commit()
 
 # association =================================================================
-def supplierProducts_create(supplier_id: str, product_id: str) -> None:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO supplier_products (supplier_id, product_id)
-                VALUES (%s, %s)
-                ON CONFLICT DO NOTHING
-            """, (supplier_id, product_id))
-            conn.commit()
+def supplierProduct_create(supplier_id: str, product_id: str) -> None:
+	with get_conn() as conn:
+		with conn.cursor() as cur:
+			cur.execute("""
+				INSERT INTO supplier_products (supplier_id, product_id)
+				VALUES (%s, %s)
+				ON CONFLICT DO NOTHING
+			""", (supplier_id, product_id))
+			conn.commit()
 
 def supplierProducts_read(supplier_id: str) -> Optional[list]:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT p.product_id, p.name, p.price
-                FROM supplier_products sp
-                JOIN products p ON sp.product_id = p.product_id
-                WHERE sp.supplier_id = %s
-            """, (supplier_id,))
-            results = []
-            for row in cur.fetchall():
-                product_id, name, price_decimal = row
+	with get_conn() as conn:
+		with conn.cursor() as cur:
+			cur.execute("""
+				SELECT product_id
+				FROM supplier_products
+				WHERE supplier_id = %s
+			""", (supplier_id,))
+			results = []
+			for row in cur.fetchall():
+				product_id, name, price_decimal = row
+				price_str = str(price_decimal) 
+				results.append((product_id, name, price_str))
+			return results
 
-                price_str = str(price_decimal) 
-                
-                results.append((product_id, name, price_str))
-                
-            return results
-
-def supplierProducts_delete(supplier_id: str, product_id: str) -> None:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                DELETE FROM supplier_products
-                WHERE supplier_id = %s AND product_id = %s
-            """, (supplier_id, product_id))
-            conn.commit()
+def supplierProduct_delete(product_id: str, supplier_id: Optional[str] = None) -> None:
+	with get_conn() as conn:
+		with conn.cursor() as cur:
+			if (supplier_id == None):
+				cur.execute("""
+					DELETE FROM supplier_products 
+					WHERE product_id = %s
+				""", (product_id))
+			else:
+				cur.execute("""
+					DELETE FROM supplier_products
+					WHERE supplier_id = %s AND product_id = %s
+				""", (supplier_id, product_id))
+			conn.commit()
 
 # http server config ==========================================================
 class Supplier(BaseModel):
@@ -147,24 +148,28 @@ class Supplier(BaseModel):
 
 app = FastAPI()
 
-origins = ["http://localhost:5173"]
+origins = [
+	"http://localhost:5173",
+	"http://localhost:8000" # product service url
+]
 
 app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_methods=["*"],
-        allow_headers=["*"],
+		CORSMiddleware,
+		allow_origins=origins,
+		allow_methods=["*"],
+		allow_headers=["*"],
 )
 
 @app.get("/")
 async def read_suppliers(s_id: Optional[str] = None):
 	if (s_id is None):
-		return {"s_id": "empty"}
-	return {"s_id": s_id}
+		data = await suppliers_read()
+		return {"suppliers": data}
+	data = await supplier_read(s_id)
+	return {"supplier": data}
 
 @app.put("/{s_id}")
 async def update_supplier(s_id: str, sup: Supplier):
-	return {"supplier": sup}
 	try:
 		data = await supplier_update(s_id, sup.name, sup.contact)
 	except Exception as ex:
@@ -173,7 +178,6 @@ async def update_supplier(s_id: str, sup: Supplier):
 
 @app.post("/")
 async def create_supplier(sup: Supplier):
-	return {"supplier": sup}
 	try:
 		data = await supplier_create(sup.name, sup.contact)
 	except Exception as ex:
@@ -181,13 +185,26 @@ async def create_supplier(sup: Supplier):
 	return {"s_id": data}
 
 @app.delete("/{s_id}")
-def delete_supplier(s_id: str):
-	return {"s_id": s_id}
+async def delete_supplier(s_id: str):
+	supplier_delete(s_id)
 
-@app.delete("/product/{p_id}")
-async def delete_association(p_id: str):
-	return {"p_id": p_id}
+# get suppliers products
+@app.get("/{s_id}/products/")
+async def read_products(s_id: str):
+	data = await supplierProducts_read(s_id)
+	return {"products": data}
 
-@app.post("/{s_id}")
+# associate product with supplier
+@app.post("/{s_id}/products/{p_id}")
 async def associate_product(s_id: str, p_id: str):
-	return {"s_id": s_id, "p_id": p_id}
+	supplierProduct_create(s_id, p_id)
+
+# disassociate product with supplier
+@app.delete("/{s_id}/products/{p_id}")
+async def delete_association(s_id: str, p_id: str):
+	supplierProduct_delete(p_id, s_id)
+
+# dissasociate product with all suppliers
+@app.delete("/products/{p_id}")
+async def delete_product(p_id: str):
+	supplierProduct_delete(p_id)

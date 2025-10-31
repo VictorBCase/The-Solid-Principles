@@ -4,24 +4,23 @@ from typing import Optional
 import psycopg2
 from contextlib import contextmanager
 import uuid
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import requests
+# import requests
 import json
 
 # URLs ========================================================================
-supplier_url = "http://0.0.0.1:8080/"
-category_url = "http://0.0.0.2:8080/"
+supplier_url = "http://localhost:8000/suppliers/"
+category_url = "http://localhost:8000/categories/"
 
 # database connection =========================================================
-DB_PORT = 5432
 DB_CONFIG = {
-	"dbname": "productDB",
+	"dbname": "product_db",
 	"user": "postgres",
 	"password": "solid",
-	"host": "data",  # add when docker set up for containers
-	"port": DB_PORT
+	"host": "product_db",  # add when docker set up for containers
+	"port": 5432
 }
 
 @contextmanager
@@ -122,40 +121,46 @@ class Product(BaseModel):
 
 app = FastAPI()
 
-origins = ["http://localhost:5173"]
-
 app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_methods=["*"],
-        allow_headers=["*"],
+		CORSMiddleware,
+		allow_origins=["*"],
+		allow_methods=["*"],
+		allow_headers=["*"]
 )
 
+@app.options("/")
+def preflight_handler():
+	headers = {
+        "Access-Control-Allow-Origin": "http://http://localhost:5173",
+        "Access-Control-Allow-Methods": "POST, GET",
+        "Access-Control-Allow-Headers": "Content-Type",
+	}
+	return Response(status_code=200, headers=headers)
+
 @app.get("/")
-async def read_products(p_id: Optional[str] = None):
-    if (p_id is None):
-        return {"p_id": "empty"} # return list
-    return {"p_id": p_id} # return product
+def read_products(p_id: Optional[str] = None):
+	if (p_id is None or p_id == ""):
+		data = products_read()
+		return {"products": data}
+	data = product_read(p_id)
+	return {"product": data}
 
 @app.put("/{p_id}")
-async def update_product(p_id: str, prod: Product):
-    return {"product": prod}
-	#try:
-	#	data = await product_update(p_id, prod.name, prod.description, prod.quantity, prod.price)
-	#except Exception as ex:
-	#	raise HTTPException(status_code=400, detail=ex)
-	#return {"product": data}
+def update_product(p_id: str, prod: Product):
+	try:
+		data = product_update(p_id, prod.name, prod.description, prod.quantity, prod.price)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=ex)
+	return {"product": data}
 
 @app.post("/")
-async def create_product(prod: Product):
-    return {"product": prod}
-	#try:
-	#	data = await product_create(prod.name, prod.description, prod.quantity, prod.price)
-	#except Exception as ex:
-	#	raise HTTPException(status_code=400, detail=ex)
-	#return {"p_id": data}
+def create_product(prod: Product):
+	try:
+		data = product_create(prod.name, prod.description, prod.quantity, prod.price)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=ex)
+	return {"p_id": data}
 
 @app.delete("/{p_id}")
 def delete_product(p_id: str):
-    return {"p_id": p_id}
-	#product_delete(p_id)
+	product_delete(p_id)

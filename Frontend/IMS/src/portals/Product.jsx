@@ -48,11 +48,14 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 function Product({fields, ops, myOps, result, setResult}) {
 
 	// api calls
-	const API = 'http://0.0.0.0:8080/';
+	const API = 'http://localhost:8000/products/';
 
 	async function list() {
 		try {
-			const res = await fetch(API, {method: 'GET'});
+			const res = await fetch(API, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'
+			}});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 			return [];
@@ -85,7 +88,10 @@ function Product({fields, ops, myOps, result, setResult}) {
 
 	async function read(id) {
 		try {
-			let res = await fetch(API + "?p_id=" + id, {method: 'GET'});
+			let res = await fetch(API + "?p_id=" + id, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'}
+			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 			let product = data["product"];
@@ -95,7 +101,10 @@ function Product({fields, ops, myOps, result, setResult}) {
 
 	async function remove(id) {
 		try {
-			let res = await fetch(API + id, {method: 'DELETE'});
+			let res = await fetch(API + id, {
+				method: 'DELETE',
+				headers: {'Content-Type': 'application/json'},
+			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 		} catch(error) { console.error(error); }
@@ -293,7 +302,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 
 	useEffect(() => {
 		// Only run this effect when the component mounts and 'products' is null
-		if (products === null) {
+		if (products == null) {
 			getProducts();
 		}
 	}, [products]); // Re-run only when 'products' changes (e.g., set to null elsewhere)

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import Product from './portals/Product.jsx';
 import Supplier from './portals/Supplier.jsx';
 import Category from './portals/Category.jsx';
