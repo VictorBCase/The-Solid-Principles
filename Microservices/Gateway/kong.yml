@@ -7,7 +7,7 @@ services:
     routes:
       - name: products-read
         methods: [GET]
-        paths: ["/products/*"]
+        paths: ["/products"]
         strip_path: true
       - name: products-create
         methods: [POST]
@@ -15,11 +15,11 @@ services:
         strip_path: true
       - name: products-update
         methods: [PUT]
-        paths: ["/products/*"]
+        paths: ["/products"]
         strip_path: true
       - name: products-delete
         methods: [DELETE]
-        paths: ["/products/*"]
+        paths: ["/products"]
         strip_path: true
 
   - name: suppliers

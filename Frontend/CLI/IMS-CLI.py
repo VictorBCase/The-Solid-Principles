@@ -2,7 +2,7 @@ import requests
 import json
 
 # URLs ------------------------------------------------------------------------
-product_url = "http://0.0.0.0:80/"
+product_url = "http://localhost:8000/products/"
 supplier_url = "http://0.0.0.1:80/"
 category_url = "http://0.0.0.2:80/"
 image_url = "http://0.0.0.3:80/"
@@ -156,12 +156,12 @@ def main():
 						sid = input("Enter supplier id: ").strip()
 						pid = input("Enter product id: ").strip()
 						supplierProduct_delete(conn, sid, pid)
-						print("Association deleted.");
+						print("Association deleted.")
 					case "categoryProduct":
 						cid = input("Enter category id: ").strip()
 						pid = input("Enter product id: ").strip()
 						categoryProduct_delete(conn, cid, pid)
-						print("Association deleted.");
+						print("Association deleted.")
 			else:
 				print("ERR: Invalid command.")
 		except KeyboardInterrupt:

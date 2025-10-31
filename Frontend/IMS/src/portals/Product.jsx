@@ -48,9 +48,9 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 function Product({fields, ops, myOps, result, setResult}) {
 
 	// api calls
-	const API = 'http://0.0.0.0:80/';
+	const API = 'http://0.0.0.0:8080/';
 
-	async function listProducts() {
+	async function list() {
 		try {
 			const res = await fetch(API, {method: 'GET'});
 			let data = await res.json();
@@ -59,7 +59,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 		} catch(error) { console.error(error); }
 	}
 
-	async function createProduct(name, desc, quantity, price) {
+	async function create(name, desc, quantity, price) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
@@ -83,7 +83,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 		} catch(error) { console.error(error); }
 	}
 
-	async function viewProduct(id) {
+	async function read(id) {
 		try {
 			let res = await fetch(API + "?p_id=" + id, {method: 'GET'});
 			let data = await res.json();
@@ -93,7 +93,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 		} catch(error) { console.error(error); }
 	}
 
-	async function removeProduct(id) {
+	async function remove(id) {
 		try {
 			let res = await fetch(API + id, {method: 'DELETE'});
 			let data = await res.json();
@@ -101,7 +101,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 		} catch(error) { console.error(error); }
 	}
 
-	async function updateProduct(id, name, desc, quantity, price) {
+	async function update(id, name, desc, quantity, price) {
 		try {
 			let res = await fetch(API + id, {
 				method: 'PUT',
@@ -124,7 +124,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 		} catch(error) { console.error(error); return false; }
 	}
 
-	async function associateProdSup(p_id, s_id) {
+	async function associateSupplier(p_id, s_id) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
@@ -144,7 +144,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 		} catch(error) { console.error(error); }
 	}
 
-	async function disassociateProdSup(p_id, s_id) {
+	async function disassociateSupplier(p_id, s_id) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
@@ -164,7 +164,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 		} catch(error) { console.error(error); }
 	}
 
-	async function associateProdCat(p_id, c_id) {
+	async function associateCategory(p_id, c_id) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
@@ -184,7 +184,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 		} catch(error) { console.error(error); }
 	}
 
-	async function disassociateProdCat(p_id, c_id) {
+	async function disassociateCategory(p_id, c_id) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
@@ -212,7 +212,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 
     // handle create/edit inputs
     const handleFields = async (data) => {
-		clearMsg();
+		setMessage('');
         let inputs = [];
         for (let i = 0; i < fields.length; i ++) {
             inputs.push(data.get(fields[i][0]));
@@ -231,21 +231,21 @@ function Product({fields, ops, myOps, result, setResult}) {
 
     // handle supplier/category associations
     const handleAssociation = async (data) => {
-		// clearMsg();
+		// setMessage('');
         let type = data.get("type");
         let id = data.get("id");
 		switch(requireId) {
 			case ops.assoc:
 				if (type == "supplier")
-					await associateSup(edit, id);
+					await associateSupplier(edit, id);
 				else
-					await associateCat(edit, id);
+					await associateCategory(edit, id);
 				break;
 			default:
 				if (type == "supplier")
-					await disassociateSup(edit, id);
+					await disassociateSupplier(edit, id);
 				else
-					await disassociateCat(edit, id);
+					await disassociateCategory(edit, id);
 				break;
 		}
 		setEdit(null);
@@ -254,7 +254,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 
     // handle CRUD inputs
     const handleOps = async (data) => {
-		clearMsg();
+		setMessage('');
         let type = data.get("type");
         let id = data.get("product");
 		if (id == null)

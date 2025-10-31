@@ -5,8 +5,14 @@ import psycopg2
 from contextlib import contextmanager
 import uuid
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+# import requests
 import json
+
+# URLs ========================================================================
+supplier_url = "http://0.0.0.1:8080/"
+category_url = "http://0.0.0.2:8080/"
 
 # database connection =========================================================
 DB_PORT = 5432
@@ -115,6 +121,15 @@ class Product(BaseModel):
 	price: str
 
 app = FastAPI()
+
+origins = ["http://localhost:5173"]
+
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_methods=["*"],
+        allow_headers=["*"],
+)
 
 @app.get("/")
 async def read_products(p_id: Optional[str] = None):
