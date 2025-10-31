@@ -3,65 +3,65 @@ _transform: true
 
 services:
   - name: products
-    url: http://products:8000
+    url: http://products_service:8000
     routes:
       - name: products-read
         methods: [GET]
-        paths: ["/products/{id}"]
+        paths: ["/products/*"]
       - name: products-create
         methods: [POST]
         paths: [/products]
       - name: products-update
         methods: [PUT]
-        paths: ["/products/{id}"]
+        paths: ["/products/*"]
       - name: products-delete
         methods: [DELETE]
-        paths: ["/products/{id}"]
+        paths: ["/products/*"]
 
   - name: suppliers
-    url: http://suppliers:8000
+    url: http://suppliers_service:8000
     routes:
       - name: suppliers-read
         methods: [GET]
-        paths: ["/suppliers/{id}"]
+        paths: ["/suppliers/*"]
       - name: suppliers-create
         methods: [POST]
         paths: [/suppliers]
       - name: suppliers-update
         methods: [PUT]
-        paths: ["/suppliers/{id}"]
+        paths: ["/suppliers/*"]
       - name: suppliers-delete
         methods: [DELETE]
-        paths: ["/suppliers/{id}"]
+        paths: ["/suppliers/*"]
 
   - name: categories
-    url: http://categories:8000
+    url: http://categories_service:8000
     routes:
       - name: categories-read
         methods: [GET]
-        paths: ["/categories/{id}"]
+        paths: ["/categories/*"]
       - name: categories-create
         methods: [POST]
         paths: [/categories]
       - name: categories-update
         methods: [PUT]
-        paths: ["/categories/{id}"]
+        paths: ["/categories/*"]
       - name: categories-delete
         methods: [DELETE]
-        paths: ["/categories/{id}"]
+        paths: ["/categories/*"]
 
   - name: images
-    url: http://images:8000
+    url: http://images_service:8000
     routes:
       - name: images-read
         methods: [GET]
-        paths: ["/images/{id}"]
+        paths: ["/images/*"]
       - name: images-create
         methods: [POST]
         paths: [/images]
       - name: images-update
         methods: [PUT]
-        paths: ["/images/{id}"]
+        paths: ["/images/*"]
       - name: images-delete
         methods: [DELETE]
-        paths: ["/images/{id}"]
+        paths: ["/images/*"]
