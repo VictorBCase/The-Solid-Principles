@@ -161,10 +161,15 @@ def preflight_handler():
 @app.get("/{c_id}")
 def read_category(c_id: Optional[str] = None):
     try:
-        data = category_read(c_id)
-        return {"category": data}
+        if c_id is None or c_id == "":
+            data = categories_read() #read all categories
+            return {"categories": data}
+        else:
+            data = category_read(c_id) #read specific category
+            return {"category": data}
     except Exception as ex:
         raise HTTPException(status_code=400, detail=str(ex))
+
 
 @app.put("/{c_id}")
 def update_category(c_id: str, cat: Category):
