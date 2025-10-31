@@ -1,4 +1,15 @@
 services:
+  # ========== FRONTEND =============
+  frontend:
+    build:
+      context: ./Frontend/IMS
+    container_name: web_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - kong
+    networks:
+      - ims_net
   # ============ GATEWAY ============
   kong:
     image: kong:3.5
