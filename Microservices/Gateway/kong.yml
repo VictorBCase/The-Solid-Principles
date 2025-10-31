@@ -1,0 +1,67 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: products
+    url: http://products:8000
+    routes:
+      - name: products-read
+        methods: [GET]
+        paths: [/products/{id}]
+      - name: products-create
+        methods: [POST]
+        paths: [/products]
+      - name: products-update
+        methods: [PUT]
+        paths: [/products/{id}]
+      - name: products-delete
+        methods: [DELETE]
+        paths: [/products/{id}]
+
+  - name: suppliers
+    url: http://suppliers:8000
+    routes:
+      - name: suppliers-read
+        methods: [GET]
+        paths: [/suppliers/{id}]
+      - name: suppliers-create
+        methods: [POST]
+        paths: [/suppliers]
+      - name: suppliers-update
+        methods: [PUT]
+        paths: [/suppliers/{id}]
+      - name: suppliers-delete
+        methods: [DELETE]
+        paths: [/suppliers/{id}]
+
+  - name: categories
+    url: http://categories:8000
+    routes:
+      - name: categories-read
+        methods: [GET]
+        paths: [/categories/{id}]
+      - name: categories-create
+        methods: [POST]
+        paths: [/categories]
+      - name: categories-update
+        methods: [PUT]
+        paths: [/categories/{id}]
+      - name: categories-delete
+        methods: [DELETE]
+        paths: [/categories/{id}]
+
+  - name: images
+    url: http://images:8000
+    routes:
+      - name: images-read
+        methods: [GET]
+        paths: [/images/{id}]
+      - name: images-create
+        methods: [POST]
+        paths: [/images]
+      - name: images-update
+        methods: [PUT]
+        paths: [/images/{id}]
+      - name: images-delete
+        methods: [DELETE]
+        paths: [/images/{id}]
