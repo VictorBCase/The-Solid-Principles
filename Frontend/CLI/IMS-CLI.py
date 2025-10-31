@@ -3,9 +3,9 @@ import json
 
 # URLs ------------------------------------------------------------------------
 product_url = "http://localhost:8000/products/"
-supplier_url = "http://0.0.0.1:80/"
-category_url = "http://0.0.0.2:80/"
-image_url = "http://0.0.0.3:80/"
+supplier_url = "http://localhost:8000/suppliers/"
+category_url = "http://localhost:8000/categories/"
+image_url = "http://localhost:8000/images/"
 
 # CLI -------------------------------------------------------------------------
  
@@ -19,12 +19,10 @@ image_url = "http://0.0.0.3:80/"
 
 def main():
 	print("Welcome to The Solid Principles' Inventory Management System")
-
 	while True:
 		try:
 			print("Type help or ? to list commands.")
 			command = input(">>> ").strip()
-	
 			if command in ("exit", "quit"):
 				print("Terminating session.")
 				break
@@ -78,7 +76,7 @@ def main():
 					case "product":
 						prod_id = input("Enter product id: ").strip()
 						r = requests.get(product_url + "?p_id=" + prod_id)
-						print(r.json())
+						print(r)
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.get(supplier_url + "?s_id=" + sup_id)

@@ -11,17 +11,16 @@ from pydantic import BaseModel
 import json
 
 # URLs ========================================================================
-supplier_url = "http://0.0.0.1:8080/"
-category_url = "http://0.0.0.2:8080/"
+supplier_url = "http://localhost:8000/suppliers/"
+category_url = "http://localhost:8000/categories/"
 
 # database connection =========================================================
-DB_PORT = 5432
 DB_CONFIG = {
-	"dbname": "productDB",
+	"dbname": "product_db",
 	"user": "postgres",
 	"password": "solid",
-	"host": "data",  # add when docker set up for containers
-	"port": DB_PORT
+	"host": "product_db",  # add when docker set up for containers
+	"port": 5432
 }
 
 @contextmanager
@@ -125,37 +124,37 @@ app = FastAPI()
 origins = ["http://localhost:5173"]
 
 app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_methods=["*"],
-        allow_headers=["*"],
+		CORSMiddleware,
+		allow_origins=origins,
+		allow_methods=["*"],
+		allow_headers=["*"],
 )
 
 @app.get("/")
 async def read_products(p_id: Optional[str] = None):
-    if (p_id is None):
-        return {"p_id": "empty"} # return list
-    return {"p_id": p_id} # return product
+	if (p_id is None):
+		data = await products_read()
+		return {"products": data}
+	data = await product_read(p_id)
+	return {"product": data}
 
 @app.put("/{p_id}")
 async def update_product(p_id: str, prod: Product):
-    return {"product": prod}
-	#try:
-	#	data = await product_update(p_id, prod.name, prod.description, prod.quantity, prod.price)
-	#except Exception as ex:
-	#	raise HTTPException(status_code=400, detail=ex)
-	#return {"product": data}
+	try:
+		data = await product_update(p_id, prod.name, prod.description, prod.quantity, prod.price)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=ex)
+	return {"product": data}
 
 @app.post("/")
 async def create_product(prod: Product):
-    return {"product": prod}
-	#try:
-	#	data = await product_create(prod.name, prod.description, prod.quantity, prod.price)
-	#except Exception as ex:
-	#	raise HTTPException(status_code=400, detail=ex)
-	#return {"p_id": data}
+	try:
+		data = await product_create(prod.name, prod.description, prod.quantity, prod.price)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=ex)
+	return {"p_id": data}
 
 @app.delete("/{p_id}")
-def delete_product(p_id: str):
-    return {"p_id": p_id}
-	#product_delete(p_id)
+async def delete_product(p_id: str):
+	product_delete(p_id)
+	# send request to category and supplier service to delete product associations
