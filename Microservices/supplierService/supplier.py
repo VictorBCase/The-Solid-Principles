@@ -116,8 +116,12 @@ def supplierProducts_read(supplier_id: str) -> Optional[list]:
 				SELECT (product_id)
 				FROM supplier_products
 				WHERE supplier_id = %s
-			""", (supplier_id))
-			return cur.fetchall()
+			""", (supplier_id,))
+			rows = cur.fetchall()
+			ret = []
+			for data in rows:
+				ret.append(data)
+			return ret
 
 def supplierProduct_delete(product_id: str, supplier_id: Optional[str] = None) -> None:
 	with get_conn() as conn:
