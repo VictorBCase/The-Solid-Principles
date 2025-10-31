@@ -46,7 +46,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: solid
-      POSTGRES_DB: productDB
+      POSTGRES_DB: product_db
     volumes:
       - ./Microservices/productService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - product_data:/var/lib/postgresql/data
@@ -74,7 +74,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: solid
-      POSTGRES_DB: productDB
+      POSTGRES_DB: supplier_db
     volumes:
       - ./Microservices/supplierService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - supplier_data:/var/lib/postgresql/data
@@ -102,7 +102,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: solid
-      POSTGRES_DB: categoryDB
+      POSTGRES_DB: category_db
     volumes:
       - ./Microservices/categoryService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - category_data:/var/lib/postgresql/data
@@ -130,7 +130,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: solid
-      POSTGRES_DB: imageDB
+      POSTGRES_DB: image_db
     volumes:
       - ./Microservices/imageService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - image_data:/var/lib/postgresql/data
