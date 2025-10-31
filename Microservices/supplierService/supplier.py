@@ -161,50 +161,50 @@ app.add_middleware(
 )
 
 @app.get("/")
-async def read_suppliers(s_id: Optional[str] = None):
-	if (s_id is None):
-		data = await suppliers_read()
+def read_suppliers(s_id: Optional[str] = None):
+	if (s_id is None or s_id == ""):
+		data = suppliers_read()
 		return {"suppliers": data}
-	data = await supplier_read(s_id)
+	data = supplier_read(s_id)
 	return {"supplier": data}
 
 @app.put("/{s_id}")
-async def update_supplier(s_id: str, sup: Supplier):
+def update_supplier(s_id: str, sup: Supplier):
 	try:
-		data = await supplier_update(s_id, sup.name, sup.contact)
+		data = supplier_update(s_id, sup.name, sup.contact)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=ex)
 	return {"supplier": data}
 
 @app.post("/")
-async def create_supplier(sup: Supplier):
+def create_supplier(sup: Supplier):
 	try:
-		data = await supplier_create(sup.name, sup.contact)
+		data = supplier_create(sup.name, sup.contact)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=ex)
 	return {"s_id": data}
 
 @app.delete("/{s_id}")
-async def delete_supplier(s_id: str):
+def delete_supplier(s_id: str):
 	supplier_delete(s_id)
 
 # get suppliers products
 @app.get("/{s_id}/products/")
-async def read_products(s_id: str):
-	data = await supplierProducts_read(s_id)
+def read_products(s_id: str):
+	data = supplierProducts_read(s_id)
 	return {"products": data}
 
 # associate product with supplier
 @app.post("/{s_id}/products/{p_id}")
-async def associate_product(s_id: str, p_id: str):
+def associate_product(s_id: str, p_id: str):
 	supplierProduct_create(s_id, p_id)
 
 # disassociate product with supplier
 @app.delete("/{s_id}/products/{p_id}")
-async def delete_association(s_id: str, p_id: str):
+def delete_association(s_id: str, p_id: str):
 	supplierProduct_delete(p_id, s_id)
 
 # dissasociate product with all suppliers
 @app.delete("/products/{p_id}")
-async def delete_product(p_id: str):
+def delete_product(p_id: str):
 	supplierProduct_delete(p_id)
