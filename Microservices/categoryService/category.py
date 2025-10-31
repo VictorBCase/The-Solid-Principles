@@ -9,46 +9,46 @@ import json
 
 # database connection =========================================================
 DB_CONFIG = {
-	"dbname": "category_db",
-	"user": "postgres",
-	"password": "solid",
-	"host": "category_db",  # add when docker set up for containers
-	"port": 5432
+    "dbname": "category_db",
+    "user": "postgres",
+    "password": "solid",
+    "host": "category_db",  # add when docker set up for containers
+    "port": 5432
 }
 
 @contextmanager
 def get_conn():
-	conn = psycopg2.connect(**DB_CONFIG)
-	try:
-		yield conn
-	finally:
-		conn.close()
+    conn = psycopg2.connect(**DB_CONFIG)
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 # validation functions ========================================================
 def gen_uuid():
-	return str(uuid.uuid4())
+    return str(uuid.uuid4())
 
 def validate_nonempty(field_name: str, value: str):
-	if value is None:
-		raise ValueError(f"{field_name} cannot be None.")
-	value = str(value).strip()
-	if not value:
-		raise ValueError(f"{field_name} must be a non-empty string.")
+    if value is None:
+        raise ValueError(f"{field_name} cannot be None.")
+    value = str(value).strip()
+    if not value:
+        raise ValueError(f"{field_name} must be a non-empty string.")
 
 def validate_positive(field_name: str, value):
-	if not isinstance(value, (int, float)) or value <= 0:
-		raise Exception(f"{field_name} must be a positive number.")
+    if not isinstance(value, (int, float)) or value <= 0:
+        raise Exception(f"{field_name} must be a positive number.")
 
 def validate_nonnegative(field_name: str, value):
-	if not isinstance(value, int) or value < 0:
-		raise Exception(f"{field_name} must be a non-negative integer.")
+    if not isinstance(value, int) or value < 0:
+        raise Exception(f"{field_name} must be a non-negative integer.")
 
 # database functions ==========================================================
 def categories_read() -> Optional[list]:
-	with get_conn() as conn:
-		with conn.cursor() as c:
-			c.execute("""SELECT (category_id) FROM categories""")
-			return c.fetchall()
+    with get_conn() as conn:
+        with conn.cursor() as c:
+            c.execute("""SELECT (category_id) FROM categories""")
+            return c.fetchall()
 
 def category_create(name: str, description: Optional[str]) -> str:
     try:
@@ -116,20 +116,15 @@ def categoryProducts_read(category_id: str) -> Optional[list]:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT p.product_id, p.name, p.price
-                FROM category_products cp
-                JOIN products p ON cp.product_id = p.product_id
-                WHERE cp.category_id = %s
-            """, (category_id,))
-            results = []
-            for row in cur.fetchall():
-                product_id, name, price_decimal = row
-
-                price_str = str(price_decimal) 
-                
-                results.append((product_id, name, price_str))
-                
-            return results
+                SELECT (product_id)
+                FROM category_products
+                WHERE category_id = %s
+            """, (category_id))
+            rows = cur.fetchall()
+            ret = []
+            for data in rows:
+                ret.append(data)
+            return ret
 
 def categoryProducts_delete(category_id: str, product_id: str) -> None:
     with get_conn() as conn:
@@ -142,26 +137,26 @@ def categoryProducts_delete(category_id: str, product_id: str) -> None:
 
 # http server config ==========================================================
 class Category(BaseModel):
-	name: str
-	description: str
+    name: str
+    description: str
 
 app = FastAPI()
 
 app.add_middleware(
-		CORSMiddleware,
-		allow_origins=["*"],
-		allow_methods=["*"],
-		allow_headers=["*"]
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["*"],
+        allow_headers=["*"]
 )
 
 @app.options("/")
 def preflight_handler():
-	headers = {
-		"Access-Control-Allow-Origin": "http://localhost:5173",
-		"Access-Control-Allow-Methods": "POST, GET, PUT, DELETE",
-		"Access-Control-Allow-Headers": "Content-Type",
-	}
-	return Response(status_code=200, headers=headers)
+    headers = {
+        "Access-Control-Allow-Origin": "http://localhost:5173",
+        "Access-Control-Allow-Methods": "POST, GET, PUT, DELETE",
+        "Access-Control-Allow-Headers": "Content-Type",
+    }
+    return Response(status_code=200, headers=headers)
 
 @app.get("/{c_id}")
 def read_category(c_id: Optional[str] = None):
@@ -175,21 +170,21 @@ def read_category(c_id: Optional[str] = None):
 
 @app.put("/{c_id}")
 def update_category(c_id: str, cat: Category):
-	#return {"category": cat}
-	try:
-		data = category_update(c_id, cat.name, cat.description)
-	except Exception as ex:
-		raise HTTPException(status_code=400, detail=str(ex))
-	return {"category": data}
+    #return {"category": cat}
+    try:
+        data = category_update(c_id, cat.name, cat.description)
+    except Exception as ex:
+        raise HTTPException(status_code=400, detail=str(ex))
+    return {"category": data}
 
 @app.post("/")
 def create_category(cat: Category):
-	#return {"category": cat}
-	try:
-		data = category_create(cat.name, cat.description)
-	except Exception as ex:
-		raise HTTPException(status_code=400, detail=str(ex))
-	return {"c_id": data}
+    #return {"category": cat}
+    try:
+        data = category_create(cat.name, cat.description)
+    except Exception as ex:
+        raise HTTPException(status_code=400, detail=str(ex))
+    return {"c_id": data}
 
 @app.delete("/{c_id}")
 def delete_category(c_id: str):

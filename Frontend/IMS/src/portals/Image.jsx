@@ -45,6 +45,13 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
+const getErrorMsg = (obj) => {
+	let data = obj.detail;
+	if (typeof data === 'string' || data instanceof String)
+		return data;
+	return data[0].msg;
+}
+
 function Image({fields, ops, myOps, result, setResult}) {
 
 	// api calls
@@ -74,9 +81,8 @@ function Image({fields, ops, myOps, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
+				let msg = getErrorMsg(data);
+				setMessage(msg);
 			}
 			return data["i_id"];
 		} catch(error) { console.error(error); }
@@ -122,9 +128,8 @@ function Image({fields, ops, myOps, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
+				let msg = getErrorMsg(data);
+				setMessage(msg);
 				return false;
 			}
 			return true;

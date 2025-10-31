@@ -45,6 +45,13 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
+const getErrorMsg = (obj) => {
+	let data = obj.detail;
+	if (typeof data === 'string' || data instanceof String)
+		return data;
+	return data[0].msg;
+}
+
 function Category({fields, ops, myOps, list, result, setResult}) {
 
 	// api calls
@@ -74,9 +81,8 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
+				let msg = getErrorMsg(data);
+				setMessage(msg);
 			}
 			return data["c_id"];
 		} catch(error) { console.error(error); }
@@ -123,9 +129,8 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
+				let msg = getErrorMsg(data);
+				setMessage(msg);
 				return false;
 			}
 			return true;
@@ -140,11 +145,11 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
+				let msg = getErrorMsg(data);
+				setMessage(msg);
 				return false;
 			}
+			return true;
 		} catch(error) { console.error(error); }
 	}
 
@@ -156,11 +161,11 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
+				let msg = getErrorMsg(data);
+				setMessage(msg);
 				return false;
 			}
+			return true;
 		} catch(error) { console.error(error); }
 	}
 
@@ -205,16 +210,19 @@ function Category({fields, ops, myOps, list, result, setResult}) {
     const handleAssociation = async (data) => {
 		// setMessage('');
         let id = data.get("id");
+		let op = false;
 		switch(requireId) {
 			case ops.assoc:
-				await associateProduct(edit, id);
+				op = await associateProduct(edit, id);
 				break;
 			default:
-				await disassociateProduct(edit, id);
+				op = await disassociateProduct(edit, id);
 				break;
 		}
-		setEdit(null);
-        setRequireId(null);
+		if (op) {
+			setEdit(null);
+			setRequireId(null);
+		}
     }
 
 	// handle CRUD inputs
