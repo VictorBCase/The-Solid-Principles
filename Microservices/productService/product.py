@@ -148,7 +148,7 @@ def update_product(p_id: str, prod: Product):
 	try:
 		data = product_update(p_id, prod.name, prod.description, prod.quantity, prod.price)
 	except Exception as ex:
-		raise HTTPException(status_code=400, detail=ex)
+		raise HTTPException(status_code=400, detail=str(ex))
 	return {"product": data}
 
 @app.post("/")
@@ -156,7 +156,7 @@ def create_product(prod: Product):
 	try:
 		data = product_create(prod.name, prod.description, prod.quantity, prod.price)
 	except Exception as ex:
-		raise HTTPException(status_code=400, detail=ex)
+		raise HTTPException(status_code=400, detail=str(ex))
 	return {"p_id": data}
 
 @app.delete("/{p_id}")
