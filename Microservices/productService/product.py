@@ -4,7 +4,7 @@ from typing import Optional
 import psycopg2
 from contextlib import contextmanager
 import uuid
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 # import requests
@@ -121,14 +121,21 @@ class Product(BaseModel):
 
 app = FastAPI()
 
-origins = ["http://localhost:5173"]
-
 app.add_middleware(
 		CORSMiddleware,
-		allow_origins=origins,
+		allow_origins=["*"],
 		allow_methods=["*"],
-		allow_headers=["*"],
+		allow_headers=["*"]
 )
+
+@app.options("/")
+async def preflight_handler():
+	headers = {
+        "Access-Control-Allow-Origin": "http://http://localhost:5173",
+        "Access-Control-Allow-Methods": "POST, GET",
+        "Access-Control-Allow-Headers": "Content-Type",
+	}
+	return Response(status_code=200, headers=headers)
 
 @app.get("/")
 async def read_products(p_id: Optional[str] = None):
@@ -157,4 +164,3 @@ async def create_product(prod: Product):
 @app.delete("/{p_id}")
 async def delete_product(p_id: str):
 	product_delete(p_id)
-	# send request to category and supplier service to delete product associations
