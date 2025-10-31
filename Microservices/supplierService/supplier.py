@@ -175,7 +175,7 @@ def update_supplier(s_id: str, sup: Supplier):
 	try:
 		data = supplier_update(s_id, sup.name, sup.contact)
 	except Exception as ex:
-		raise HTTPException(status_code=400, detail=ex)
+		raise HTTPException(status_code=400, detail=str(ex))
 	return {"supplier": data}
 
 @app.post("/")
@@ -183,7 +183,7 @@ def create_supplier(sup: Supplier):
 	try:
 		data = supplier_create(sup.name, sup.contact)
 	except Exception as ex:
-		raise HTTPException(status_code=400, detail=ex)
+		raise HTTPException(status_code=400, detail=str(ex))
 	return {"s_id": data}
 
 @app.delete("/{s_id}")
