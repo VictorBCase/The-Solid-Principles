@@ -42,7 +42,7 @@ def main():
 						payload = {'name': name, 'description': desc, 'quantity': int(quant), 'price': price}
 						r = requests.post(product_url, json=payload)
 						if (r.status_code > 299):
-							print("Error creating product, please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "supplier":
@@ -51,7 +51,7 @@ def main():
 						payload = {'name': name, 'contact': email}
 						r = requests.post(supplier_url, json=payload)
 						if (r.status_code > 299):
-							print("Error creating supplier, please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "category":
@@ -60,7 +60,7 @@ def main():
 						payload = {'name': name, 'description': desc}
 						r = requests.post(category_url, json=payload)
 						if (r.status_code > 299):
-							print("Error creating category, please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "image":
@@ -69,7 +69,7 @@ def main():
 						payload = {'p_id': pid, 'url': url}
 						r = requests.post(image_url, json=payload)
 						if (r.status_code > 299):
-							print("Error creating image, please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "supplierProduct":
@@ -90,28 +90,28 @@ def main():
 						prod_id = input("Enter product id: ").strip()
 						r = requests.get(product_url + "?p_id=" + prod_id)
 						if (r.status_code > 299):
-							print("Error reading product: " + prod_id + ", please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.get(supplier_url + "?s_id=" + sup_id)
 						if (r.status_code > 299):
-							print("Error reading supplier: " + sup_id + ", please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						r = requests.get(category_url + "?c_id=" + cat_id)
 						if (r.status_code > 299):
-							print("Error reading category: " + cat_id + ", please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						r = requests.get(image_url + "?i_id=" + img_id)
 						if (r.status_code > 299):
-							print("Error reading image: " + img_id + ", please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "supplierProducts":
@@ -133,7 +133,7 @@ def main():
 						payload = {'name': name, 'description': desc, 'quantity': int(quant), 'price': price}
 						r = requests.put(product_url + prod_id, json=payload)
 						if (r.status_code > 299):
-							print("Error updating product: " + prod_id + ", please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "supplier":
@@ -143,7 +143,7 @@ def main():
 						payload = {'name': name, 'contact': email}
 						r = requests.put(supplier_url + sup_id, json=payload)
 						if (r.status_code > 299):
-							print("Error updating supplier: " + sup_id + ", please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "category":
@@ -153,7 +153,7 @@ def main():
 						payload = {'name': name, 'description': desc}
 						r = requests.put(category_url + cat_id, json=payload)
 						if (r.status_code > 299):
-							print("Error updating category: " + cat_id + ", please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 					case "image":
@@ -163,7 +163,7 @@ def main():
 						payload = {'p_id': prod_id, 'url': url}
 						r = requests.put(image_url + img_id, json=payload)
 						if (r.status_code > 299):
-							print("Error updating image: " + img_id + ", please try again.")
+							print(r.json().get("detail"))
 						else:
 							print(r.json())
 			elif command == "delete":
