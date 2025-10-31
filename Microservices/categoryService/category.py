@@ -160,8 +160,6 @@ def preflight_handler():
 
 @app.get("/{c_id}")
 def read_category(c_id: Optional[str] = None):
-    if c_id is None or c_id.strip() == "": #check for invalid input
-        raise HTTPException(status_code=400, detail="Category ID cannot be empty.")
     try:
         data = category_read(c_id)
         return {"category": data}
