@@ -11,10 +11,10 @@ import json
 
 # database connection =========================================================
 DB_CONFIG = {
-	"dbname": "supplierDB",
+	"dbname": "supplier_db",
 	"user": "postgres",
 	"password": "solid",
-	"host": "data",  # add when docker set up for containers
+	"host": "supplier_db",  # add when docker set up for containers
 	"port": 5432
 }
 

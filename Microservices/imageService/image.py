@@ -11,10 +11,10 @@ import json
 
 # database connection =========================================================
 DB_CONFIG = {
-	"dbname": "imageDB",
+	"dbname": "image_db",
 	"user": "postgres",
 	"password": "solid",
-	"host": "data",  # add when docker set up for containers
+	"host": "image_db",  # add when docker set up for containers
 	"port": 5432
 }
 
@@ -123,19 +123,19 @@ async def read_images(i_id: Optional[str] = None):
 	return {"i_id": i_id}
 
 @app.put("/{i_id}")
-async def update_image(i_id: str, img: Image):
-	return {"image": img}
+def update_image(i_id: str, img: Image):
+	#return {"image": img}
 	try:
-		data = await image_update(i_id, img.name, img.url)
+		data = image_update(i_id, img.name, img.url)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=ex)
 	return {"image": data}
 
 @app.post("/")
-async def create_image(img: Image):
-	return {"image": img}
+def create_image(img: Image):
+	#return {"image": img}
 	try:
-		data = await image_create(img.name, img.url)
+		data = image_create(img.name, img.url)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=ex)
 	return {"i_id": data}
