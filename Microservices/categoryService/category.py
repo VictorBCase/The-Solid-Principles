@@ -11,10 +11,10 @@ import json
 
 # database connection =========================================================
 DB_CONFIG = {
-	"dbname": "categoryDB",
+	"dbname": "category_db",
 	"user": "postgres",
 	"password": "solid",
-	"host": "data",  # add when docker set up for containers
+	"host": "category_db",  # add when docker set up for containers
 	"port": 5432
 }
 
@@ -159,37 +159,37 @@ app.add_middleware(
 )
 
 @app.get("/{c_id}")
-async def read_category(c_id: Optional[str] = None):
+def read_category(c_id: Optional[str] = None):
 	if (c_id is None):
 		return {"c_id": "empty"}
 	return {"c_id": c_id}
 
 @app.put("/{c_id}")
-async def update_category(c_id: str, cat: Category):
-	return {"category": cat}
+def update_category(c_id: str, cat: Category):
+	#return {"category": cat}
 	try:
-		data = await category_update(c_id, cat.name, cat.description)
+		data = category_update(c_id, cat.name, cat.description)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=ex)
 	return {"category": data}
 
 @app.post("/")
-async def create_category(cat: Category):
-	return {"category": cat}
+def create_category(cat: Category):
+	#return {"category": cat}
 	try:
-		data = await category_create(cat.name, cat.description)
+		data = category_create(cat.name, cat.description)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=ex)
 	return {"c_id": data}
 
 @app.delete("/{c_id}")
-async def delete_image(c_id: str):
+def delete_image(c_id: str):
 	return {"c_id": c_id}
 
 @app.delete("/product/{p_id}")
-async def delete_association(p_id: str):
+def delete_association(p_id: str):
 	return {"p_id": p_id}
 
 @app.post("/{c_id}")
-async def associate_product(c_id: str, p_id: str):
+def associate_product(c_id: str, p_id: str):
 	return {"c_id": c_id, "p_id": p_id}
