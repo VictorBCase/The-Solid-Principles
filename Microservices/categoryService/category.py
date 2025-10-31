@@ -12,10 +12,10 @@ import json
 # database connection =========================================================
 DB_PORT = 5432
 DB_CONFIG = {
-	"dbname": "categoryDB",
+	"dbname": "category_db",
 	"user": "postgres",
 	"password": "solid",
-	"host": "data",  # add when docker set up for containers
+	"host": "category_db",  # add when docker set up for containers
 	"port": DB_PORT
 }
 
