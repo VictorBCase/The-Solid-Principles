@@ -7,7 +7,7 @@ import uuid
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import requests
+# import requests
 import json
 
 # URLs ========================================================================
