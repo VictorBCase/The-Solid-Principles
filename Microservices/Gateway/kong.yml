@@ -6,23 +6,7 @@ services:
     url: http://products_service:8000
     routes:
       - name: products-options
-        methods: [OPTIONS]
-        paths: ["/products"]
-        strip_path: true
-      - name: products-read
-        methods: [GET]
-        paths: ["/products"]
-        strip_path: true
-      - name: products-create
-        methods: [POST]
-        paths: [/products]
-        strip_path: true
-      - name: products-update
-        methods: [PUT]
-        paths: ["/products"]
-        strip_path: true
-      - name: products-delete
-        methods: [DELETE]
+        methods: [OPTIONS, GET, POST, PUT, DELETE]
         paths: ["/products"]
         strip_path: true
 
@@ -53,9 +37,13 @@ services:
   - name: categories
     url: http://categories_service:8000
     routes:
+      - name: categories-options
+        methods: [OPTIONS]
+        paths: ["/categories"]
+        strip_path: true
       - name: categories-read
         methods: [GET]
-        paths: ["/categories/*"]
+        paths: ["/categories"]
         strip_path: true
       - name: categories-create
         methods: [POST]
@@ -63,19 +51,23 @@ services:
         strip_path: true
       - name: categories-update
         methods: [PUT]
-        paths: ["/categories/*"]
+        paths: ["/categories"]
         strip_path: true
       - name: categories-delete
         methods: [DELETE]
-        paths: ["/categories/*"]
+        paths: ["/categories"]
         strip_path: true
 
   - name: images
     url: http://images_service:8000
     routes:
+      - name: images-options
+        methods: [OPTIONS]
+        paths: ["/images"]
+        strip_path: true
       - name: images-read
         methods: [GET]
-        paths: ["/images/*"]
+        paths: ["/images"]
         strip_path: true
       - name: images-create
         methods: [POST]
@@ -83,9 +75,9 @@ services:
         strip_path: true
       - name: images-update
         methods: [PUT]
-        paths: ["/images/*"]
+        paths: ["/images"]
         strip_path: true
       - name: images-delete
         methods: [DELETE]
-        paths: ["/images/*"]
+        paths: ["/images"]
         strip_path: true

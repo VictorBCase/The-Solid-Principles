@@ -1,5 +1,3 @@
-# fastapi run product.py --host 0.0.0.0 --port 80
-
 from typing import Optional
 import psycopg2
 from contextlib import contextmanager

@@ -1,5 +1,3 @@
-# fastapi run product.py --host 0.0.0.1 --port 80
-
 from typing import Optional
 import psycopg2
 from contextlib import contextmanager
@@ -147,11 +145,6 @@ class Supplier(BaseModel):
 	contact: str
 
 app = FastAPI()
-
-origins = [
-	"http://localhost:5173",
-	"http://localhost:8000" # product service url
-]
 
 app.add_middleware(
 		CORSMiddleware,
