@@ -48,29 +48,26 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 function Category({fields, ops, myOps, list, result, setResult}) {
 
 	// api calls
-	const API = 'http://localhost:8080/api/categoryService';
+	const API = 'http://localhost:8000/categories/';
 
-	async function listCategories() {
+	async function list() {
 		try {
-			let res = await fetch(API, {
+			const res = await fetch(API, {
 				method: 'GET',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({meth: 'categories_read'})
-			});
+				headers: {'Content-Type': 'application/json'
+			}});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			let categories = data.list;
-			return categories;
+			return data["suppliers"];
 		} catch(error) { console.error(error); }
 	}
 
-	async function createCategory(name, desc) {
+	async function create(name, desc) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					meth: 'category_create',
 					name: name,
 					description: desc
 				})
@@ -81,43 +78,45 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 				let msg = data.error;
 				setVaidationMsg(msg);
 			}
+			return data["c_id"];
 		} catch(error) { console.error(error); }
 	}
 
-	async function viewCategory(id) {
+	async function read(id) {
 		try {
-			let res = await fetch(API + "?id=" + id, {
+			let res = await fetch(API + "?c_id=" + id, {
 				method: 'GET',
 				headers: {'Content-Type': 'application/json'}
 			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			let category = data.category;
+			data = data["category"];
+			let category = {
+				c_id: data[0],
+				name: data[1],
+				description: data[2]
+			};
 			return category;
 		} catch(error) { console.error(error); }
 	}
 
-	async function removeCategory(id) {
+	async function remove(id) {
 		try {
-			let res = await fetch(API, {
+			let res = await fetch(API + id, {
 				method: 'DELETE',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					meth: 'category_delete',
-					c_id: id
-				})
+				headers: {'Content-Type': 'application/json'}
 			});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
 		} catch(error) { console.error(error); }
 	}
 
-	async function updateCategory(id, name, desc) {
+	async function update(id, name, desc) {
 		try {
-			let res = await fetch(API, {
+			let res = await fetch(API + id, {
 				method: 'PUT',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					meth: 'category_update',
-					c_id: id,
 					name: name,
 					description: desc
 				})
@@ -133,14 +132,59 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 		} catch(error) { console.error(error); return false; }
 	}
 
+	async function associateProduct(c_id, p_id) {
+		try {
+			let res = await fetch(API + c_id + "/products/" + p_id, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'}
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+		} catch(error) { console.error(error); }
+	}
+
+	async function disassociateProduct(c_id, p_id) {
+		try {
+			let res = await fetch(API + c_id + "/products/" + p_id, {
+				method: 'DELETE',
+				headers: {'Content-Type': 'application/json'}
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+		} catch(error) { console.error(error); }
+	}
+
+	async function readProducts(id) {
+		try {
+			const res = await fetch(API + id + "/products/", {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'
+			}});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			return data["products"];
+		} catch(error) { console.error(error); }
+	}
+
 	// state variables for the menu
 	const [edit, setEdit] = useState(null);
+    const [requireId, setRequireId] = useState(null);
 	const [categories, setCategories] = useState(null);
 	const [message, setMessage] = useState("");
 
 	// handle create/edit inputs
 	const handleFields = async (data) => {
-		clearMsg();
+		setMessage('');
 		let inputs = [];
 		for (let i = 0; i < fields.length; i ++) {
 			inputs.push(data.get(fields[i][0]));
@@ -157,9 +201,25 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 		setCategories(null);
 	};
 
+    // handle product associations
+    const handleAssociation = async (data) => {
+		// setMessage('');
+        let id = data.get("id");
+		switch(requireId) {
+			case ops.assoc:
+				await associateProduct(edit, id);
+				break;
+			default:
+				await disassociateProduct(edit, id);
+				break;
+		}
+		setEdit(null);
+        setRequireId(null);
+    }
+
 	// handle CRUD inputs
 	const handleOps = async (data) => {
-		clearMsg();
+		setMessage('');
 		let type = data.get("type");
 		let id = data.get("category");
 		if (id == null)
@@ -174,7 +234,15 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 				remove(id);
 				setCategories(null);
 				break;
-			case ops.prods:
+            case ops.assoc:
+				setRequireId(ops.assoc);
+				setEdit(id);
+                break;
+            case ops.disas:
+                setRequireId(ops.disas);
+				setEdit(id);
+                break;
+            case ops.prods:
 				let prods = await readProducts(id);
 				setResult(JSON.stringify(prods));
 				break;
@@ -203,6 +271,17 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 		<>
 			<h2>category portal</h2>
 			<Result result={result} clear={() => setResult(null)} />
+			{requireId != null ? <>
+				<button onClick={() => {setEdit(null); setRequireId(null);}}>cancel</button>
+				<form action={handleAssociation}>
+					<label>provide product id to {requireId} with this category:
+						<input type="text" name="id" />
+						<button type="submit">confirm</button>
+					</label>
+					<ValidationMsg message={message} />
+				</form>					
+			</>
+			: <>
 				<FieldForm fields={fields} edit={edit} close={() => setEdit(null)} formAction={handleFields} />
 				<ValidationMsg message={message} />
 				{edit === null &&
@@ -221,6 +300,12 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 							<li>
 								<input type="radio" name="type" value={myOps[3]} />{myOps[3]}
 							</li>
+							<li>
+								<input type="radio" name="type" value={myOps[4]} />{myOps[4]}
+							</li>
+							<li>
+								<input type="radio" name="type" value={myOps[5]} />{myOps[5]}
+							</li>
 						</ul>
 						<p>on category:</p>
 						<ul>
@@ -237,6 +322,7 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 						<button type="submit">confirm</button>
 					</form>
 				}
+			</>}
 		</>
 	);
 }

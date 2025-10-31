@@ -92,7 +92,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			data = data["product"]
+			data = data["product"];
 			let product = {
 				p_id: data[0],
 				name: data[1],
@@ -140,7 +140,6 @@ function Product({fields, ops, myOps, result, setResult}) {
 
     // state variables for the menu
     const [edit, setEdit] = useState(null);
-    const [requireId, setRequireId] = useState(null);
 	const [products, setProducts] = useState(null);
 	const [message, setMessage] = useState("");
 
@@ -163,29 +162,6 @@ function Product({fields, ops, myOps, result, setResult}) {
         setProducts(null);
     };
 
-    // handle supplier/category associations
-    const handleAssociation = async (data) => {
-		// setMessage('');
-        let type = data.get("type");
-        let id = data.get("id");
-		switch(requireId) {
-			case ops.assoc:
-				if (type == "supplier")
-					await associateSupplier(edit, id);
-				else
-					await associateCategory(edit, id);
-				break;
-			default:
-				if (type == "supplier")
-					await disassociateSupplier(edit, id);
-				else
-					await disassociateCategory(edit, id);
-				break;
-		}
-		setEdit(null);
-        setRequireId(null);
-    }
-
     // handle CRUD inputs
     const handleOps = async (data) => {
 		setMessage('');
@@ -202,14 +178,6 @@ function Product({fields, ops, myOps, result, setResult}) {
             case ops.del:
                 remove(id);
 				setProducts(null);
-                break;
-            case ops.assoc:
-				setRequireId(ops.assoc);
-				setEdit(id);
-                break;
-            case ops.disas:
-                setRequireId(ops.disas);
-				setEdit(id);
                 break;
             case ops.view:
                 product = await read(id);
@@ -236,58 +204,36 @@ function Product({fields, ops, myOps, result, setResult}) {
         <>
             <h2>product portal</h2>
             <Result result={result} clear={() => setResult(null)} />
-            {requireId != null ?
-				<>
-                    <button onClick={() => {setEdit(null); setRequireId(null);}}>cancel</button>
-                    <form action={handleAssociation}>
-                        <label>
-                            <input type="radio" name="type" value="supplier" defaultChecked />supplier
-                        </label>
-                        <label>
-                            <input type="radio" name="type" value="category" />category
-                        </label>
-                        <br />
-                        <label>provide id to {requireId} with this product:
-                            <input type="text" name="id" />
-                            <button type="submit">confirm</button>
-                        </label>
-                        <ValidationMsg message={message} />
-                    </form>
-                </>
-			:
-				<>
-					<FieldForm fields={fields} edit={edit} close={() => setEdit(null)} formAction={handleFields} />
-					<ValidationMsg message={message} />
-					{edit === null &&
-						<form action={handleOps}>
-							<p>perform</p>
-							<ul>
-								<li>
-									<input type="radio" name="type" value={myOps[0]} defaultChecked />{myOps[0]}
+			<FieldForm fields={fields} edit={edit} close={() => setEdit(null)} formAction={handleFields} />
+			<ValidationMsg message={message} />
+			{edit === null &&
+				<form action={handleOps}>
+					<p>perform</p>
+					<ul>
+						<li>
+							<input type="radio" name="type" value={myOps[0]} defaultChecked />{myOps[0]}
+						</li>
+						<li>
+							<input type="radio" name="type" value={myOps[1]} />{myOps[1]}
+						</li>
+						<li>
+							<input type="radio" name="type" value={myOps[2]} />{myOps[2]}
+						</li>
+					</ul>
+					<p>on product:</p>
+					<ul>
+						{products != null &&
+							products.map((product) => (
+								<li key={product}>
+									<label>
+										<input type="radio" name="product" value={product} />{product}
+									</label>
 								</li>
-								<li>
-									<input type="radio" name="type" value={myOps[1]} />{myOps[1]}
-								</li>
-								<li>
-									<input type="radio" name="type" value={myOps[2]} />{myOps[2]}
-								</li>
-							</ul>
-							<p>on product:</p>
-							<ul>
-								{products != null &&
-									products.map((product) => (
-										<li key={product}>
-											<label>
-												<input type="radio" name="product" value={product} />{product}
-											</label>
-										</li>
-									))
-								}
-							</ul>
-							<button type="submit">confirm</button>
-						</form>
-					}
-				</>
+							))
+						}
+					</ul>
+					<button type="submit">confirm</button>
+				</form>
 			}
         </>
     );

@@ -164,9 +164,9 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 		} catch(error) { console.error(error); }
 	}
 
-	async function readProducts(s_id) {
+	async function readProducts(id) {
 		try {
-			const res = await fetch(API + s_id + "/products/", {
+			const res = await fetch(API + id + "/products/", {
 				method: 'GET',
 				headers: {'Content-Type': 'application/json'
 			}});
@@ -302,6 +302,9 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 							</li>
 							<li>
 								<input type="radio" name="type" value={myOps[4]} />{myOps[4]}
+							</li>
+							<li>
+								<input type="radio" name="type" value={myOps[5]} />{myOps[5]}
 							</li>
 						</ul>
 						<p>on supplier:</p>

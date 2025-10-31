@@ -39,13 +39,14 @@ function App() {
 		edit: "edit",
 		del: "delete",
 		assoc: "associate",
-		disas: "disassociate"
+		disas: "disassociate",
+		prods: "view products"
 	};
 
 	const portalOps = {
-		product: Array(ops.view, ops.edit, ops.del, ops.assoc, ops.disas),
-		supplier: Array(ops.view, ops.edit, ops.del),
-		category: Array(ops.view, ops.edit, ops.del),
+		product: Array(ops.view, ops.edit, ops.del),
+		supplier: Array(ops.view, ops.edit, ops.del, ops.assoc, ops.disas, ops.prods),
+		category: Array(ops.view, ops.edit, ops.del, ops.assoc, ops.disas, ops.prods),
 		image: Array(ops.view, ops.edit, ops.del)
 	};
 
