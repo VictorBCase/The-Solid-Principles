@@ -48,29 +48,26 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 function Image({fields, ops, myOps, result, setResult}) {
 
 	// api calls
-	const API = 'http://localhost:8080/api/imageService';
+	const API = 'http://localhost:8000/images/';
 
-	async function listImages() {
+	async function list() {
 		try {
 			let res = await fetch(API, {
 				method: 'GET',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({meth: 'images_read'})
+				headers: {'Content-Type': 'application/json'}
 			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			let images = data.list;
-			return images;
+			return data["images"];
 		} catch(error) { console.error(error); }
 	}
 
-	async function createImage(p_id, url) {
+	async function create(p_id, url) {
 		try {
 			let res = await fetch(API, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					meth: 'image_create',
 					p_id: p_id,
 					url: url
 				})
@@ -81,43 +78,44 @@ function Image({fields, ops, myOps, result, setResult}) {
 				let msg = data.error;
 				setVaidationMsg(msg);
 			}
+			return data["i_id"];
 		} catch(error) { console.error(error); }
 	}
 
-	async function viewImage(id) {
+	async function read(id) {
 		try {
-			let res = await fetch(API + "?id=" + id, {
+			let res = await fetch(API + "?i_id=" + id, {
 				method: 'GET',
 				headers: {'Content-Type': 'application/json'}
 			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			let image = data.image;
+			data = data["image"];
+			let image = {
+				i_id: data[0],
+				p_id: data[1],
+				url: data[2]
+			};
 			return image;
 		} catch(error) { console.error(error); }
 	}
 
-	async function removeImage(id) {
+	async function remove(id) {
 		try {
-			let res = await fetch(API, {
+			let res = await fetch(API + id, {
 				method: 'DELETE',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					meth: 'image_delete',
-					i_id: id
-				})
+				headers: {'Content-Type': 'application/json'}
 			});
+			if (res.status > 299) return console.error(data);
 		} catch(error) { console.error(error); }
 	}
 
-	async function updateImage(id, p_id, url) {
+	async function update(id, p_id, url) {
 		try {
-			let res = await fetch(API, {
+			let res = await fetch(API + id, {
 				method: 'PUT',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					meth: 'image_update',
-					i_id: id,
 					p_id: p_id,
 					url: url
 				})
@@ -140,7 +138,7 @@ function Image({fields, ops, myOps, result, setResult}) {
 
 	// handle create/edit inputs
 	const handleFields = async (data) => {
-		clearMsg();
+		setMessage('');
 		let inputs = [];
 		for (let i = 0; i < fields.length; i ++) {
 			inputs.push(data.get(fields[i][0]));
@@ -159,7 +157,7 @@ function Image({fields, ops, myOps, result, setResult}) {
 
 	// handle CRUD inputs
 	const handleOps = async (data) => {
-		clearMsg();
+		setMessage('');
 		let type = data.get("type");
 		let id = data.get("image");
 		if (id == null)

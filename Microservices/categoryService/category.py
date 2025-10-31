@@ -1,10 +1,8 @@
-# fastapi run product.py --host 0.0.0.2 --port 80
-
 from typing import Optional
 import psycopg2
 from contextlib import contextmanager
 import uuid
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
@@ -149,18 +147,25 @@ class Category(BaseModel):
 
 app = FastAPI()
 
-origins = ["http://localhost:5173"]
-
 app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_methods=["*"],
-        allow_headers=["*"],
+		CORSMiddleware,
+		allow_origins=["*"],
+		allow_methods=["*"],
+		allow_headers=["*"]
 )
+
+@app.options("/")
+def preflight_handler():
+	headers = {
+		"Access-Control-Allow-Origin": "http://localhost:5173",
+		"Access-Control-Allow-Methods": "POST, GET, PUT, DELETE",
+		"Access-Control-Allow-Headers": "Content-Type",
+	}
+	return Response(status_code=200, headers=headers)
 
 @app.get("/{c_id}")
 def read_category(c_id: Optional[str] = None):
-	if (c_id is None):
+	if (c_id is None or c_id == ""):
 		return {"c_id": "empty"}
 	return {"c_id": c_id}
 

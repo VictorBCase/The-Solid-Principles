@@ -48,14 +48,17 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 function Supplier({fields, ops, myOps, result, setResult}) {
 
 	// api calls
-	const API = 'http://localhost:8080/api/supplierService';
+	const API = 'http://localhost:8000/suppliers/';
 
 	async function list() {
 		try {
-			let res = await fetch(API, {method: 'GET'});
+			const res = await fetch(API, {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'
+			}});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			return [];
+			return data["suppliers"];
 		} catch(error) { console.error(error); }
 	}
 
@@ -75,26 +78,34 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 				let msg = data.error;
 				setVaidationMsg(msg);
 			}
-			return data["p_id"];
+			return data["s_id"];
 		} catch(error) { console.error(error); }
 	}
 
 	async function read(id) {
 		try {
-			let res = await fetch(API + "?id=" + id, {
+			let res = await fetch(API + "?s_id=" + id, {
 				method: 'GET',
 				headers: {'Content-Type': 'application/json'}
 			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			let supplier = data["supplier"];
+			data = data["supplier"];
+			let supplier = {
+				s_id: data[0],
+				name: data[1],
+				contact: data[2]
+			};
 			return supplier;
 		} catch(error) { console.error(error); }
 	}
 
 	async function remove(id) {
 		try {
-			let res = await fetch(API + id, {method: 'DELETE'});
+			let res = await fetch(API + id, {
+				method: 'DELETE',
+				headers: {'Content-Type': 'application/json'},
+			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
 		} catch(error) { console.error(error); }
@@ -121,8 +132,53 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 		} catch(error) { console.error(error); return false; }
 	}
 
+	async function associateProduct(s_id, p_id) {
+		try {
+			let res = await fetch(API + s_id + "/products/" + p_id, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'}
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+		} catch(error) { console.error(error); }
+	}
+
+	async function disassociateProduct(s_id, p_id) {
+		try {
+			let res = await fetch(API + s_id + "/products/" + p_id, {
+				method: 'DELETE',
+				headers: {'Content-Type': 'application/json'}
+			});
+			let data = await res.json();
+			if (res.status > 299) {
+				console.error(data);
+				let msg = data.error;
+				setVaidationMsg(msg);
+				return false;
+			}
+		} catch(error) { console.error(error); }
+	}
+
+	async function readProducts(id) {
+		try {
+			const res = await fetch(API + id + "/products/", {
+				method: 'GET',
+				headers: {'Content-Type': 'application/json'
+			}});
+			let data = await res.json();
+			if (res.status > 299) return console.error(data);
+			return data["products"];
+		} catch(error) { console.error(error); }
+	}
+
     // state variables for the menu
     const [edit, setEdit] = useState(null);
+    const [requireId, setRequireId] = useState(null);
 	const [suppliers, setSuppliers] = useState(null);
 	const [message, setMessage] = useState("");
 
@@ -145,6 +201,22 @@ function Supplier({fields, ops, myOps, result, setResult}) {
         setSuppliers(null);
     };
 
+    // handle product associations
+    const handleAssociation = async (data) => {
+		// setMessage('');
+        let id = data.get("id");
+		switch(requireId) {
+			case ops.assoc:
+				await associateProduct(edit, id);
+				break;
+			default:
+				await disassociateProduct(edit, id);
+				break;
+		}
+		setEdit(null);
+        setRequireId(null);
+    }
+
     // handle CRUD inputs
     const handleOps = async (data) => {
 		setMessage('');
@@ -161,6 +233,14 @@ function Supplier({fields, ops, myOps, result, setResult}) {
             case ops.del:
                 remove(id);
 				setSuppliers(null);
+                break;
+            case ops.assoc:
+				setRequireId(ops.assoc);
+				setEdit(id);
+                break;
+            case ops.disas:
+                setRequireId(ops.disas);
+				setEdit(id);
                 break;
             case ops.prods:
 				let prods = await readProducts(id);
@@ -191,6 +271,17 @@ function Supplier({fields, ops, myOps, result, setResult}) {
         <>
             <h2>supplier portal</h2>
             <Result result={result} clear={() => setResult(null)} />
+			{requireId != null ? <>
+				<button onClick={() => {setEdit(null); setRequireId(null);}}>cancel</button>
+				<form action={handleAssociation}>
+					<label>provide product id to {requireId} with this supplier:
+						<input type="text" name="id" />
+						<button type="submit">confirm</button>
+					</label>
+					<ValidationMsg message={message} />
+				</form>					
+			</>
+			: <>
 				<FieldForm fields={fields} edit={edit} close={() => setEdit(null)} formAction={handleFields} />
 				<ValidationMsg message={message} />
 				{edit === null &&
@@ -209,6 +300,12 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 							<li>
 								<input type="radio" name="type" value={myOps[3]} />{myOps[3]}
 							</li>
+							<li>
+								<input type="radio" name="type" value={myOps[4]} />{myOps[4]}
+							</li>
+							<li>
+								<input type="radio" name="type" value={myOps[5]} />{myOps[5]}
+							</li>
 						</ul>
 						<p>on supplier:</p>
 						<ul>
@@ -225,6 +322,7 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 						<button type="submit">confirm</button>
 					</form>
 				}
+			</>}
         </>
     );
 }

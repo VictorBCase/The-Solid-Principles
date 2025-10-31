@@ -1,10 +1,8 @@
-# fastapi run product.py --host 0.0.0.1 --port 80
-
 from typing import Optional
 import psycopg2
 from contextlib import contextmanager
 import uuid
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
@@ -56,7 +54,7 @@ def supplier_create(name: str, contact_email: str, supplier_id: Optional[str] = 
 	try:
 		validate_nonempty("name", name)
 		validate_nonempty("contact_email", contact_email)
-		sid = gen_uuid(supplier_id)
+		sid = gen_uuid()
 		with get_conn() as conn:
 			with conn.cursor() as c:
 				c.execute("""
@@ -148,17 +146,21 @@ class Supplier(BaseModel):
 
 app = FastAPI()
 
-origins = [
-	"http://localhost:5173",
-	"http://localhost:8000" # product service url
-]
-
 app.add_middleware(
 		CORSMiddleware,
-		allow_origins=origins,
+		allow_origins=["*"],
 		allow_methods=["*"],
-		allow_headers=["*"],
+		allow_headers=["*"]
 )
+
+@app.options("/")
+def preflight_handler():
+	headers = {
+		"Access-Control-Allow-Origin": "http://localhost:5173",
+		"Access-Control-Allow-Methods": "POST, GET, PUT, DELETE",
+		"Access-Control-Allow-Headers": "Content-Type",
+	}
+	return Response(status_code=200, headers=headers)
 
 @app.get("/")
 def read_suppliers(s_id: Optional[str] = None):
