@@ -44,7 +44,7 @@ def main():
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "supplier":
 						name = input("Enter supplier name: ").strip()
 						email = input("Enter supplier email: ").strip()
@@ -53,7 +53,7 @@ def main():
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "category":
 						name = input("Enter category name: ").strip()
 						desc = input("Enter category description: ").strip()
@@ -62,7 +62,7 @@ def main():
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "image":
 						pid = input("Enter product id: ").strip()
 						url = input("Enter image URL: ").strip()
@@ -71,7 +71,7 @@ def main():
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "supplierProduct":
 						sid = input("Enter supplier id: ").strip()
 						pid = input("Enter product id: ").strip()
@@ -92,28 +92,28 @@ def main():
 						if (r.status_code > 299):
 							print("Failed to read: Invalid product ID")
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.get(supplier_url + "?s_id=" + sup_id)
 						if (r.status_code > 299):
 							print("Failed to read: Invalid supplier ID")
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						r = requests.get(category_url + "?c_id=" + cat_id)
 						if (r.status_code > 299):
 							print("Failed to read: Invalid category ID")
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						r = requests.get(image_url + "?i_id=" + img_id)
 						if (r.status_code > 299):
 							print("Failed to read: Invalid image ID")
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "supplierProducts":
 						sup_id = input("Enter supplier id: ").strip()
 						supplierProducts_read(conn, sup_id)
@@ -135,7 +135,7 @@ def main():
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						name = input("Enter new supplier name: ").strip()
@@ -145,7 +145,7 @@ def main():
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						name = input("Enter new category name: ").strip()
@@ -155,7 +155,7 @@ def main():
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						prod_id = input("Enter new product id: ").strip()
@@ -165,7 +165,7 @@ def main():
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
-							print(r.json())
+							print(json.loads(r.content))
 			elif command == "delete":
 				print("What type of record do you want to delete: product, supplier, category, image, supplierProduct, categoryProduct")
 				read_type = input(">>> ").strip()
@@ -173,29 +173,29 @@ def main():
 					case "product":
 						prod_id = input("Enter product id: ").strip()
 						r = requests.delete(product_url + prod_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.delete(supplier_url + sup_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						r = requests.delete(category_url + cat_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						r = requests.delete(image_url + img_id)
-						print(r.json())
+						print(json.loads(r.content))
 					case "supplierProduct":
 						sid = input("Enter supplier id: ").strip()
 						pid = input("Enter product id: ").strip()
 						supplierProduct_delete(conn, sid, pid)
-						print("Association deleted.");
+						print("Association deleted.")
 					case "categoryProduct":
 						cid = input("Enter category id: ").strip()
 						pid = input("Enter product id: ").strip()
 						categoryProduct_delete(conn, cid, pid)
-						print("Association deleted.");
+						print("Association deleted.")
 			else:
 				print("ERR: Invalid command.")
 		except KeyboardInterrupt:
