@@ -23,6 +23,13 @@ const Result = ({result, clear}) => {
 	);
 }
 
+const getErrorMsg = (obj) => {
+	let data = obj.detail;
+	if (typeof data === 'string' || data instanceof String)
+		return data;
+	return data[0].msg;
+}
+
 // field form html
 const FieldForm = ({fields, edit, close, formAction}) => {
 	return (
@@ -76,9 +83,8 @@ function Product({fields, ops, myOps, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
+				let msg = getErrorMsg(data);
+				setMessage(msg);
 			}
 			return data["p_id"];
 		} catch(error) { console.error(error); }
@@ -129,9 +135,8 @@ function Product({fields, ops, myOps, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
+				let msg = getErrorMsg(data);
+				setMessage(msg);
 				return false;
 			}
 			return true;
