@@ -131,9 +131,9 @@ app.add_middleware(
 @app.options("/")
 def preflight_handler():
 	headers = {
-        "Access-Control-Allow-Origin": "http://localhost:5173",
-        "Access-Control-Allow-Methods": "POST, GET, PUT, DELETE",
-        "Access-Control-Allow-Headers": "Content-Type",
+		"Access-Control-Allow-Origin": "http://localhost:5173",
+		"Access-Control-Allow-Methods": "POST, GET, PUT, DELETE",
+		"Access-Control-Allow-Headers": "Content-Type",
 	}
 	return Response(status_code=200, headers=headers)
 

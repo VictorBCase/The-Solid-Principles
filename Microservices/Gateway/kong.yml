@@ -5,6 +5,10 @@ services:
   - name: products
     url: http://products_service:8000
     routes:
+      - name: products-options
+        methods: [OPTIONS]
+        paths: ["/products"]
+        strip_path: true
       - name: products-read
         methods: [GET]
         paths: ["/products"]
@@ -25,9 +29,13 @@ services:
   - name: suppliers
     url: http://suppliers_service:8000
     routes:
+      - name: suppliers-options
+        methods: [OPTIONS]
+        paths: ["/suppliers"]
+        strip_path: true
       - name: suppliers-read
         methods: [GET]
-        paths: ["/suppliers/*"]
+        paths: ["/suppliers"]
         strip_path: true
       - name: suppliers-create
         methods: [POST]
@@ -35,11 +43,11 @@ services:
         strip_path: true
       - name: suppliers-update
         methods: [PUT]
-        paths: ["/suppliers/*"]
+        paths: ["/suppliers"]
         strip_path: true
       - name: suppliers-delete
         methods: [DELETE]
-        paths: ["/suppliers/*"]
+        paths: ["/suppliers"]
         strip_path: true
 
   - name: categories

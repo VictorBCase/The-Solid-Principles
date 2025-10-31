@@ -58,7 +58,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 			}});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			return [];
+			return data["products"];
 		} catch(error) { console.error(error); }
 	}
 
@@ -81,8 +81,6 @@ function Product({fields, ops, myOps, result, setResult}) {
 				setVaidationMsg(msg);
 			}
 			return data["p_id"];
-			//let id = data.p_id;
-			//return id;
 		} catch(error) { console.error(error); }
 	}
 
@@ -94,7 +92,14 @@ function Product({fields, ops, myOps, result, setResult}) {
 			});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			let product = data["product"];
+			data = data["product"]
+			let product = {
+				p_id: data[0],
+				name: data[1],
+				description: data[2],
+				quantity: data[3],
+				price: data[4]
+			};
 			return product;
 		} catch(error) { console.error(error); }
 	}
@@ -131,86 +136,6 @@ function Product({fields, ops, myOps, result, setResult}) {
 			}
 			return true;
 		} catch(error) { console.error(error); return false; }
-	}
-
-	async function associateSupplier(p_id, s_id) {
-		try {
-			let res = await fetch(API, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					meth: 'supplierProducts_create',
-					p_id: p_id,
-					s_id: s_id
-				})
-			});
-			let data = await res.json();
-			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
-			}
-		} catch(error) { console.error(error); }
-	}
-
-	async function disassociateSupplier(p_id, s_id) {
-		try {
-			let res = await fetch(API, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					meth: 'supplierProducts_delete',
-					p_id: p_id,
-					s_id: s_id
-				})
-			});
-			let data = await res.json();
-			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
-			}
-		} catch(error) { console.error(error); }
-	}
-
-	async function associateCategory(p_id, c_id) {
-		try {
-			let res = await fetch(API, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					meth: 'categoryProducts_create',
-					p_id: p_id,
-					c_id: c_id
-				})
-			});
-			let data = await res.json();
-			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
-			}
-		} catch(error) { console.error(error); }
-	}
-
-	async function disassociateCategory(p_id, c_id) {
-		try {
-			let res = await fetch(API, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					meth: 'categoryProducts_delete',
-					p_id: p_id,
-					c_id: c_id
-				})
-			});
-			let data = await res.json();
-			if (res.status > 299) {
-				console.error(data);
-				let msg = data.error;
-				setVaidationMsg(msg);
-			}
-		} catch(error) { console.error(error); }
 	}
 
     // state variables for the menu
@@ -345,12 +270,6 @@ function Product({fields, ops, myOps, result, setResult}) {
 								</li>
 								<li>
 									<input type="radio" name="type" value={myOps[2]} />{myOps[2]}
-								</li>
-								<li>
-									<input type="radio" name="type" value={myOps[3]} />{myOps[3]}
-								</li>
-								<li>
-									<input type="radio" name="type" value={myOps[4]} />{myOps[4]}
 								</li>
 							</ul>
 							<p>on product:</p>
