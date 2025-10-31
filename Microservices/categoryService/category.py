@@ -200,7 +200,7 @@ app.delete("/{c_id}/product/{p_id}")
 def delete_association(c_id: str, p_id: str):
     try:
         categoryProducts_delete(c_id, p_id)
-        return {"message": f"Product {p_id} unlinked from category {c_id}"}
+        return {"message": f"Product {p_id} deassociated from category {c_id}"}
     except Exception as ex:
         raise HTTPException(status_code=400, detail=str(ex))
 
@@ -208,6 +208,6 @@ def delete_association(c_id: str, p_id: str):
 def associate_product(c_id: str, p_id: str):
     try:
         categoryProducts_create(c_id, p_id)
-        return {"message": f"Product {p_id} linked to category {c_id}"}
+        return {"message": f"Product {p_id} associated to category {c_id}"}
     except Exception as ex:
         raise HTTPException(status_code=400, detail=str(ex))

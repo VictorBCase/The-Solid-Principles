@@ -147,4 +147,8 @@ def create_image(img: Image):
 
 @app.delete("/{i_id}")
 def delete_image(i_id: str):
-	return {"i_id": i_id}
+    try:
+        image_delete(i_id)
+        return {"deleted": i_id}
+    except Exception as ex:
+        raise HTTPException(status_code=400, detail=str(ex))
