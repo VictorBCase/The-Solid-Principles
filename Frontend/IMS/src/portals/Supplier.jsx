@@ -76,7 +76,7 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 			if (res.status > 299) {
 				console.error(data);
 				let msg = data.error;
-				setVaidationMsg(msg);
+				setMessage(msg);
 			}
 			return data["s_id"];
 		} catch(error) { console.error(error); }
@@ -125,7 +125,7 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 			if (res.status > 299) {
 				console.error(data);
 				let msg = data.error;
-				setVaidationMsg(msg);
+				setMessage(msg);
 				return false;
 			}
 			return true;
@@ -142,7 +142,7 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 			if (res.status > 299) {
 				console.error(data);
 				let msg = data.error;
-				setVaidationMsg(msg);
+				setMessage(msg);
 				return false;
 			}
 		} catch(error) { console.error(error); }
@@ -158,7 +158,7 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 			if (res.status > 299) {
 				console.error(data);
 				let msg = data.error;
-				setVaidationMsg(msg);
+				setMessage(msg);
 				return false;
 			}
 		} catch(error) { console.error(error); }

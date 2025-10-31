@@ -76,7 +76,7 @@ function Image({fields, ops, myOps, result, setResult}) {
 			if (res.status > 299) {
 				console.error(data);
 				let msg = data.error;
-				setVaidationMsg(msg);
+				setMessage(msg);
 			}
 			return data["i_id"];
 		} catch(error) { console.error(error); }
@@ -124,7 +124,7 @@ function Image({fields, ops, myOps, result, setResult}) {
 			if (res.status > 299) {
 				console.error(data);
 				let msg = data.error;
-				setVaidationMsg(msg);
+				setMessage(msg);
 				return false;
 			}
 			return true;
