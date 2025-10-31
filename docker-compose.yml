@@ -13,7 +13,7 @@ services:
       KONG_PROXY_LISTEN: 0.0.0.0:8000
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
     volumes:
-      - ./kong/kong.yml:/kong/kong.yml
+      - ./Microservices/Gateway/kong.yml:/kong/kong.yml
     ports:
       - "8000:8000" # public proxy
       - "8001:8001" # admin API
@@ -48,7 +48,7 @@ services:
       POSTGRES_PASSWORD: solid
       POSTGRES_DB: productDB
     volumes:
-      - ./productService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./Microservices/productService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - product_data:/var/lib/postgresql/data
     networks:
       - ims_net # for kong gateway
@@ -76,7 +76,7 @@ services:
       POSTGRES_PASSWORD: solid
       POSTGRES_DB: productDB
     volumes:
-      - ./supplierService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./Microservices/supplierService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - supplier_data:/var/lib/postgresql/data
     networks:
       - ims_net # for kong gateway
@@ -104,7 +104,7 @@ services:
       POSTGRES_PASSWORD: solid
       POSTGRES_DB: categoryDB
     volumes:
-      - ./categoryService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./Microservices/categoryService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - category_data:/var/lib/postgresql/data
     networks:
       - ims_net # for kong gateway
@@ -132,7 +132,7 @@ services:
       POSTGRES_PASSWORD: solid
       POSTGRES_DB: imageDB
     volumes:
-      - ./imageService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./Microservices/imageService/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - image_data:/var/lib/postgresql/data
     networks:
       - ims_net # for kong gateway

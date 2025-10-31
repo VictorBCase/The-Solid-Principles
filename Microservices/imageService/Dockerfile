@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 8000
 
 # Run FastAPI with uvicorn
-CMD ["fastapi", "run", "image.py", "--host", "0.0.0.2", "--port", "8000"]
+CMD ["fastapi", "run", "image.py", "--host", "0.0.0.0", "--port", "8000"]
