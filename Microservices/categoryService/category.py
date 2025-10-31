@@ -175,7 +175,7 @@ def update_category(c_id: str, cat: Category):
 	try:
 		data = category_update(c_id, cat.name, cat.description)
 	except Exception as ex:
-		raise HTTPException(status_code=400, detail=ex)
+		raise HTTPException(status_code=400, detail=str(ex))
 	return {"category": data}
 
 @app.post("/")
@@ -184,7 +184,7 @@ def create_category(cat: Category):
 	try:
 		data = category_create(cat.name, cat.description)
 	except Exception as ex:
-		raise HTTPException(status_code=400, detail=ex)
+		raise HTTPException(status_code=400, detail=str(ex))
 	return {"c_id": data}
 
 @app.delete("/{c_id}")

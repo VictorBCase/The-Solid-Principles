@@ -133,7 +133,7 @@ def update_image(i_id: str, img: Image):
 	try:
 		data = image_update(i_id, img.name, img.url)
 	except Exception as ex:
-		raise HTTPException(status_code=400, detail=ex)
+		raise HTTPException(status_code=400, detail=str(ex))
 	return {"image": data}
 
 @app.post("/")
@@ -142,7 +142,7 @@ def create_image(img: Image):
 	try:
 		data = image_create(img.name, img.url)
 	except Exception as ex:
-		raise HTTPException(status_code=400, detail=ex)
+		raise HTTPException(status_code=400, detail=str(ex))
 	return {"i_id": data}
 
 @app.delete("/{i_id}")
