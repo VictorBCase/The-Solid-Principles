@@ -5,6 +5,7 @@ import psycopg2
 from contextlib import contextmanager
 import uuid
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
 
@@ -103,12 +104,60 @@ def category_delete(category_id: str) -> None:
             c.execute("DELETE FROM categories WHERE category_id = %s", (category_id,))
             conn.commit()
 
+# association =================================================================
+def categoryProducts_create(category_id: str, product_id: str) -> None:
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO category_products (category_id, product_id)
+                VALUES (%s, %s)
+                ON CONFLICT DO NOTHING
+            """, (category_id, product_id))
+            conn.commit()
+
+def categoryProducts_read(category_id: str) -> Optional[list]:
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT p.product_id, p.name, p.price
+                FROM category_products cp
+                JOIN products p ON cp.product_id = p.product_id
+                WHERE cp.category_id = %s
+            """, (category_id,))
+            results = []
+            for row in cur.fetchall():
+                product_id, name, price_decimal = row
+
+                price_str = str(price_decimal) 
+                
+                results.append((product_id, name, price_str))
+                
+            return results
+
+def categoryProducts_delete(category_id: str, product_id: str) -> None:
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                DELETE FROM category_products
+                WHERE category_id = %s AND product_id = %s
+            """, (category_id, product_id))
+            conn.commit()
+
 # http server config ==========================================================
 class Category(BaseModel):
 	name: str
 	description: str
 
 app = FastAPI()
+
+origins = ["http://localhost:5173"]
+
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_methods=["*"],
+        allow_headers=["*"],
+)
 
 @app.get("/{c_id}")
 async def read_category(c_id: Optional[str] = None):
@@ -135,5 +184,13 @@ async def create_category(cat: Category):
 	return {"c_id": data}
 
 @app.delete("/{c_id}")
-def delete_image(c_id: str):
+async def delete_image(c_id: str):
 	return {"c_id": c_id}
+
+@app.delete("/product/{p_id}")
+async def delete_association(p_id: str):
+	return {"p_id": p_id}
+
+@app.post("/{c_id}")
+async def associate_product(c_id: str, p_id: str):
+	return {"c_id": c_id, "p_id": p_id}

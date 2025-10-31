@@ -71,6 +71,8 @@ function App() {
 					fields={inputFields.product}
 					ops={ops}
 					myOps={portalOps.product}
+					result={result}
+					setResult={setResult}
 				/>
 			}
 			{
@@ -79,6 +81,8 @@ function App() {
 					fields={inputFields.supplier}
 					ops={ops}
 					myOps={portalOps.supplier}
+					result={result}
+					setResult={setResult}
 				/>
 			}
 			{
@@ -87,6 +91,8 @@ function App() {
 					fields={inputFields.category}
 					ops={ops}
 					myOps={portalOps.category}
+					result={result}
+					setResult={setResult}
 				/>
 			}
 			{
@@ -95,6 +101,8 @@ function App() {
 					fields={inputFields.image}
 					ops={ops}
 					myOps={portalOps.image}
+					result={result}
+					setResult={setResult}
 				/>
 			}
 		</>
