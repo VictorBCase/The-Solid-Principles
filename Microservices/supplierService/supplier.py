@@ -101,6 +101,45 @@ def supplier_delete(supplier_id: str) -> None:
             c.execute("DELETE FROM suppliers WHERE supplier_id = %s", (supplier_id,))
             conn.commit()
 
+# association =================================================================
+def supplierProducts_create(supplier_id: str, product_id: str) -> None:
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO supplier_products (supplier_id, product_id)
+                VALUES (%s, %s)
+                ON CONFLICT DO NOTHING
+            """, (supplier_id, product_id))
+            conn.commit()
+
+def supplierProducts_read(supplier_id: str) -> Optional[list]:
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT p.product_id, p.name, p.price
+                FROM supplier_products sp
+                JOIN products p ON sp.product_id = p.product_id
+                WHERE sp.supplier_id = %s
+            """, (supplier_id,))
+            results = []
+            for row in cur.fetchall():
+                product_id, name, price_decimal = row
+
+                price_str = str(price_decimal) 
+                
+                results.append((product_id, name, price_str))
+                
+            return results
+
+def supplierProducts_delete(supplier_id: str, product_id: str) -> None:
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                DELETE FROM supplier_products
+                WHERE supplier_id = %s AND product_id = %s
+            """, (supplier_id, product_id))
+            conn.commit()
+
 # http server config ==========================================================
 class Supplier(BaseModel):
 	name: str
@@ -144,3 +183,11 @@ async def create_supplier(sup: Supplier):
 @app.delete("/{s_id}")
 def delete_supplier(s_id: str):
 	return {"s_id": s_id}
+
+@app.delete("/product/{p_id}")
+async def delete_association(p_id: str):
+	return {"p_id": p_id}
+
+@app.post("/{s_id}")
+async def associate_product(s_id: str, p_id: str):
+	return {"s_id": s_id, "p_id": p_id}
