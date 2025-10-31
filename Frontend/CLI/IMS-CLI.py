@@ -90,28 +90,28 @@ def main():
 						prod_id = input("Enter product id: ").strip()
 						r = requests.get(product_url + "?p_id=" + prod_id)
 						if (r.status_code > 299):
-							print(r.json().get("detail"))
+							print("Failed to read: Invalid product ID")
 						else:
 							print(r.json())
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.get(supplier_url + "?s_id=" + sup_id)
 						if (r.status_code > 299):
-							print(r.json().get("detail"))
+							print("Failed to read: Invalid supplier ID")
 						else:
 							print(r.json())
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						r = requests.get(category_url + "?c_id=" + cat_id)
 						if (r.status_code > 299):
-							print(r.json().get("detail"))
+							print("Failed to read: Invalid category ID")
 						else:
 							print(r.json())
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						r = requests.get(image_url + "?i_id=" + img_id)
 						if (r.status_code > 299):
-							print(r.json().get("detail"))
+							print("Failed to read: Invalid image ID")
 						else:
 							print(r.json())
 					case "supplierProducts":
