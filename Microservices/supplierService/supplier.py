@@ -102,7 +102,7 @@ def supplier_delete(supplier_id: str) -> None:
             conn.commit()
 
 # association =================================================================
-def supplierProducts_create(supplier_id: str, product_id: str) -> None:
+def supplierProduct_create(supplier_id: str, product_id: str) -> None:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -116,28 +116,30 @@ def supplierProducts_read(supplier_id: str) -> Optional[list]:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT p.product_id, p.name, p.price
-                FROM supplier_products sp
-                JOIN products p ON sp.product_id = p.product_id
-                WHERE sp.supplier_id = %s
+                SELECT product_id
+                FROM supplier_products
+                WHERE supplier_id = %s
             """, (supplier_id,))
             results = []
             for row in cur.fetchall():
                 product_id, name, price_decimal = row
-
                 price_str = str(price_decimal) 
-                
                 results.append((product_id, name, price_str))
-                
             return results
 
-def supplierProducts_delete(supplier_id: str, product_id: str) -> None:
+def supplierProduct_delete(supplier_id: Optional[str] = None, product_id: str) -> None:
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute("""
-                DELETE FROM supplier_products
-                WHERE supplier_id = %s AND product_id = %s
-            """, (supplier_id, product_id))
+			if (supplier_id == None):
+				cur.execute("""
+					DELETE FROM supplier_products 
+					WHERE product_id = %s
+				""", (product_id))
+			else:
+				cur.execute("""
+					DELETE FROM supplier_products
+					WHERE supplier_id = %s AND product_id = %s
+				""", (supplier_id, product_id))
             conn.commit()
 
 # http server config ==========================================================
@@ -147,7 +149,10 @@ class Supplier(BaseModel):
 
 app = FastAPI()
 
-origins = ["http://localhost:5173"]
+origins = [
+	"http://localhost:5173",
+	"http://localhost:8000" # product service url
+]
 
 app.add_middleware(
         CORSMiddleware,
@@ -159,12 +164,13 @@ app.add_middleware(
 @app.get("/")
 async def read_suppliers(s_id: Optional[str] = None):
 	if (s_id is None):
-		return {"s_id": "empty"}
-	return {"s_id": s_id}
+		data = await suppliers_read()
+		return {"suppliers": data}
+	data = await supplier_read(s_id)
+	return {"supplier": data}
 
 @app.put("/{s_id}")
 async def update_supplier(s_id: str, sup: Supplier):
-	return {"supplier": sup}
 	try:
 		data = await supplier_update(s_id, sup.name, sup.contact)
 	except Exception as ex:
@@ -173,7 +179,6 @@ async def update_supplier(s_id: str, sup: Supplier):
 
 @app.post("/")
 async def create_supplier(sup: Supplier):
-	return {"supplier": sup}
 	try:
 		data = await supplier_create(sup.name, sup.contact)
 	except Exception as ex:
@@ -181,13 +186,26 @@ async def create_supplier(sup: Supplier):
 	return {"s_id": data}
 
 @app.delete("/{s_id}")
-def delete_supplier(s_id: str):
-	return {"s_id": s_id}
+async def delete_supplier(s_id: str):
+	supplier_delete(s_id)
 
-@app.delete("/product/{p_id}")
-async def delete_association(p_id: str):
-	return {"p_id": p_id}
+# get suppliers products
+@app.get("/{s_id}/products/")
+async def read_products(s_id: str):
+	data = await supplierProducts_read(s_id)
+	return {"products": data}
 
-@app.post("/{s_id}")
+# associate product with supplier
+@app.post("/{s_id}/products/{p_id}")
 async def associate_product(s_id: str, p_id: str):
-	return {"s_id": s_id, "p_id": p_id}
+	supplierProduct_create(s_id, p_id)
+
+# disassociate product with supplier
+@app.delete("/{s_id}/products/{p_id}")
+async def delete_association(s_id: str, p_id: str):
+	supplierProduct_delete(s_id, p_id)
+
+# dissasociate product with all suppliers
+@app.delete("/products/{p_id}")
+async def orphan_check(p_id: str):
+	supplierProduct_delete(p_id)
