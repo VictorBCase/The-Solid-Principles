@@ -172,6 +172,7 @@ def read_suppliers(c_id: Optional[str] = None):
 	data = category_read(c_id)
 	return {"category": data}
 
+
 @app.put("/{c_id}")
 def update_category(c_id: str, cat: Category):
     #return {"category": cat}

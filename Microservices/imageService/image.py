@@ -122,10 +122,17 @@ def preflight_handler():
 	return Response(status_code=200, headers=headers)
 
 @app.get("/")
-async def read_images(i_id: Optional[str] = None):
-	if (i_id is None):
-		return {"i_id": "empty"}
-	return {"i_id": i_id}
+def read_images(i_id: Optional[str] = None):
+    try:
+        if i_id is None:
+            data = images_read() #read all images
+            return {"images": data}
+        else:
+            data = image_read(i_id) #read specific image
+            return {"image": data}
+    except Exception as ex:
+        raise HTTPException(status_code=400, detail=str(ex))
+
 
 @app.put("/{i_id}")
 def update_image(i_id: str, img: Image):
