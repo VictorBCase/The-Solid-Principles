@@ -45,14 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-const getErrorMsg = (obj) => {
-	let data = obj.detail;
-	if (typeof data === 'string' || data instanceof String)
-		return data;
-	return data[0].msg;
-}
-
-function Supplier({fields, ops, myOps, result, setResult}) {
+function Supplier({fields, ops, myOps, result, setResult, getErrorMsg}) {
 
 	// api calls
 	const API = 'http://localhost:8000/suppliers/';

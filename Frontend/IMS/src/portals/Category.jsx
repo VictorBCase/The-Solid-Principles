@@ -45,14 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-const getErrorMsg = (obj) => {
-	let data = obj.detail;
-	if (typeof data === 'string' || data instanceof String)
-		return data;
-	return data[0].msg;
-}
-
-function Category({fields, ops, myOps, list, result, setResult}) {
+function Category({fields, ops, myOps, list, result, setResult, getErrorMsg}) {
 
 	// api calls
 	const API = 'http://localhost:8000/categories/';

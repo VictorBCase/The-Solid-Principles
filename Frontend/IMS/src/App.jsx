@@ -50,6 +50,13 @@ function App() {
 		image: Array(ops.view, ops.edit, ops.del)
 	};
 
+	const getErrorMsg = (obj) => {
+		let data = obj.detail;
+		if (typeof data === 'string' || data instanceof String)
+			return data;
+		return data[0].msg;
+	};
+
 	// state variables
 	const [portal, setPortal] = useState(null);
 	const [result, setResult] = useState(null);
@@ -73,6 +80,7 @@ function App() {
 					myOps={portalOps.product}
 					result={result}
 					setResult={setResult}
+					getErrorMsg={getErrorMsg}
 				/>
 			}
 			{
@@ -83,6 +91,7 @@ function App() {
 					myOps={portalOps.supplier}
 					result={result}
 					setResult={setResult}
+					getErrorMsg={getErrorMsg}
 				/>
 			}
 			{
@@ -93,6 +102,7 @@ function App() {
 					myOps={portalOps.category}
 					result={result}
 					setResult={setResult}
+					getErrorMsg={getErrorMsg}
 				/>
 			}
 			{
@@ -103,6 +113,7 @@ function App() {
 					myOps={portalOps.image}
 					result={result}
 					setResult={setResult}
+					getErrorMsg={getErrorMsg}
 				/>
 			}
 		</>
