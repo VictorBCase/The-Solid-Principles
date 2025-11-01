@@ -102,7 +102,7 @@ def category_delete(category_id: str) -> None:
             conn.commit()
 
 # association =================================================================
-def categoryProducts_create(category_id: str, product_id: str) -> None:
+def categoryProduct_create(category_id: str, product_id: str) -> None:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -113,27 +113,33 @@ def categoryProducts_create(category_id: str, product_id: str) -> None:
             conn.commit()
 
 def categoryProducts_read(category_id: str) -> Optional[list]:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT (product_id)
-                FROM category_products
-                WHERE category_id = %s
-            """, (category_id))
-            rows = cur.fetchall()
-            ret = []
-            for data in rows:
-                ret.append(data)
-            return ret
+	with get_conn() as conn:
+		with conn.cursor() as cur:
+			cur.execute("""
+				SELECT (product_id)
+				FROM category_products
+				WHERE category_id = %s
+			""", (category_id,))
+			rows = cur.fetchall()
+			ret = []
+			for data in rows:
+				ret.append(data)
+			return ret
 
-def categoryProducts_delete(category_id: str, product_id: str) -> None:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                DELETE FROM category_products
-                WHERE category_id = %s AND product_id = %s
-            """, (category_id, product_id))
-            conn.commit()
+def categoryProduct_delete(product_id: str, category_id: Optional[str] = None) -> None:
+	with get_conn() as conn:
+		with conn.cursor() as cur:
+			if (category_id == None):
+				cur.execute("""
+					DELETE FROM category_products 
+					WHERE product_id = %s
+				""", (product_id))
+			else:
+				cur.execute("""
+					DELETE FROM category_products
+					WHERE category_id = %s AND product_id = %s
+				""", (category_id, product_id))
+			conn.commit()
 
 # http server config ==========================================================
 class Category(BaseModel):
@@ -158,15 +164,13 @@ def preflight_handler():
     }
     return Response(status_code=200, headers=headers)
 
-@app.get("/{c_id}")
-def read_category(c_id: Optional[str] = None):
-    if c_id is None or c_id.strip() == "": #check for invalid input
-        raise HTTPException(status_code=400, detail="Category ID cannot be empty.")
-    try:
-        data = category_read(c_id)
-        return {"category": data}
-    except Exception as ex:
-        raise HTTPException(status_code=400, detail=str(ex))
+@app.get("/")
+def read_suppliers(c_id: Optional[str] = None):
+	if (c_id is None or c_id == ""):
+		data = categories_read()
+		return {"categories": data}
+	data = category_read(c_id)
+	return {"category": data}
 
 @app.put("/{c_id}")
 def update_category(c_id: str, cat: Category):
@@ -194,19 +198,23 @@ def delete_category(c_id: str):
     except Exception as ex:
         raise HTTPException(status_code=400, detail=str(ex))
 
-# ASSOCIATIONS =================================================
-app.delete("/{c_id}/product/{p_id}")
-def delete_association(c_id: str, p_id: str):
-    try:
-        categoryProducts_delete(c_id, p_id)
-        return {"message": f"Product {p_id} deassociated from category {c_id}"}
-    except Exception as ex:
-        raise HTTPException(status_code=400, detail=str(ex))
+# get category products
+@app.get("/{c_id}/products/")
+def read_products(c_id: str):
+	data = categoryProducts_read(c_id)
+	return {"products": data}
 
-@app.post("/{c_id}/product/{p_id}")
+# associate product with category
+@app.post("/{c_id}/products/{p_id}")
 def associate_product(c_id: str, p_id: str):
-    try:
-        categoryProducts_create(c_id, p_id)
-        return {"message": f"Product {p_id} associated to category {c_id}"}
-    except Exception as ex:
-        raise HTTPException(status_code=400, detail=str(ex))
+	categoryProduct_create(c_id, p_id)
+
+# disassociate product with category
+@app.delete("/{c_id}/products/{p_id}")
+def delete_association(c_id: str, p_id: str):
+	categoryProduct_delete(p_id, c_id)
+
+# dissasociate product with all categories
+@app.delete("/products/{p_id}")
+def delete_product(p_id: str):
+	categoryProduct_delete(p_id)
