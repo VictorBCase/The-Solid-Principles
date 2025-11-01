@@ -232,7 +232,7 @@ function Supplier({fields, ops, myOps, result, setResult, getErrorMsg}) {
 				setEdit(supplier);
                 break;
             case ops.del:
-                remove(id);
+                await remove(id);
 				setSuppliers(null);
                 break;
             case ops.assoc:

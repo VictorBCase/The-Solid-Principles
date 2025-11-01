@@ -174,7 +174,7 @@ function Product({fields, ops, myOps, result, setResult, getErrorMsg}) {
 				setEdit(product);
                 break;
             case ops.del:
-                remove(id);
+                await remove(id);
 				setProducts(null);
                 break;
             case ops.view:

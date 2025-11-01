@@ -167,7 +167,7 @@ function Image({fields, ops, myOps, result, setResult, getErrorMsg}) {
 				setEdit(image);
 				break;
 			case ops.del:
-				remove(id);
+				await remove(id);
 				setImages(null);
 				break;
 			case ops.view:

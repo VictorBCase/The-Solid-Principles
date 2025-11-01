@@ -232,7 +232,7 @@ function Category({fields, ops, myOps, list, result, setResult, getErrorMsg}) {
 				setEdit(category);
 				break;
 			case ops.del:
-				remove(id);
+				await remove(id);
 				setCategories(null);
 				break;
             case ops.assoc:
