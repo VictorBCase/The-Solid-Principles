@@ -96,28 +96,28 @@ def main():
 						prod_id = input("Enter product id: ").strip()
 						r = requests.get(product_url + "?p_id=" + prod_id)
 						if (r.status_code > 299):
-							print("Failed to read: Invalid product ID")
+							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.get(supplier_url + "?s_id=" + sup_id)
 						if (r.status_code > 299):
-							print("Failed to read: Invalid supplier ID")
+							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						r = requests.get(category_url + "?c_id=" + cat_id)
 						if (r.status_code > 299):
-							print("Failed to read: Invalid category ID")
+							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						r = requests.get(image_url + "?i_id=" + img_id)
 						if (r.status_code > 299):
-							print("Failed to read: Invalid image ID")
+							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "supplierProducts":
@@ -187,19 +187,31 @@ def main():
 					case "product":
 						prod_id = input("Enter product id: ").strip()
 						r = requests.delete(product_url + prod_id)
-						print(json.loads(r.content))
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Product deleted.")
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.delete(supplier_url + sup_id)
-						print(json.loads(r.content))
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Supplier deleted.")
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						r = requests.delete(category_url + cat_id)
-						print(json.loads(r.content))
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Category deleted.")
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						r = requests.delete(image_url + img_id)
-						print(json.loads(r.content))
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Image deleted.")
 					case "supplierProduct":
 						sid = input("Enter supplier id: ").strip()
 						pid = input("Enter product id: ").strip()

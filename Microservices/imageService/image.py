@@ -124,7 +124,7 @@ def preflight_handler():
 @app.get("/")
 def read_images(i_id: Optional[str] = None):
     try:
-        if i_id is None:
+        if (i_id is None or i_id == ""):
             data = images_read() #read all images
             return {"images": data}
         else:
@@ -138,7 +138,7 @@ def read_images(i_id: Optional[str] = None):
 def update_image(i_id: str, img: Image):
 	#return {"image": img}
 	try:
-		data = image_update(i_id, img.name, img.url)
+		data = image_update(i_id, img.p_id, img.url)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=str(ex))
 	return {"image": data}
@@ -147,7 +147,7 @@ def update_image(i_id: str, img: Image):
 def create_image(img: Image):
 	#return {"image": img}
 	try:
-		data = image_create(img.name, img.url)
+		data = image_create(img.p_id, img.url)
 	except Exception as ex:
 		raise HTTPException(status_code=400, detail=str(ex))
 	return {"i_id": data}
