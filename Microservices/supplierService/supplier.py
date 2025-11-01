@@ -130,7 +130,7 @@ def supplierProduct_delete(product_id: str, supplier_id: Optional[str] = None) -
 				cur.execute("""
 					DELETE FROM supplier_products 
 					WHERE product_id = %s
-				""", (product_id))
+				""", (product_id,))
 			else:
 				cur.execute("""
 					DELETE FROM supplier_products
