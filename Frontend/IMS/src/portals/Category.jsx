@@ -65,7 +65,7 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 			}});
 			let data = await res.json();
 			if (res.status > 299) return console.error(data);
-			return data["suppliers"];
+			return data["categories"];
 		} catch(error) { console.error(error); }
 	}
 

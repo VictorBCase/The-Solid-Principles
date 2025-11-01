@@ -75,13 +75,19 @@ def main():
 					case "supplierProduct":
 						sid = input("Enter supplier id: ").strip()
 						pid = input("Enter product id: ").strip()
-						supplierProduct_create(conn, sid, pid)
-						print("Association created.")
+						r = requests.post(supplier_url + sid + "/products/" + pid)
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Association created.")
 					case "categoryProduct":
 						cid = input("Enter category id: ").strip()
 						pid = input("Enter product id: ").strip()
-						categoryProduct_create(conn, cid, pid)
-						print("Association created.")
+						r = requests.post(category_url + cid + "/products/" + pid)
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Association created.")
 			elif command == "read":
 				print("What type of record do you want to read: product, supplier, category, image, supplierProducts, categoryProducts")
 				read_type = input(">>> ").strip()
@@ -90,36 +96,44 @@ def main():
 						prod_id = input("Enter product id: ").strip()
 						r = requests.get(product_url + "?p_id=" + prod_id)
 						if (r.status_code > 299):
-							print("Failed to read: Invalid product ID")
+							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.get(supplier_url + "?s_id=" + sup_id)
 						if (r.status_code > 299):
-							print("Failed to read: Invalid supplier ID")
+							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						r = requests.get(category_url + "?c_id=" + cat_id)
 						if (r.status_code > 299):
-							print("Failed to read: Invalid category ID")
+							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						r = requests.get(image_url + "?i_id=" + img_id)
 						if (r.status_code > 299):
-							print("Failed to read: Invalid image ID")
+							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "supplierProducts":
 						sup_id = input("Enter supplier id: ").strip()
-						supplierProducts_read(conn, sup_id)
+						r = requests.get(supplier_url + sup_id + "/products/")
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print(json.loads(r.content))
 					case "categoryProducts":
 						cat_id = input("Enter category id: ").strip()
-						categoryProducts_read(conn, cat_id)
+						r = requests.get(category_url + cat_id + "/products/")
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print(json.loads(r.content))
 			elif command == "update":
 				print("What type of record do you want to update: product, supplier, category, image")
 				update_type = input(">>> ").strip()
@@ -173,29 +187,47 @@ def main():
 					case "product":
 						prod_id = input("Enter product id: ").strip()
 						r = requests.delete(product_url + prod_id)
-						print(json.loads(r.content))
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Product deleted.")
 					case "supplier":
 						sup_id = input("Enter supplier id: ").strip()
 						r = requests.delete(supplier_url + sup_id)
-						print(json.loads(r.content))
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Supplier deleted.")
 					case "category":
 						cat_id = input("Enter category id: ").strip()
 						r = requests.delete(category_url + cat_id)
-						print(json.loads(r.content))
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Category deleted.")
 					case "image":
 						img_id = input("Enter image id: ").strip()
 						r = requests.delete(image_url + img_id)
-						print(json.loads(r.content))
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Image deleted.")
 					case "supplierProduct":
 						sid = input("Enter supplier id: ").strip()
 						pid = input("Enter product id: ").strip()
-						supplierProduct_delete(conn, sid, pid)
-						print("Association deleted.")
+						r = requests.delete(category_url + sid + "/products/" + pid)
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Association deleted.")
 					case "categoryProduct":
 						cid = input("Enter category id: ").strip()
 						pid = input("Enter product id: ").strip()
-						categoryProduct_delete(conn, cid, pid)
-						print("Association deleted.")
+						r = requests.delete(category_url + cid + "/products/" + pid)
+						if (r.status_code > 299):
+							print(r.json().get("detail"))
+						else:
+							print("Association deleted.")
 			else:
 				print("ERR: Invalid command.")
 		except KeyboardInterrupt:
