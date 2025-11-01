@@ -208,4 +208,7 @@ def delete_association(s_id: str, p_id: str):
 # dissasociate product with all suppliers
 @app.delete("/products/{p_id}")
 def delete_product(p_id: str):
-	supplierProduct_delete(p_id)
+	try:
+		supplierProduct_delete(p_id)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=str(ex))
