@@ -215,6 +215,7 @@ function Supplier({fields, ops, myOps, result, setResult, getErrorMsg}) {
 		if (op) {
 			setEdit(null);
         	setRequireId(null);
+			setSuppliers(null);
 		}
     }
 

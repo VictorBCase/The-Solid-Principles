@@ -215,6 +215,7 @@ function Category({fields, ops, myOps, list, result, setResult, getErrorMsg}) {
 		if (op) {
 			setEdit(null);
 			setRequireId(null);
+			setCategories(null);
 		}
     }
 
