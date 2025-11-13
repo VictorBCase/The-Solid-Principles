@@ -32,7 +32,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USER=guest
       - RABBITMQ_PASS=guest
-      - SUPPLIERS_API=http://suppliers_service:8000
+      - API_GATEWAY=http://kong:8000
     depends_on: 
       - rabbitmq
       - suppliers_service
@@ -45,7 +45,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USER=guest
       - RABBITMQ_PASS=guest
-      - PRODUCTS_API=http://products_service:8000
+      - API_GATEWAY=http://kong:8000
     depends_on: 
       - rabbitmq
       - products_service
