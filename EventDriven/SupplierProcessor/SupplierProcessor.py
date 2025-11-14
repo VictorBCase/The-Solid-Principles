@@ -69,7 +69,7 @@ def process_supplier(channel, method, properties, body):
             channel.basic_ack(delivery_tag=method.delivery_tag)
             return
 
-        supplier_id = resp.json()["sid"]
+        supplier_id = resp.json()["s_id"]
         print(f"supplier_id={supplier_id} is stored")
 
         # Go through each product event
@@ -88,7 +88,7 @@ def process_supplier(channel, method, properties, body):
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
     except Exception as e:
-        print("Error, sending to supplier DLQ")
+        print("Error, sending to supplier DLQ: ", e)
         send_to_dlq(channel, body)
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
