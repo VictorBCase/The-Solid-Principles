@@ -71,7 +71,7 @@ def process_product(channel, method, properties, body):
         print(f"Stored product_id={product_id} for supplier_id={supplier_id}")
 
         # associate product with supplier
-        assoc_resp = requests.post(f"{PRODUCT_API}s/{supplier_id}/products/{product_id}")
+        assoc_resp = requests.post(f"{PRODUCT_API}/{product_id}/suppliers/{supplier_id}")
         if assoc_resp.status_code != 200:
             print(f"Failed to associate product with supplier {supplier_id}")
 
