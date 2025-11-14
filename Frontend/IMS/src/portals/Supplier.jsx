@@ -45,14 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-const getErrorMsg = (obj) => {
-	let data = obj.detail;
-	if (typeof data === 'string' || data instanceof String)
-		return data;
-	return data[0].msg;
-}
-
-function Supplier({fields, ops, myOps, result, setResult}) {
+function Supplier({fields, ops, myOps, result, setResult, getErrorMsg}) {
 
 	// api calls
 	const API = 'http://localhost:8000/suppliers/';
@@ -222,6 +215,7 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 		if (op) {
 			setEdit(null);
         	setRequireId(null);
+			setSuppliers(null);
 		}
     }
 
@@ -239,7 +233,7 @@ function Supplier({fields, ops, myOps, result, setResult}) {
 				setEdit(supplier);
                 break;
             case ops.del:
-                remove(id);
+                await remove(id);
 				setSuppliers(null);
                 break;
             case ops.assoc:

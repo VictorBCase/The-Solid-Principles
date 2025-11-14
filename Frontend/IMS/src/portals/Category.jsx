@@ -45,14 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-const getErrorMsg = (obj) => {
-	let data = obj.detail;
-	if (typeof data === 'string' || data instanceof String)
-		return data;
-	return data[0].msg;
-}
-
-function Category({fields, ops, myOps, list, result, setResult}) {
+function Category({fields, ops, myOps, list, result, setResult, getErrorMsg}) {
 
 	// api calls
 	const API = 'http://localhost:8000/categories/';
@@ -222,6 +215,7 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 		if (op) {
 			setEdit(null);
 			setRequireId(null);
+			setCategories(null);
 		}
     }
 
@@ -239,7 +233,7 @@ function Category({fields, ops, myOps, list, result, setResult}) {
 				setEdit(category);
 				break;
 			case ops.del:
-				remove(id);
+				await remove(id);
 				setCategories(null);
 				break;
             case ops.assoc:

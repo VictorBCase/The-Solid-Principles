@@ -93,28 +93,28 @@ def main():
 				read_type = input(">>> ").strip()
 				match read_type:
 					case "product":
-						prod_id = input("Enter product id: ").strip()
+						prod_id = input("Enter product id, or leave empty for list: ").strip()
 						r = requests.get(product_url + "?p_id=" + prod_id)
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "supplier":
-						sup_id = input("Enter supplier id: ").strip()
+						sup_id = input("Enter supplier id, or leave empty for list: ").strip()
 						r = requests.get(supplier_url + "?s_id=" + sup_id)
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "category":
-						cat_id = input("Enter category id: ").strip()
+						cat_id = input("Enter category id, or leave empty for list: ").strip()
 						r = requests.get(category_url + "?c_id=" + cat_id)
 						if (r.status_code > 299):
 							print(r.json().get("detail"))
 						else:
 							print(json.loads(r.content))
 					case "image":
-						img_id = input("Enter image id: ").strip()
+						img_id = input("Enter image id, or leave empty for list: ").strip()
 						r = requests.get(image_url + "?i_id=" + img_id)
 						if (r.status_code > 299):
 							print(r.json().get("detail"))

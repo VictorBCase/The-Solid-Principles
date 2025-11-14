@@ -9,8 +9,8 @@ import requests
 import json
 
 # URLs ========================================================================
-supplier_url = "http://localhost:8000/suppliers/"
-category_url = "http://localhost:8000/categories/"
+supplier_url = "http://kong:8000/suppliers/"
+category_url = "http://kong:8000/categories/"
 
 # database connection =========================================================
 DB_CONFIG = {
@@ -109,7 +109,9 @@ def product_delete(product_id: str) -> None:
 		with conn.cursor() as c:
 			c.execute("DELETE FROM products WHERE product_id = %s", (product_id,))
 			conn.commit()
-	requests.delete(supplier_url + "products/" + product_id)
+	r = requests.delete(supplier_url + "products/" + product_id)
+	if r.status_code > 299:
+		print(r.json().get("detail"))
 	requests.delete(category_url + "products/" + product_id)
 
 # http server config ==========================================================

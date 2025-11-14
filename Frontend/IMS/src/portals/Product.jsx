@@ -23,13 +23,6 @@ const Result = ({result, clear}) => {
 	);
 }
 
-const getErrorMsg = (obj) => {
-	let data = obj.detail;
-	if (typeof data === 'string' || data instanceof String)
-		return data;
-	return data[0].msg;
-}
-
 // field form html
 const FieldForm = ({fields, edit, close, formAction}) => {
 	return (
@@ -52,7 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-function Product({fields, ops, myOps, result, setResult}) {
+function Product({fields, ops, myOps, result, setResult, getErrorMsg}) {
 
 	// api calls
 	const API = 'http://localhost:8000/products/';
@@ -181,7 +174,7 @@ function Product({fields, ops, myOps, result, setResult}) {
 				setEdit(product);
                 break;
             case ops.del:
-                remove(id);
+                await remove(id);
 				setProducts(null);
                 break;
             case ops.view:

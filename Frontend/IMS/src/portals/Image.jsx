@@ -45,14 +45,7 @@ const FieldForm = ({fields, edit, close, formAction}) => {
 	);
 }
 
-const getErrorMsg = (obj) => {
-	let data = obj.detail;
-	if (typeof data === 'string' || data instanceof String)
-		return data;
-	return data[0].msg;
-}
-
-function Image({fields, ops, myOps, result, setResult}) {
+function Image({fields, ops, myOps, result, setResult, getErrorMsg}) {
 
 	// api calls
 	const API = 'http://localhost:8000/images/';
@@ -174,7 +167,7 @@ function Image({fields, ops, myOps, result, setResult}) {
 				setEdit(image);
 				break;
 			case ops.del:
-				remove(id);
+				await remove(id);
 				setImages(null);
 				break;
 			case ops.view:

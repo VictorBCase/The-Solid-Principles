@@ -133,7 +133,7 @@ def categoryProduct_delete(product_id: str, category_id: Optional[str] = None) -
 				cur.execute("""
 					DELETE FROM category_products 
 					WHERE product_id = %s
-				""", (product_id))
+				""", (product_id,))
 			else:
 				cur.execute("""
 					DELETE FROM category_products

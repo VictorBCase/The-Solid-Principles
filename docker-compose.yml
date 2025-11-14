@@ -1,4 +1,57 @@
 services:
+  # ========== EVENT-DRIVEN ===========
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - ims_net
+
+  publisher:
+    build: ./EventDriven/Publisher
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+      - EVENTS_FILE=/app/events # Replace once we import provided events
+    depends_on: 
+      - rabbitmq
+    networks:
+      - ims_net
+  
+  supplier_processor:
+    build: ./EventDriven/SupplierProcessor
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+      - API_GATEWAY=http://kong:8000
+    depends_on: 
+      - rabbitmq
+      - suppliers_service
+    networks:
+      - ims_net
+
+  product_processor:
+    build: ./EventDriven/ProductProcessor
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+      - API_GATEWAY=http://kong:8000
+    depends_on: 
+      - rabbitmq
+      - products_service
+    networks:
+      - ims_net
+  
   # ========== FRONTEND =============
   frontend:
     build:
@@ -155,6 +208,7 @@ volumes:
   supplier_data:
   category_data:
   image_data:
+  rabbitmq_data:
 
 
 
