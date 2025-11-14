@@ -5,13 +5,6 @@ CREATE TABLE IF NOT EXISTS suppliers (
     name TEXT NOT NULL,
     contact_email TEXT NOT NULL
 );
-
-CREATE TABLE IF NOT EXISTS supplier_products (
-    supplier_id UUID NOT NULL,
-    product_id UUID NOT NULL,
-    PRIMARY KEY (supplier_id, product_id)
-);
-
 /*
 --Old table from layered for debugging
 CREATE TABLE IF NOT EXISTS supplier_products (
@@ -21,7 +14,7 @@ CREATE TABLE IF NOT EXISTS supplier_products (
 );
 */
 
-
+/*
 -- Function: delete supplier when it has no linked products
 CREATE OR REPLACE FUNCTION delete_orphan_supplier() RETURNS TRIGGER AS $$
 BEGIN
@@ -40,3 +33,4 @@ CREATE TRIGGER sp_after_del
 AFTER DELETE ON supplier_products
 FOR EACH ROW
 EXECUTE FUNCTION delete_orphan_supplier();
+*/

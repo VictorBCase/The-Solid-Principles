@@ -288,7 +288,7 @@ function Category({fields, ops, myOps, list, result, setResult, getErrorMsg}) {
 				<ValidationMsg message={message} />
 				{edit === null &&
 					<form action={handleOps}>
-						<p>perform</p>
+						<button type="submit">perform</button>
 						<ul>
 							<li>
 								<input type="radio" name="type" value={myOps[0]} defaultChecked />{myOps[0]}
@@ -321,7 +321,6 @@ function Category({fields, ops, myOps, list, result, setResult, getErrorMsg}) {
 								))
 							}
 						</ul>
-						<button type="submit">confirm</button>
 					</form>
 				}
 			</>}

@@ -49,6 +49,7 @@ function Supplier({fields, ops, myOps, result, setResult, getErrorMsg}) {
 
 	// api calls
 	const API = 'http://localhost:8000/suppliers/';
+	const prod_API = 'http://localhost:8000/products/';
 
 	async function list() {
 		try {
@@ -132,7 +133,7 @@ function Supplier({fields, ops, myOps, result, setResult, getErrorMsg}) {
 
 	async function associateProduct(s_id, p_id) {
 		try {
-			let res = await fetch(API + s_id + "/products/" + p_id, {
+			let res = await fetch(prod_API + p_id + "/suppliers/" + s_id, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'}
 			});
@@ -148,7 +149,7 @@ function Supplier({fields, ops, myOps, result, setResult, getErrorMsg}) {
 
 	async function disassociateProduct(s_id, p_id) {
 		try {
-			let res = await fetch(API + s_id + "/products/" + p_id, {
+			let res = await fetch(prod_API + p_id + "/suppliers/" + s_id, {
 				method: 'DELETE',
 				headers: {'Content-Type': 'application/json'}
 			});
@@ -164,7 +165,7 @@ function Supplier({fields, ops, myOps, result, setResult, getErrorMsg}) {
 
 	async function readProducts(id) {
 		try {
-			const res = await fetch(API + id + "/products/", {
+			const res = await fetch(prod_API + "/suppliers/" + id, {
 				method: 'GET',
 				headers: {'Content-Type': 'application/json'
 			}});
@@ -288,7 +289,7 @@ function Supplier({fields, ops, myOps, result, setResult, getErrorMsg}) {
 				<ValidationMsg message={message} />
 				{edit === null &&
 					<form action={handleOps}>
-						<p>perform</p>
+						<button type="submit">perform</button>
 						<ul>
 							<li>
 								<input type="radio" name="type" value={myOps[0]} defaultChecked />{myOps[0]}
@@ -321,7 +322,6 @@ function Supplier({fields, ops, myOps, result, setResult, getErrorMsg}) {
 								))
 							}
 						</ul>
-						<button type="submit">confirm</button>
 					</form>
 				}
 			</>}

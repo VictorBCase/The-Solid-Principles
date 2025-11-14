@@ -109,10 +109,58 @@ def product_delete(product_id: str) -> None:
 		with conn.cursor() as c:
 			c.execute("DELETE FROM products WHERE product_id = %s", (product_id,))
 			conn.commit()
-	r = requests.delete(supplier_url + "products/" + product_id)
-	if r.status_code > 299:
-		print(r.json().get("detail"))
+	# r = requests.delete(supplier_url + "products/" + product_id)
+	# if r.status_code > 299:
+	# 	print(r.json().get("detail"))
 	requests.delete(category_url + "products/" + product_id)
+
+# association =================================================================
+def productSupplier_create(product_id: str, supplier_id: str) -> None:
+	with get_conn() as conn:
+		with conn.cursor() as cur:
+			cur.execute("""
+				INSERT INTO product_suppliers (product_id, supplier_id)
+				VALUES (%s, %s)
+				ON CONFLICT DO NOTHING
+			""", (product_id, supplier_id,))
+			conn.commit()
+
+def productSuppliers_read(supplier_id: str) -> Optional[list]:
+	with get_conn() as conn:
+		with conn.cursor() as cur:
+			cur.execute("""
+				SELECT (product_id)
+				FROM product_suppliers
+				WHERE supplier_id = %s
+			""", (supplier_id,))
+			rows = cur.fetchall()
+			ret = []
+			for data in rows:
+				ret.append(data)
+			return ret
+
+def productSupplier_delete(supplier_id: str, product_id: Optional[str] = None) -> None:
+	with get_conn() as conn:
+		with conn.cursor() as cur:
+			if (product_id == None):
+				cur.execute("""
+					DELETE FROM product_suppliers 
+					WHERE supplier_id = %s
+				""", (supplier_id,))
+			else:
+				cur.execute("""WITH deleted AS (
+					DELETE FROM product_suppliers WHERE product_id = %s AND supplier_id = %s RETURNING supplier_id
+				) SELECT supplier_id FROM deleted WHERE supplier_id NOT IN (SELECT supplier_id FROM product_suppliers)""", (product_id, supplier_id,))
+				rows = cur.fetchall()
+				for row in rows:
+					print(row)
+					s_id = row[0]
+					r = requests.delete(supplier_url + '/' + s_id)
+					if r.status_code > 299:
+						print(r.json().get("detail"))
+						return
+			conn.commit()
+				
 
 # http server config ==========================================================
 class Product(BaseModel):
@@ -166,3 +214,27 @@ def create_product(prod: Product):
 @app.delete("/{p_id}")
 def delete_product(p_id: str):
 	product_delete(p_id)
+
+# get product suppliers
+@app.get("/suppliers/{s_id}")
+def read_suppliers(s_id: str):
+	data = productSuppliers_read(s_id)
+	return {"products": data}
+
+# associate supplier with product
+@app.post("/{p_id}/suppliers/{s_id}")
+def associate_product(p_id: str, s_id: str):
+	productSupplier_create(p_id, s_id)
+
+# disassociate supplier with product
+@app.delete("/{p_id}/suppliers/{s_id}")
+def delete_association(p_id: str, s_id: str):
+	productSupplier_delete(s_id, p_id)
+
+# dissasociate supplier with all products
+@app.delete("/suppliers/{s_id}")
+def delete_supplier(s_id: str):
+	try:
+		productSupplier_delete(s_id)
+	except Exception as ex:
+		raise HTTPException(status_code=400, detail=str(ex))

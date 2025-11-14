@@ -5,7 +5,11 @@ import uuid
 from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import requests
 import json
+
+# URLs ========================================================================
+product_url = "http://kong:8000/products/"
 
 # database connection =========================================================
 DB_CONFIG = {
@@ -97,46 +101,48 @@ def supplier_delete(supplier_id: str) -> None:
 		with conn.cursor() as c:
 			c.execute("DELETE FROM suppliers WHERE supplier_id = %s", (supplier_id,))
 			conn.commit()
+	r = requests.delete(product_url + "suppliers/" + supplier_id)
+	if r.status_code > 299:
+		print(r.json().get("detail"))
 
 # association =================================================================
-def supplierProduct_create(supplier_id: str, product_id: str) -> None:
-	with get_conn() as conn:
-		with conn.cursor() as cur:
-			cur.execute("""
-				INSERT INTO supplier_products (supplier_id, product_id)
-				VALUES (%s, %s)
-				ON CONFLICT DO NOTHING
-			""", (supplier_id, product_id))
-			conn.commit()
+# def supplierProduct_create(supplier_id: str, product_id: str) -> None:
+#	with get_conn() as conn:
+#		with conn.cursor() as cur:
+#				INSERT INTO supplier_products (supplier_id, product_id)
+#				VALUES (%s, %s)
+#				ON CONFLICT DO NOTHING
+#			""", (supplier_id, product_id))
+#			conn.commit()
 
-def supplierProducts_read(supplier_id: str) -> Optional[list]:
-	with get_conn() as conn:
-		with conn.cursor() as cur:
-			cur.execute("""
-				SELECT (product_id)
-				FROM supplier_products
-				WHERE supplier_id = %s
-			""", (supplier_id,))
-			rows = cur.fetchall()
-			ret = []
-			for data in rows:
-				ret.append(data)
-			return ret
+# def supplierProducts_read(supplier_id: str) -> Optional[list]:
+#	with get_conn() as conn:
+#		with conn.cursor() as cur:
+#			cur.execute("""
+#				SELECT (product_id)
+#				FROM supplier_products
+#				WHERE supplier_id = %s
+#			""", (supplier_id,))
+#			rows = cur.fetchall()
+#			ret = []
+#			for data in rows:
+#				ret.append(data)
+#			return ret
 
-def supplierProduct_delete(product_id: str, supplier_id: Optional[str] = None) -> None:
-	with get_conn() as conn:
-		with conn.cursor() as cur:
-			if (supplier_id == None):
-				cur.execute("""
-					DELETE FROM supplier_products 
-					WHERE product_id = %s
-				""", (product_id,))
-			else:
-				cur.execute("""
-					DELETE FROM supplier_products
-					WHERE supplier_id = %s AND product_id = %s
-				""", (supplier_id, product_id))
-			conn.commit()
+# def supplierProduct_delete(product_id: str, supplier_id: Optional[str] = None) -> None:
+#	with get_conn() as conn:
+#		with conn.cursor() as cur:
+#			if (supplier_id == None):
+#				cur.execute("""
+#					DELETE FROM supplier_products 
+#					WHERE product_id = %s
+#				""", (product_id,))
+#			else:
+#				cur.execute("""
+#					DELETE FROM supplier_products
+#					WHERE supplier_id = %s AND product_id = %s
+#				""", (supplier_id, product_id))
+#			conn.commit()
 
 # http server config ==========================================================
 class Supplier(BaseModel):
@@ -190,25 +196,25 @@ def delete_supplier(s_id: str):
 	supplier_delete(s_id)
 
 # get suppliers products
-@app.get("/{s_id}/products/")
-def read_products(s_id: str):
-	data = supplierProducts_read(s_id)
-	return {"products": data}
+# @app.get("/{s_id}/products/")
+# def read_products(s_id: str):
+#	data = supplierProducts_read(s_id)
+#	return {"products": data}
 
 # associate product with supplier
-@app.post("/{s_id}/products/{p_id}")
-def associate_product(s_id: str, p_id: str):
-	supplierProduct_create(s_id, p_id)
+# @app.post("/{s_id}/products/{p_id}")
+# def associate_product(s_id: str, p_id: str):
+#	supplierProduct_create(s_id, p_id)
 
 # disassociate product with supplier
-@app.delete("/{s_id}/products/{p_id}")
-def delete_association(s_id: str, p_id: str):
-	supplierProduct_delete(p_id, s_id)
+# @app.delete("/{s_id}/products/{p_id}")
+# def delete_association(s_id: str, p_id: str):
+#	supplierProduct_delete(p_id, s_id)
 
 # dissasociate product with all suppliers
-@app.delete("/products/{p_id}")
-def delete_product(p_id: str):
-	try:
-		supplierProduct_delete(p_id)
-	except Exception as ex:
-		raise HTTPException(status_code=400, detail=str(ex))
+# @app.delete("/products/{p_id}")
+# def delete_product(p_id: str):
+#	try:
+#		supplierProduct_delete(p_id)
+#	except Exception as ex:
+#		raise HTTPException(status_code=400, detail=str(ex))
