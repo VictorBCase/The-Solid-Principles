@@ -107,6 +107,19 @@ def product_update(product_id: str, name: str, description: str, quantity: int, 
 def product_delete(product_id: str) -> None:
 	with get_conn() as conn:
 		with conn.cursor() as c:
+			c.execute("""
+				WITH deleted AS (
+				DELETE FROM product_suppliers WHERE product_id = %s RETURNING supplier_id
+				) SELECT supplier_id FROM deleted WHERE supplier_id NOT IN (SELECT supplier_id FROM product_suppliers)
+			""", (product_id,))
+			rows = c.fetchall()
+			for row in rows:
+				print(row)
+				s_id = row[0]
+				r = requests.delete(supplier_url + '/' + s_id)
+				if r.status_code > 299:
+					print(r.json().get("detail"))
+					return
 			c.execute("DELETE FROM products WHERE product_id = %s", (product_id,))
 			conn.commit()
 	# r = requests.delete(supplier_url + "products/" + product_id)
@@ -136,7 +149,7 @@ def productSuppliers_read(supplier_id: str) -> Optional[list]:
 			rows = cur.fetchall()
 			ret = []
 			for data in rows:
-				ret.append(data)
+				ret.append(data[0])
 			return ret
 
 def productSupplier_delete(supplier_id: str, product_id: Optional[str] = None) -> None:
@@ -148,9 +161,11 @@ def productSupplier_delete(supplier_id: str, product_id: Optional[str] = None) -
 					WHERE supplier_id = %s
 				""", (supplier_id,))
 			else:
-				cur.execute("""WITH deleted AS (
+				cur.execute("""
+					WITH deleted AS (
 					DELETE FROM product_suppliers WHERE product_id = %s AND supplier_id = %s RETURNING supplier_id
-				) SELECT supplier_id FROM deleted WHERE supplier_id NOT IN (SELECT supplier_id FROM product_suppliers)""", (product_id, supplier_id,))
+					) SELECT supplier_id FROM deleted WHERE supplier_id NOT IN (SELECT supplier_id FROM product_suppliers)
+				""", (product_id, supplier_id,))
 				rows = cur.fetchall()
 				for row in rows:
 					print(row)
