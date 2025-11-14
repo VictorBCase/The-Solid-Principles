@@ -9,7 +9,7 @@ PRODUCT_QUEUE = "product_queue"
 SUPPLIER_DLQ = "supplier_dlq"
 
 
-SUPPLIER_API =  "http://suppliers_service:8000/" # change using APi gateway if needed
+SUPPLIER_API =  "http://kong:8000/suppliers" # change using APi gateway if needed
 
 
 def validate_supplier_event(event: dict) -> bool:

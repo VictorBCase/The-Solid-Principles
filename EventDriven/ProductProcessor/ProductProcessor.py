@@ -7,7 +7,7 @@ RABBITMQ_HOST = "rabbitmq"
 PRODUCT_QUEUE = "product_queue"
 PRODUCT_DLQ = "product_dlq"
 
-PRODUCT_API = "http://products_service:8000/" # change to kong api if needed
+PRODUCT_API = "http://kong:8000/products" # change to kong api if needed
 
 
 def validate_product_event(event: dict) -> bool:
