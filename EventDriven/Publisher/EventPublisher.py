@@ -4,7 +4,7 @@ import time
 import pika
 
 EVENTS_DIR = "events"
-QUEUE_NAME = "intitial-events"
+QUEUE_NAME = "initial-events"
 
 
 def wait_for_rabbitmq():
@@ -27,7 +27,7 @@ def publish_events(channel):
         return
 
     files = sorted(f for f in os.listdir(EVENTS_DIR) if f.endswith(".json"))
-    print(f"Found {len(files)} event files.", flush=True)
+    print(f"Found {len(files)} event files.")
 
     for filename in files:
         filepath = os.path.join(EVENTS_DIR, filename)
@@ -44,8 +44,6 @@ def publish_events(channel):
                     content_type="application/json"
                 )
             )
-
-            print(f"Published event: {filename}", flush=True)
 
         except Exception as e:
             print(f"Error publishing {filename}: {e}")

@@ -3,4 +3,4 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY SupplierProcessor.py ./ 
-CMD ["python", "SupplierProcessor.py"]
+CMD ["python", "-u", "SupplierProcessor.py"]

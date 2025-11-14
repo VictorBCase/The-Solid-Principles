@@ -1,9 +1,10 @@
 import json
 import pika
 import requests
+import time
 
 RABBITMQ_HOST = "rabbitmq"
-SUPPLIER_QUEUE = "supplier_queue"
+SUPPLIER_QUEUE = "initial-events"
 PRODUCT_QUEUE = "product_queue"
 SUPPLIER_DLQ = "supplier_dlq"
 
@@ -68,7 +69,7 @@ def process_supplier(channel, method, properties, body):
             channel.basic_ack(delivery_tag=method.delivery_tag)
             return
 
-        supplier_id = resp.json()["sid"]
+        supplier_id = resp.json()["s_id"]
         print(f"supplier_id={supplier_id} is stored")
 
         # Go through each product event
@@ -87,16 +88,26 @@ def process_supplier(channel, method, properties, body):
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
     except Exception as e:
-        print("Error, sending to supplier DLQ")
+        print("Error, sending to supplier DLQ: ", e)
         send_to_dlq(channel, body)
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
+def wait_for_rabbitmq():
+    while True:
+        try:
+            print("Connecting to RabbitMQ...")
+            connection = pika.BlockingConnection(
+                pika.ConnectionParameters(host=RABBITMQ_HOST)
+            )
+            print("Connected to RabbitMQ!")
+            return connection
+        except Exception as e:
+            print(f"RabbitMQ not ready: {e}")
+            time.sleep(2)
 
 def start_supplier_processor():
 
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host=RABBITMQ_HOST)
-    )
+    connection = wait_for_rabbitmq()
 
     channel = connection.channel()
 
