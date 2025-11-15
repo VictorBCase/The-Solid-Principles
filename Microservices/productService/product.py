@@ -108,18 +108,18 @@ def product_delete(product_id: str) -> None:
 	with get_conn() as conn:
 		with conn.cursor() as c:
 			c.execute("""
-				WITH deleted AS (
-				DELETE FROM product_suppliers WHERE product_id = %s RETURNING supplier_id
-				) SELECT supplier_id FROM deleted WHERE supplier_id NOT IN (SELECT supplier_id FROM product_suppliers)
+				SELECT supplier_id, COUNT(supplier_id) FROM product_suppliers WHERE supplier_id IN (
+				SELECT supplier_id FROM product_suppliers WHERE product_id = %s
+				) GROUP BY supplier_id
 			""", (product_id,))
 			rows = c.fetchall()
 			for row in rows:
-				print(row)
-				s_id = row[0]
-				r = requests.delete(supplier_url + '/' + s_id)
-				if r.status_code > 299:
-					print(r.json().get("detail"))
-					return
+				count = row[1]
+				if count == 1:
+					r = requests.delete(supplier_url + '/' + row[0])
+					if r.status_code > 299:
+						print(r.json().get("detail"))
+						return
 			c.execute("DELETE FROM products WHERE product_id = %s", (product_id,))
 			conn.commit()
 	# r = requests.delete(supplier_url + "products/" + product_id)
@@ -162,20 +162,19 @@ def productSupplier_delete(supplier_id: str, product_id: Optional[str] = None) -
 				""", (supplier_id,))
 			else:
 				cur.execute("""
-					WITH deleted AS (
-					DELETE FROM product_suppliers WHERE product_id = %s AND supplier_id = %s RETURNING supplier_id
-					) SELECT supplier_id FROM deleted WHERE supplier_id NOT IN (SELECT supplier_id FROM product_suppliers)
-				""", (product_id, supplier_id,))
-				rows = cur.fetchall()
-				for row in rows:
-					print(row)
-					s_id = row[0]
-					r = requests.delete(supplier_url + '/' + s_id)
+					SELECT COUNT(*) FROM product_suppliers WHERE supplier_id = %s
+				""", (supplier_id,))
+				count = cur.fetchone()[0]
+				if count == 1:
+					r = requests.delete(supplier_url + '/' + supplier_id)
 					if r.status_code > 299:
 						print(r.json().get("detail"))
 						return
-			conn.commit()
-				
+				cur.execute("""
+					DELETE FROM product_suppliers 
+					WHERE supplier_id = %s AND product_id = %s
+				""", (supplier_id, product_id,))
+			conn.commit()		
 
 # http server config ==========================================================
 class Product(BaseModel):
